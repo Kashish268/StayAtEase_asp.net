@@ -20,3 +20,50 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+/* Ensure navbar uses flex layout */
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+}
+
+/* Logo Styling */
+.nav-logo {
+    height: 50px; /* Adjust size */
+    width: auto;
+    max-width: 100%;
+}
+
+/* Align content to the right */
+.navbar-nav {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Space between items */
+}
+
+/* Style the login button */
+.btn-primary {
+    background: linear-gradient(to right, #1E3C72, #2A5298);
+    border: none;
+    padding: 8px 20px;
+    font-weight: bold;
+    border-radius: 5px;
+    transition: background 0.3s ease-in-out;
+}
+
+    .btn-primary:hover {
+        background: linear-gradient(to right, #2A5298, #1E3C72);
+    }
+
+/* Ensure responsiveness */
+@media (max-width: 768px) {
+    .navbar-collapse {
+        justify-content: center;
+    }
+
+    .nav-logo {
+        height: 40px; /* Smaller logo on mobile */
+    }
+}
