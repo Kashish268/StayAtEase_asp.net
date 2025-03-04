@@ -23,24 +23,29 @@ body {
 
 /* Ensure navbar uses flex layout */
 .navbar {
+    letter-spacing:1px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 20px;
+    padding: 7px 7px;
+    font-weight:600;
+    font-size:larger;
+
 }
 
 /* Logo Styling */
 .nav-logo {
     height: 50px; /* Adjust size */
-    width: auto;
+    width: fit-content;
     max-width: 100%;
+    margin-left: 20px; /* Moves logo 20px to the right */
 }
 
 /* Align content to the right */
 .navbar-nav {
     display: flex;
     align-items: center;
-    gap: 15px; /* Space between items */
+    gap: 25px; /* Space between items */
 }
 
 /* Style the login button */
@@ -64,6 +69,168 @@ body {
     }
 
     .nav-logo {
-        height: 40px; /* Smaller logo on mobile */
+        height: 45px; /* Smaller logo on mobile */
+        width:45px;
     }
+}
+/* Default styling for navbar links */
+.navbar-nav .nav-item .nav-link {
+    color: #111827; /* Default text color */
+    font-weight: normal;
+    transition: color 0.3s ease-in-out, font-weight 0.3s ease-in-out, background 0.3s ease-in-out;
+}
+
+    /* Hover effect - background changes */
+    .navbar-nav .nav-item .nav-link:hover {
+        color: #2563EB !important; /* Dark blue text */
+        font-weight: bold;
+    }
+
+
+.navbar-nav .nav-item {
+    transition: transform 0.3s ease-in-out;
+}
+
+.navbar-nav .nav-item:hover {
+    transform: scale(1.1); /* Slight zoom effect */
+}
+
+    /* Active tab - text becomes bold and changes color */
+    .navbar-nav .nav-item .nav-link.active {
+        color: #2563EB !important; /* Dark blue text */
+        font-weight: bold;
+    }
+
+
+/*=================footer==================*/
+
+/* Footer Styling */
+/* Footer Styling */
+/* Footer Styling */
+footer {
+  background: #000;
+  padding: 0 0 30px 0;
+  color: #fff;
+  font-size: 14px;
+  margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+footer .footer-top {
+  background: #111;
+  padding: 60px 0 30px 0;
+}
+
+footer .footer-top .footer-info {
+  margin-bottom: 30px;
+}
+
+footer .footer-top .footer-info h3 {
+  font-size: 34px;
+  margin: 0 0 20px 0;
+  padding: 2px 0 2px 10px;
+  line-height: 1;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 700;
+  letter-spacing: 3px;
+  border-left: 4px solid rgb(244, 107, 44);
+  color: #fff;
+}
+
+footer .footer-top .footer-info p {
+  font-size: 14px;
+  line-height: 24px;
+  margin-bottom: 0;
+  font-family: "Montserrat", sans-serif;
+  color: #fff;
+}
+footer .footer-top .social-links a {
+  font-size: 18px;
+  display: inline-block;
+  background: #333;
+  color: #fff;
+  line-height: 1;
+  padding: 8px 0;
+  margin-right: 4px;
+  border-radius: 50%;
+  text-align: center;
+  width: 36px;
+  height: 36px;
+  transition: 0.3s ease;
+}
+
+footer .footer-top .social-links a:hover {
+  background: linear-gradient(45deg, rgb(233, 92, 26), rgb(232, 140, 3));
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(49, 47, 46, 0.5);
+}
+
+
+footer .footer-top h4 {
+  font-size: 14px;
+  font-weight: bold;
+  color: #fff;
+  text-transform: uppercase;
+  position: relative;
+  padding-bottom: 12px;
+}
+
+footer .footer-top h4::before,
+footer .footer-top h4::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 2px;
+}
+
+footer .footer-top h4::before {
+  right: 0;
+  background: #555;
+}
+
+footer .footer-top h4::after {
+  background: rgb(244, 107, 44);
+  width: 60px;
+}
+
+footer .footer-top .footer-links ul i {
+  padding-right: 8px;
+  color: #ddd;
+}
+footer .footer-top .footer-links ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+footer .footer-top .footer-links ul li {
+  border-bottom: 1px solid #333;
+  padding: 10px 0;
+}
+
+footer .footer-top .footer-links ul li:first-child {
+  padding-top: 0;
+}
+
+footer .footer-top .footer-links ul a {
+  color: #eee;
+  text-decoration: none;  Remove underline 
+}
+
+footer .footer-top .footer-links ul a:hover {
+  color: rgb(244, 107, 44);  Change hover color to your preference 
+}
+
+
+footer .copyright {
+  text-align: center;
+  padding-top: 30px;
+  color: #fff;
+}
+
+footer .credits {
+  text-align: center;
+  font-size: 13px;
+  color: #ddd;
 }

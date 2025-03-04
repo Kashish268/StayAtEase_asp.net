@@ -15,16 +15,19 @@ namespace WebApplication1.Controllers
 
         public IActionResult Index()
         {
+            ViewData["ActivePage"] = "Home";
             return View();
         }
 
         public IActionResult Privacy()
         {
+            ViewData["ActivePage"] = "Privacy";
             return View();
         }
 
         public IActionResult WishList()
         {
+            ViewData["ActivePage"] = "WishList";
             return View();
         }
 
