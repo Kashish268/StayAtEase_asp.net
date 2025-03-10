@@ -1,6 +1,92 @@
 ﻿@{
     ViewData["Title"] = "Privacy";
 }
-<h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+
+<div class="p-5" style="background-color:#F9FAFB;">
+    <h2 class="fw-bold" style="letter-spacing:0.1px; margin-left:12px;">Find Your Perfect Stay</h2>
+    <p style="letter-spacing:0.1px; margin-left:12px;color:#64748B;">Browse through our curated collection of properties</p>
+
+    <!-- Search & Filters Section -->
+    <div class="search-filters d-flex flex-wrap align-items-center justify-content-between gap-2 mt-3 mb-3 p-3 bg-light rounded">
+        <!-- Left Side: Search Bar, Dropdown & Price Range -->
+        <div class="d-flex flex-wrap align-items-center gap-3 flex-grow-1">
+            <input type="text" class="form-control search-input" placeholder="Search..." style="max-width: 350px; min-width: 220px;">
+
+            <select class="form-select search-input" style="max-width: 200px; min-width: 150px;">
+                <option selected>🏠 Property Type</option>
+                <option>Apartment</option>
+                <option>House</option>
+                <option>Villa</option>
+            </select>
+
+            <div class="d-flex align-items-center">
+                <label class="me-2 fw-bold">Price:</label>
+                <input type="range" min="500" max="10000" step="500" class="form-range" style="width: 150px;">
+                <span id="priceValue" class="ms-2 fw-bold">₹500</span>
+            </div>
+        </div>
+
+        <!-- Right Side: Buttons -->
+        <div class="d-flex flex-wrap gap-2">
+            <button class="btn btn-outline-primary filter-btn" onclick="toggleActive(this)">New</button>
+            <button class="btn btn-outline-primary filter-btn" onclick="toggleActive(this)">Price Ascending</button>
+            <button class="btn btn-outline-primary filter-btn" onclick="toggleActive(this)">Price Descending</button>
+        </div>
+    </div>
+    @* <div class="container"> *@
+    
+        <div class="row g-4">
+            @foreach (var property in new[]
+            {
+            new {Image="property1.jpg", Title="Luxury Beachfront Villa", Location="Miami Beach, Florida", Beds="4", Baths="3", Size="2800 sqft", Price="₹1,950/month", Rating="4.3", Reviews="124"},
+            new {Image="property2.jpg", Title="Modern Luxury Apartment", Location="Downtown, New York", Beds="3", Baths="2", Size="2200 sqft", Price="₹2,500/month", Rating="4.8", Reviews="98"},
+            new {Image="property3.jpg", Title="Cozy Studio Apartment", Location="Brooklyn, New York", Beds="1", Baths="1", Size="900 sqft", Price="₹1,800/month", Rating="4.5", Reviews="67"},
+            new {Image="property4.jpg", Title="Spacious Family Home", Location="Los Angeles, California", Beds="5", Baths="4", Size="3500 sqft", Price="₹3,200/month", Rating="4.7", Reviews="142"},
+            new {Image="property5.jpg", Title="Penthouse Suite", Location="San Francisco, California", Beds="3", Baths="3", Size="2800 sqft", Price="₹4,500/month", Rating="4.9", Reviews="189"},
+            new {Image="property6.jpg", Title="Lakeview Cabin", Location="Austin, Texas", Beds="2", Baths="1", Size="1500 sqft", Price="₹2,100/month", Rating="4.6", Reviews="75"},
+            new {Image="property7.jpg", Title="Modern Condo", Location="Seattle, Washington", Beds="2", Baths="2", Size="1300 sqft", Price="₹2,700/month", Rating="4.5", Reviews="88"},
+            new {Image="property8.jpg", Title="Luxury Townhouse", Location="Chicago, Illinois", Beds="4", Baths="3", Size="2600 sqft", Price="₹3,800/month", Rating="4.7", Reviews="112"},
+            new {Image="property9.jpg", Title="Garden Apartment", Location="Boston, Massachusetts", Beds="2", Baths="2", Size="1100 sqft", Price="₹2,300/month", Rating="4.4", Reviews="69"}
+            })
+            {
+                <div class="col-md-4">
+                    <div class="card shadow-sm">
+                        <!-- Property Image -->
+                        <img src="@property.Image" class="card-img-top" alt="Property Image">
+
+                        <!-- Like Button -->
+                        <button class="like-btn position-absolute top-0 end-0 m-2">
+                            <i class="fa fa-heart"></i>
+                        </button>
+
+                        <!-- Card Body -->
+                        <div class="card-body">
+                            <h5 class="card-title">@property.Title</h5>
+                            <p class="text-muted">📍 @property.Location</p>
+
+                            <!-- Property Features -->
+                            <div class="d-flex align-items-center mb-2">
+                                <span class="me-3"><i class="fa fa-bed"></i> @property.Beds beds</span>
+                                <span class="me-3"><i class="fa fa-bath"></i> @property.Baths baths</span>
+                                <span><i class="fa fa-expand"></i> @property.Size</span>
+                            </div>
+
+                            <!-- Rating -->
+                            <div class="d-flex align-items-center mb-2">
+                                <span class="text-warning me-2">⭐ @property.Rating</span>
+                                <small class="text-muted">(@property.Reviews)</small>
+                            </div>
+
+                            <!-- Price -->
+                            <h6 class="text-primary fw-bold">@property.Price</h6>
+
+                            <!-- View Details Button -->
+                            <a href="#" class="btn btn-primary w-100 mt-2">View Details</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
