@@ -85,4 +85,26 @@ $(document).ready(function () {
     });     
 });
 
+//=========liked button================
 
+
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".like-btn").forEach(button => {
+        button.addEventListener("click", function () {
+            this.classList.toggle("liked");
+        });
+    });
+});
+
+//============Filter button===============//
+
+function toggleActive(button) {
+    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+    button.classList.add('active');
+}
+
+//============price====================//
+
+document.querySelector('.form-range').addEventListener('input', function () {
+    document.getElementById('priceValue').innerText = '₹' + this.value;
+});

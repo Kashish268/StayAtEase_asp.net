@@ -2,7 +2,136 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome StayAtEase</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="hero d-flex align-items-center justify-content-center text-center">
+    <div class="overlay"></div>
+    <div class="container content">
+        <h1 class="fw-bold text-white mb-4" style="letter-spacing:1px;">Find Your Perfect Home</h1>
+        <div class="search-container p-4 rounded shadow-lg d-inline-block">
+            <div class="d-flex flex-wrap justify-content-center">
+                <select class="form-select me-2 mb-2 search-input">
+                    <option selected>📍 Location</option>
+                    <option>New York</option>
+                    <option>Los Angeles</option>
+                    <option>Chicago</option>
+                </select>
+                <select class="form-select me-2 mb-2 search-input">
+                    <option selected>🏠 Property Type</option>
+                    <option>Apartment</option>
+                    <option>House</option>
+                    <option>Villa</option>
+                </select>
+                <select class="form-select me-2 mb-2 search-input">
+                    <option selected>💰 Budget</option>
+                    <option>$100k - $300k</option>
+                    <option>$300k - $600k</option>
+                    <option>$600k+</option>
+                </select>
+                <button class="btn btn-primary search-button">Search</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Featured Properties Section -->
+<div class="p-5" style="background-color:#F9FAFB;">
+    <div class="d-flex justify-content-between align-items-center mb-4" style="padding-left:10px; padding-right:10px;">
+        <h2 class="fw-bold mt-3" style="letter-spacing:0.1px;">Featured Properties</h2>
+        <button href="#" class="btn btn-outline-primary" style="background-color:#1A237E;color:white;border-color:#1A237E">View All</button>
+    </div>
+    <div class="row g-4">
+        @foreach (var property in new[]
+        {
+        new {Image="property1.jpg", Title="Modern Luxury Apartment", Location="Downtown, New York", Price="$2,500/month", Rating="4.8"},
+        new {Image="property2.jpg", Title="Cozy Studio Apartment", Location="Brooklyn, New York", Price="$1,800/month", Rating="4.5"},
+        new {Image="property3.jpg", Title="Spacious Family Home", Location="Queens, New York", Price="$3,200/month", Rating="4.9"},
+        new {Image="property4.jpg", Title="Penthouse with City View", Location="Manhattan, New York", Price="$5,000/month", Rating="4.7"},
+        new {Image="property5.jpg", Title="Garden Apartment", Location="Staten Island, New York", Price="$2,200/month", Rating="4.6"},
+        new {Image="property6.jpg", Title="Historic Brownstone", Location="Brooklyn Heights, New York", Price="$4,500/month", Rating="4.8"}
+        })
+        {
+            <div class="col-md-4">
+                <div class="card shadow-sm">
+                    <img src="@property.Image" class="card-img-top" alt="Property Image">
+                    <button class="like-btn position-absolute top-0 end-0 m-2">
+                        <i class="fa fa-heart"></i>
+                    </button>
+                    <div class="card-body">
+                        <h5 class="card-title">@property.Title</h5>
+                        <p class="text-muted">📍 @property.Location</p>
+                        <h6 class="text-primary fw-bold">@property.Price</h6>
+                        <p class="text-warning">⭐ @property.Rating</p>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="card about-card">
+    <div class="row g-0 align-items-center">
+        <div class="col-md-7 p-5">
+            <div class="card-body">
+                <h2 class="card-title" style="letter-spacing:0.7px;">About StayAtEase</h2>
+                <p class="card-text" style="letter-spacing:0.5px;">
+                    StayAtEase is a hassle-free platform for finding the perfect home or listing your property for rent.
+                    Whether you're a tenant looking for a cozy place or an owner wanting to rent out your space,
+                    we provide a smooth and secure experience.
+                </p>
+                <a href="#" class="btn btn-primary">Explore Listings</a>
+            </div>
+        </div>
+        <div class="col-md-5">
+            <img src="assets/image.png" class="img-fluid rounded-end about-image" alt="StayAtEase">
+        </div>
+    </div>
+</div>
+
+<div class="my-5 py-5" style="background-color:#F9FAFB;">
+    <h2 class="text-center fw-bold mb-4">Why Choose StayAtEase?</h2>
+    <div class="container pb-3">
+        <div class="row g-4 px-3">
+            <div class="col-md-4 col-sm-6">
+                <div class="feature-card">
+                    <i class="fa fa-check-circle feature-icon"></i>
+                    <h5>Verified Listings</h5>
+                    <p>Ensuring only genuine properties are listed.</p>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6">
+                <div class="feature-card">
+                    <i class="fa fa-comments feature-icon"></i>
+                    <h5>Secure Communication</h5>
+                    <p>Chat directly with property owners.</p>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6">
+                <div class="feature-card">
+                    <i class="fa fa-search feature-icon"></i>
+                    <h5>Easy Search & Filters</h5>
+                    <p>Find your ideal home in seconds.</p>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6">
+                <div class="feature-card">
+                    <i class="fa fa-bookmark feature-icon"></i>
+                    <h5>Wishlist Feature</h5>
+                    <p>Save properties for later.</p>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6">
+                <div class="feature-card">
+                    <i class="fa fa-star feature-icon"></i>
+                    <h5>Reviews & Ratings</h5>
+                    <p>Honest feedback from previous tenants.</p>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6">
+                <div class="feature-card">
+                    <i class="fa fa-shield-alt feature-icon"></i>
+                    <h5>Secure Platform</h5>
+                    <p>Your safety is our priority.</p>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
