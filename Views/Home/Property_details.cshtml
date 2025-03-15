@@ -1,0 +1,396 @@
+﻿@{
+    ViewData["Title"] = "Property_details";
+}
+
+<div class="property-info custom-property">
+    <!-- Image & Details Row -->
+    <div class="row align-items-start">
+        
+        <!-- Main Image Column -->
+        <div class="col-md-8">
+            <div class="main-image-container">
+                <img src="~/assets/Property1.jpg" class="img-fluid w-100 mb-3" 
+                     alt="Main Property Image" style="max-height: 500px; object-fit: cover;">
+            </div>
+        </div>
+
+        <!-- Small Images Column -->
+        <div class="col-md-4 d-flex flex-column">
+            <img src="~/assets/Property4.jpg" class="img-fluid mb-3" 
+                 alt="Image 1" style="max-height: 240px; object-fit: cover;">
+            <span class="custom-image-container">
+                <img src="~/assets/Property2.jpg" class="img-fluid mb-3 open-slider"
+                     alt="Image 2" style="max-height: 240px; object-fit: cover; "
+                     data-bs-target="#imageModal" data-bs-slide-to="0">
+                <span class="custom-overlay">+ 7 more</span>
+            </span>
+            @* <img src="~/assets/Property3.jpg" class="img-fluid mb-3"  *@
+            @*      alt="Image 3" style="max-height: 100px; object-fit: cover;"> *@
+            @* <img src="~/assets/Property5.jpg" class="img-fluid mb-3"  *@
+            @*      alt="Image 4" style="max-height: 100px; object-fit: cover;"> *@
+        </div>
+    </div>
+
+    <!-- Property Details & Agent Section -->
+    <div class="row mt-4">
+        
+        <!-- Property Details Column -->
+        <div class="col-md-8">
+            <h2 style="font-weight:600; letter-spacing:0.1px;">Luxury Apartment with City View</h2>
+            <p style="color:#4B5563;">123 Park Avenue, Mumbai, Maharashtra</p>
+            <h4 class="text-primary" style="font-weight:600;">₹45,000 / month</h4>
+            <p class="mt-2" style="color:#4B5563;">🛏 4 beds &nbsp; | &nbsp; 🛁 3 baths &nbsp; | &nbsp; 📏 2,450 sq ft</p>
+
+            <!-- Features & Amenities -->
+            <h5 class="mt-3 p-3" style="font-weight:600;">Features & Amenities</h5>
+            <div class="row" style="color:#4B5563;">
+                <div class="col-md-4">
+                    <p><i class="fas fa-wifi" style="color:#347AE2;"></i> High-speed WiFi</p>
+                    <p><i class="fas fa-swimming-pool" style="color:#347AE2;"></i> Swimming Pool</p>
+                    <p><i class="fas fa-shield-alt" style="color:#347AE2;"></i> 24/7 Security</p>
+                </div>
+                <div class="col-md-4">
+                    <p><i class="fas fa-car" style="color:#347AE2;"></i> Parking Space</p>
+                    <p><i class="fas fa-dumbbell" style="color:#347AE2;"></i> Fitness Center</p>
+                    <p><i class="fas fa-tv" style="color:#347AE2;"></i> Smart TV</p>
+                </div>
+                <div class="col-md-4">
+                    <p><i class="fas fa-utensils" style="color:#347AE2;"></i> Kitchen</p>
+                    <p><i class="fas fa-tshirt" style="color:#347AE2;"></i> Laundry</p>
+                </div>
+            </div>
+
+            <!-- About Property -->
+            <h5 class ="mt-3 p-3" style="font-weight:600;">
+                About this property</h5>
+            <p style="color:#4B5563; margin-left:12px; letter-spacing:0.2px;">
+                This stunning apartment offers modern living at its finest. With breathtaking city views, 
+                premium amenities, and a prime location, it's perfect for those seeking luxury and convenience.
+                The property features high-end finishes, spacious rooms, and state-of-the-art facilities.
+            </p>
+        </div>
+
+        <!-- Agent Contact Column -->
+        <div class="col-md-4">
+            <div class="agent-card p-3 border rounded shadow-sm">
+                <div class="d-flex align-items-center mb-3">
+                    <img src="~/assets/team-1.jpg" class="rounded-circle me-2" width="50" height="50" alt="Agent Image">
+                    <div>
+                        <h6 class="mb-0" style="font-weight:600">Michael Anderson</h6>
+                        <small style="color:#4B5563;">Senior Property Consultant</small>
+                    </div>
+                </div>
+                <button class="btn btn-primary w-100 mb-2">📞 Call Agent</button>
+                <button class="btn btn-outline-primary w-100 mb-2" data-bs-toggle="modal" data-bs-target="#inquiryModal">
+                    ✉️ Send Inquiry
+                </button>
+                <button class="btn btn-light w-100" data-bs-toggle="modal" data-bs-target="#reviewModal">
+                    ✍️ Write Review
+                </button>
+                <hr>
+                <h6 style="color:#4B5563;">Available Hours</h6>
+                <p class="mb-0" style="color:#4B5563;">Mon - Fri: 9:00 AM - 6:00 PM</p>
+                <p style="color:#4B5563;">Sat: 10:00 AM - 4:00 PM</p>
+            </div>
+        </div>
+
+    </div>
+
+
+
+
+
+    <div class="container-fluid bg-body-tertiary py-3">
+        <div id="testimonialCarousel" class="carousel">
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <div class="card shadow-sm rounded-3">
+                        <div class="quotes display-2 text-body-tertiary">
+                            <i class="bi bi-quote"></i>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">
+                                "Some quick example text to build on the card title and make up the
+                                bulk of the card's content."
+                            </p>
+                            <div class="d-flex align-items-center pt-2">
+                                <img src="~/assets/team-1.jpg" alt="bootstrap testimonial carousel slider 2">
+                                <div>
+                                    <h5 class="card-title fw-bold">Jane Doe</h5>
+                                    <span class="text-secondary">CEO, Example Company</span>
+                                    <div class="text-warning">
+                                        ★★★★☆
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="carousel-item active">
+                    <div class="card shadow-sm rounded-3">
+                        <div class="quotes display-2 text-body-tertiary">
+                            <i class="bi bi-quote"></i>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">
+                                "Some quick example text to build on the card title and make up the
+                                bulk of the card's content."
+                            </p>
+                            <div class="d-flex align-items-center pt-2">
+                                <img src="~/assets/team-2.jpg" alt="bootstrap testimonial carousel slider 2">
+                                <div>
+                                    <h5 class="card-title fw-bold">Jane Doe</h5>
+                                    <span class="text-secondary">CEO, Example Company</span>
+                                    <div class="text-warning">
+                                        ★★★★☆
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="carousel-item active">
+                    <div class="card shadow-sm rounded-3">
+                        <div class="quotes display-2 text-body-tertiary">
+                            <i class="bi bi-quote"></i>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">
+                                "Some quick example text to build on the card title and make up the
+                                bulk of the card's content."
+                            </p>
+                            <div class="d-flex align-items-center pt-2">
+                                <img src="~/assets/team-4.jpg" alt="bootstrap testimonial carousel slider 2">
+                                <div>
+                                    <h5 class="card-title fw-bold">Jane Doe</h5>
+                                    <span class="text-secondary">CEO, Example Company</span>
+                                    <div class="text-warning">
+                                        ★★★★☆
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="carousel-item active">
+                    <div class="card shadow-sm rounded-3">
+                        <div class="quotes display-2 text-body-tertiary">
+                            <i class="bi bi-quote"></i>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">
+                                "Some quick example text to build on the card title and make up the
+                                bulk of the card's content."
+                            </p>
+                            <div class="d-flex align-items-center pt-2">
+                                <img src="~/assets/testimonial-1.jpg" alt="bootstrap testimonial carousel slider 2">
+                                <div>
+                                    <h5 class="card-title fw-bold">Jane Doe</h5>
+                                    <span class="text-secondary">CEO, Example Company</span>
+                                    <div class="text-warning">
+                                        ★★★★☆
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <div class="card shadow-sm rounded-3">
+                        <div class="quotes display-2 text-body-tertiary">
+                            <i class="bi bi-quote"></i>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">
+                                "Some quick example text to build on the card title and make up the
+                                bulk of the card's content."
+                            </p>
+                            <div class="d-flex align-items-center pt-2">
+                                <img src="~/assets/testimonial-2.jpg" alt="bootstrap testimonial carousel slider 2">
+                                <div>
+                                    <h5 class="card-title fw-bold">June Doe</h5>
+                                    <span class="text-secondary">CEO, Example Company</span>
+                                    <div class="text-warning">
+                                        ★★★★★
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Repeat for remaining items -->
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+    </div>
+
+    </div>
+
+
+
+
+<div class="modal fade" id="inquiryModal" tabindex="-1" aria-labelledby="inquiryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content p-3" style="border-radius: 10px; max-width: 500px; margin: auto;">
+            <div class="modal-header border-0">
+                <h4 class="modal-title fw-bold" id="inquiryModalLabel">Send us an inquiry</h4>
+
+                <button type="button" class="btn-close position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+               
+                <form>
+                    <div class="mb-3">
+                        <label for="fullName" class="form-label fw-semibold">Full Name</label>
+                        <input type="text" class="form-control" id="fullName" placeholder="Enter your full name">
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label fw-semibold">Email Address</label>
+                        <input type="email" class="form-control" id="email" placeholder="Enter your email address">
+                    </div>
+                    <div class="mb-3">
+                        <label for="contactNo" class="form-label fw-semibold">Contact No</label>
+                        <input type="text" class="form-control" id="contactNo" placeholder="Enter your contact no">
+                    </div>
+                    <div class="mb-3">
+                        <label for="message" class="form-label fw-semibold">Your Message</label>
+                        <textarea class="form-control" id="message" rows="4" placeholder="Enter your message"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100" style="border-radius: 8px;">Send Inquiry</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    <!-- Corolsole popup -->
+<div class="modal fade" id="reviewModal" tabindex="-1" aria-labelledby="reviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content p-2" style="border-radius: 12px; max-width: 500px; margin: auto;">
+            <div class="modal-header border-0">
+                <h4 class="modal-title fw-bold" id="reviewModalLabel">Write Your Review</h4>
+                <button type="button" class="btn-close position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Rating Section -->
+                <label class="fw-semibold">Rating</label>
+                <div class="mb-3">
+                    <span class="star" onclick="setRating(1)" data-value="1">★</span>
+                    <span class="star" onclick="setRating(2)" data-value="2">★</span>
+                    <span class="star" onclick="setRating(3)" data-value="3">★</span>
+                    <span class="star" onclick="setRating(4)" data-value="4">★</span>
+                    <span class="star" onclick="setRating(5)" data-value="5">★</span>
+                </div>
+
+                <!-- Review Textarea -->
+                <div class="mb-3">
+                    <label for="reviewText" class="form-label fw-semibold">Your Review</label>
+                    <textarea class="form-control" id="reviewText" rows="4" placeholder="Share your experience..."></textarea>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="btn btn-primary w-100" style="border-radius: 8px;">Submit Review</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    <!-- Bootstrap Modal -->
+    <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="imageModalLabel">Image Gallery</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Carousel -->
+                    <div id="carouselExample" class="carousel slide" data-bs-ride="carousel">
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+                                <img src="~/assets/Property2.jpg" class="d-block w-100" alt="Image 2">
+                            </div>
+                            <div class="carousel-item">
+                                <img src="~/assets/Property4.jpg" class="d-block w-100" alt="Image 3">
+                            </div>
+                            <div class="carousel-item">
+                                <img src="~/assets/Property5.jpg" class="d-block w-100" alt="Image 4">
+                            </div>
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true" style="filter: brightness(0) saturate(100%) invert(15%) contrast(200%);"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true" style=" filter: brightness(0) saturate(100%) invert(15%) contrast(200%);"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+<!-- Reviews Section -->
+
+@* <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> *@
+   
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+
+        window.onload = function () {
+        console.log("✅ JavaScript Loaded!");
+
+        const thumbnails = document.querySelectorAll(".open-slider");
+        const modalElement = document.getElementById("imageModal");
+        const carouselElement = document.querySelector("#carouselExample");
+
+        if (!modalElement) {
+            console.error("❌ Modal element not found! Check ID in HTML.");
+            return;
+        }
+        if (!carouselElement) {
+            console.error("❌ Carousel element not found! Check ID in HTML.");
+            return;
+        }
+
+        console.log("✅ Modal and Carousel found!");
+
+        const modal = new bootstrap.Modal(modalElement);
+
+        thumbnails.forEach((thumb, index) => {
+            thumb.addEventListener("click", function () {
+                console.log(`🖼️ Thumbnail ${index} clicked`);
+                modal.show();
+                console.log("✅ Modal opened");
+
+                modalElement.addEventListener("shown.bs.modal", function () {
+                    console.log("✅ Modal fully shown");
+                    const carouselInstance = new bootstrap.Carousel(carouselElement);
+                    console.log(`🎠 Switching to slide ${index}`);
+                    carouselInstance.to(index);
+                }, { once: true });
+            });
+        });
+    };
+
+
+       
+
+
+
+</script>

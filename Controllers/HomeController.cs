@@ -31,15 +31,36 @@ namespace WebApplication1.Controllers
             return View();
         }
 
+        public IActionResult Property_details()
+        {
+            ViewData["ActivePage"] = "Property_details";
+            return View();
+        }
+
         public IActionResult Login()
         {
            return View();
         }
 
+        [HttpGet]
         public IActionResult Register()
         {
-            return View();
+            return PartialView("_Register", new RegisterViewModel());
+
         }
+
+        [HttpPost]
+        public IActionResult Register(RegisterViewModel model) {
+            if (!ModelState.IsValid)
+            {
+                return PartialView("_Register", model);
+            }
+
+                   return Json(new { success = true, message = "Registration successful!" });
+
+        }
+
+
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
