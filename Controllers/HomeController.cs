@@ -42,28 +42,28 @@ namespace WebApplication1.Controllers
            return View();
         }
 
-        [HttpGet]
+       
         public IActionResult Register()
         {
-            return PartialView("_Register", new RegisterViewModel());
+            return View();
 
         }
 
-        [HttpPost]
-        public IActionResult Register(RegisterViewModel model) {
-            if (!ModelState.IsValid)
-            {
-                return PartialView("_Register", model);
-            }
+        //    [HttpPost]
+        //    public IActionResult Register(RegisterViewModel model) {
+        //        if (!ModelState.IsValid)
+        //        {
+        //            return PartialView("Register", model);
+        //        }
 
-                   return Json(new { success = true, message = "Registration successful!" });
+        //               return Json(new { success = true, message = "Registration successful!" });
 
-        }
+        //    }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
+        //    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        //    public IActionResult Error()
+        //    {
+        //        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        //    }
     }
 }

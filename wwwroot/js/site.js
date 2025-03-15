@@ -16,6 +16,7 @@ $(document).ready(function () {
         });
     });
 
+
     // When "Login" is clicked inside the Register Modal
     $("#openLogin").click(function (event) {
         event.preventDefault();
@@ -159,5 +160,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 //================================//
+
 
 
