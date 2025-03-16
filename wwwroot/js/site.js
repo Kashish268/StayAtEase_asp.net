@@ -16,7 +16,6 @@ $(document).ready(function () {
         });
     });
 
-
     // When "Login" is clicked inside the Register Modal
     $("#openLogin").click(function (event) {
         event.preventDefault();
@@ -83,7 +82,7 @@ $(document).ready(function () {
                 alert("Error loading register form.");
             }
         });
-    });     
+    });
 });
 
 //=========liked button================
