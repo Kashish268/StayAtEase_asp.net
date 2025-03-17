@@ -82,7 +82,7 @@ $(document).ready(function () {
                 alert("Error loading register form.");
             }
         });
-    });     
+    });
 });
 
 //=========liked button================
@@ -105,6 +105,60 @@ function toggleActive(button) {
 
 //============price====================//
 
-document.querySelector('.form-range').addEventListener('input', function () {
-    document.getElementById('priceValue').innerText = '₹' + this.value;
+//document.querySelector('.form-range').addEventListener('input', function () {
+//    document.getElementById('priceValue').innerText = '₹' + this.value;
+//});
+
+//==========rating==================//
+
+function setRating(rating) {
+    let stars = document.querySelectorAll('.star');
+    stars.forEach((star, index) => {
+        if (index < rating) {
+            star.classList.add('selected');
+        } else {
+            star.classList.remove('selected');
+        }
+    });
+}
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    const multipleItemCarousel = document.querySelector("#testimonialCarousel");
+
+    if (window.matchMedia("(min-width: 576px)").matches) {
+        const carousel = new bootstrap.Carousel(multipleItemCarousel, {
+            interval: false,
+            wrap: false
+        });
+
+        let carouselInner = document.querySelector(".carousel-inner");
+        let carouselItems = document.querySelectorAll(".carousel-item");
+        let cardWidth = carouselItems[0].offsetWidth;
+        let scrollPosition = 0;
+
+        document.querySelector(".carousel-control-next").addEventListener("click", function () {
+            let maxScroll = carouselInner.scrollWidth - carouselInner.clientWidth;
+            if (scrollPosition < maxScroll) {
+                scrollPosition += cardWidth;
+                carouselInner.scrollTo({ left: scrollPosition, behavior: "smooth" });
+            }
+        });
+
+        document.querySelector(".carousel-control-prev").addEventListener("click", function () {
+            if (scrollPosition > 0) {
+                scrollPosition -= cardWidth;
+                carouselInner.scrollTo({ left: scrollPosition, behavior: "smooth" });
+            }
+        });
+
+    } else {
+        multipleItemCarousel.classList.add("slide");
+    }
 });
+
+
+//================================//
+
+
+
