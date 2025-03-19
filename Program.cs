@@ -24,4 +24,11 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
+// Route for Admin controller
+app.MapControllerRoute(
+    name: "admin",
+    pattern: "Account/{action=Dashboard}/{id?}",
+    defaults: new { controller = "Account", action = "Dashboard" }
+);
+
 app.Run();
