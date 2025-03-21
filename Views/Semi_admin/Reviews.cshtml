@@ -1,0 +1,78 @@
+﻿@model PropertyReviewViewModel
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Admin Dashboard";
+    ViewData["ActivePage"] = "Reviews";
+}
+
+<div class="container mx-auto p-6 px-7 mt-6">
+    <h2 class="text-2xl font-bold text-gray-800">Property Reviews</h2>
+    <p class="text-gray-500">Sunset Heights Apartments</p>
+
+    <!-- Search Bar -->
+    <form method="get" class="relative w-full max-w-md my-4">
+        <input type="text"
+               name="searchTerm"
+               class="border border-gray-300 rounded-full py-2 pl-4 pr-4 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full"
+               placeholder="Search reviews..."
+               value="@(Model?.SearchTerm ?? "")" />
+        <button type="submit" class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500">
+            🔍
+        </button>
+    </form>
+
+    <!-- Review Table -->
+    <div class="overflow-x-auto">
+        <table class="min-w-full">
+            <thead class="bg-gray-100 text-left">
+                <tr>
+                    <th class="p-3">Reviewer</th>
+                    <th class="p-3">Date</th>
+                    <th class="p-3">Rating</th>
+                    <th class="p-3">Review</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model?.Reviews != null && Model.Reviews.Any())
+                {
+                    @foreach (var review in Model.Reviews)
+                    {
+                        <tr class="even:bg-gray-50">
+                            <td class="p-3 flex items-center">
+                                <img src="@(review.Image ?? "https://via.placeholder.com/40")" alt="Reviewer" class="w-10 h-10 rounded-full mr-3" />
+                                <span class="font-medium">@review.Name</span>
+                            </td>
+                            <td class="p-3">@review.Date</td>
+                            <td class="p-3">@review.Rating</td>
+                            <td class="p-3">@review.Review</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="4" class="text-center text-gray-500 p-3">No reviews found.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="flex justify-between items-center mt-6 pb-6">
+        <p class="text-gray-500 text-sm">
+            Showing @(Math.Min(((Model?.CurrentPage ?? 1) - 1) * 5 + 1, Model?.TotalReviews ?? 0)) to @(Math.Min((Model?.CurrentPage ?? 1) * 5, Model?.TotalReviews ?? 0)) of @(Model?.TotalReviews ?? 0) reviews
+        </p>
+        <nav class="flex space-x-2">
+            <a asp-action="Index" asp-route-page="@((Model?.CurrentPage ?? 1) - 1)" asp-route-searchTerm="@(Model?.SearchTerm ?? "")"
+               class="px-4 py-2 text-gray-500 bg-gray-100 hover:bg-gray-200 rounded-lg @((Model?.CurrentPage ?? 1) == 1 ? "pointer-events-none opacity-50" : "")">
+                Previous
+            </a>
+            <span class="px-4 py-2 rounded-lg text-white bg-blue-500">@(Model?.CurrentPage ?? 1)</span>
+            <a asp-action="Index" asp-route-page="@((Model?.CurrentPage ?? 1) + 1)" asp-route-searchTerm="@(Model?.SearchTerm ?? "")"
+               class="px-4 py-2 text-gray-500 bg-gray-100 hover:bg-gray-200 rounded-lg @((Model?.CurrentPage ?? 1) == (Model?.TotalPages ?? 1) ? "pointer-events-none opacity-50" : "")">
+                Next
+            </a>
+        </nav>
+    </div>
+</div>

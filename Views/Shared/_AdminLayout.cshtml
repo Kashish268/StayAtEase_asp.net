@@ -39,6 +39,25 @@
                                 Add Properties
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewData["ActivePage"] == "Property_List" ? "active" : "")"
+                               asp-controller="Semi_admin" asp-action="Property_List">
+                                My List
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewData["ActivePage"] == "Reviews" ? "active" : "")"
+                               asp-controller="Semi_admin" asp-action="Reviews">
+                                Reviews
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewData["ActivePage"] == "Massages" ? "active" : "")"
+                               asp-controller="Semi_admin" asp-action="Messages">
+                               Messages
+                            </a>
+                        </li>
+
                         @* <li class="nav-item"> *@
                         @*     <a class="nav-link @(ViewData["ActivePage"] == "WishList" ? "active" : "")" asp-area="" asp-controller="Home" asp-action="WishList">My Listing</a> *@
                         @* </li> *@

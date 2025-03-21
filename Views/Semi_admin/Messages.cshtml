@@ -1,0 +1,94 @@
+﻿@model PropertyMessageViewModel
+
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Admin Dashboard";
+    ViewData["ActivePage"] = "Messages";
+}
+
+<div class="container mx-auto mt-6 p-6">
+    <h3 class="font-bold text-xl my-4 py-2">All Property Messages</h3>
+
+    <!-- Search Bar -->
+    <div class="relative mb-4">
+        <span class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">🔍</span>
+        <input type="text"
+               id="searchInput"
+               class="w-full border-gray-300 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring focus:ring-blue-200"
+               placeholder="Search messages..."
+               onkeyup="filterMessages()">
+    </div>
+
+    <!-- Table -->
+    <div class="overflow-x-auto">
+        <table class="min-w-full border">
+            <thead class="bg-gray-100 text-left">
+                <tr>
+                    <th class="p-3 border">Guest Name</th>
+                    <th class="p-3 border">Property Id</th>
+                    <th class="p-3 border">Email Address</th>
+                    <th class="p-3 border">Contact No</th>
+                    <th class="p-3 border">Message</th>
+                </tr>
+            </thead>
+            <tbody id="messagesTable">
+                @if (Model?.PagedMessages != null && Model.PagedMessages.Any())
+                {
+                    @foreach (var msg in Model.PagedMessages)
+                    {
+                        <tr class="border even:bg-gray-50 hover:bg-gray-50">
+                            <td class="p-3 border">@msg.Name</td>
+                            <td class="p-3 border">@msg.PropertyId</td>
+                            <td class="p-3 border">@msg.Email</td>
+                            <td class="p-3 border">@msg.Contact</td>
+                            <td class="p-3 border">@msg.Message</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="5" class="text-center text-gray-500 p-4">No messages found.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    @if (Model != null && Model.TotalPages > 1)
+    {
+        <div class="flex justify-between items-center mt-6 pb-6">
+            <p class="text-gray-500 text-sm">
+                Showing @Model.FirstItemIndex to @Model.LastItemIndex of @Model.TotalMessages messages
+            </p>
+
+            <nav class="flex space-x-2">
+                <a asp-action="Index" asp-route-page="@(Model.CurrentPage - 1)"
+                   class="px-4 py-2 text-gray-500 bg-gray-100 hover:bg-gray-200 disabled:opacity-50 rounded-lg @(Model.CurrentPage == 1 ? "pointer-events-none opacity-50" : "")">
+                    Previous
+                </a>
+                <span class="px-4 py-2 rounded-lg text-white bg-blue-500">@Model.CurrentPage</span>
+                <a asp-action="Index" asp-route-page="@(Model.CurrentPage + 1)"
+                   class="px-4 py-2 text-gray-500 bg-gray-100 hover:bg-gray-200 disabled:opacity-50 rounded-lg @(Model.CurrentPage == Model.TotalPages ? "pointer-events-none opacity-50" : "")">
+                    Next
+                </a>
+            </nav>
+        </div>
+    }
+</div>
+
+<script>
+    function filterMessages() {
+        let input = document.getElementById("searchInput").value.toLowerCase();
+        let rows = document.getElementById("messagesTable").getElementsByTagName("tr");
+
+        for (let i = 0; i < rows.length; i++) {
+            let nameCell = rows[i].getElementsByTagName("td")[0];
+            if (nameCell) {
+                let nameText = nameCell.textContent || nameCell.innerText;
+                rows[i].style.display = nameText.toLowerCase().indexOf(input) > -1 ? "" : "none";
+            }
+        }
+    }
+</script>

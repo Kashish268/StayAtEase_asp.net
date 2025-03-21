@@ -1,0 +1,100 @@
+﻿
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Admin Dashboard";
+    ViewData["ActivePage"] = "Property_List";
+   
+}
+
+@model MyListingsViewModel
+
+
+<div class="container mx-auto p-6 px-7 mt-6">
+    <h2 class="text-2xl font-bold text-gray-800">My Listings</h2>
+
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-3 gap-6 my-6">
+        <div class="p-5 bg-white shadow rounded-lg text-center">
+            <p class="text-gray-500">Total Properties</p>
+            <h3 class="text-2xl font-bold">@Model.TotalProperties</h3>
+        </div>
+        <div class="p-5 bg-white shadow rounded-lg text-center">
+            <p class="text-gray-500">Active Listings</p>
+            <h3 class="text-2xl font-bold">@Model.ActiveListings</h3>
+        </div>
+        <div class="p-5 bg-white shadow rounded-lg text-center">
+            <p class="text-gray-500">Inquiries</p>
+            <h3 class="text-2xl font-bold">@Model.TotalInquiries</h3>
+        </div>
+    </div>
+
+    <!-- Search Bar -->
+    <form method="get" class="relative w-full max-w-md my-4">
+        <input type="text"
+               name="searchTerm"
+               class="border border-gray-300 rounded-full py-2 pl-4 pr-4 w-full"
+               placeholder="Search properties..."
+               value="@Model.SearchTerm" />
+        <button type="submit" class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500">🔍</button>
+    </form>
+
+    <!-- Add Property Button -->
+    <div class="flex justify-end mb-4">
+        <a asp-action="AddProperty" class="bg-blue-500 text-white px-4 py-2 rounded-lg">+ Add Property</a>
+    </div>
+
+    <!-- Listings Table -->
+    <div class="overflow-x-auto">
+        <table class="min-w-full bg-white shadow rounded-lg">
+            <thead class="bg-gray-100 text-left">
+                <tr>
+                    <th class="p-3">Image</th>
+                    <th class="p-3">Title</th>
+                    <th class="p-3">Price / month</th>
+                    <th class="p-3">Area(sq ft)</th>
+                    <th class="p-3">Address</th>
+                    <th class="p-3">Status</th>
+                    <th class="p-3">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Properties != null && Model.Properties.Any())
+                {
+                    @foreach (var property in Model.Properties)
+                    {
+                        <tr class="even:bg-gray-50">
+                            <td class="p-3">
+                                <img src="@(property.ImageUrl ?? "https://via.placeholder.com/50")" alt="Property" class="w-16 h-16 rounded-lg" />
+                            </td>
+                            <td class="p-3">@property.Title</td>
+                            <td class="p-3 font-bold text-gray-800">₹ @property.Price</td>
+                            <td class="p-3">@property.Area sq ft</td>
+                            <td class="p-3">@property.Address</td>
+                            <td class="p-3">
+                                <span class="px-3 py-1 rounded-full text-white @(property.IsAvailable ? "bg-green-500" : "bg-red-500")">
+                                    @(property.IsAvailable ? "Available" : "Unavailable")
+                                </span>
+                            </td>
+                            <td class="p-3">
+                                <a asp-action="ViewProperty" asp-route-id="@property.Id" class="bg-blue-500 text-white px-4 py-2 rounded-lg">View</a>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="7" class="text-center text-gray-500 p-3">No properties found.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="mt-10 bg-gray-100 p-6 text-center text-gray-600">
+    <p>© 2025 StayAtEasy. All Rights Reserved.</p>
+</footer>
+
+
