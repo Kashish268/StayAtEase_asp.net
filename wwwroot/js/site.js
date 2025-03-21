@@ -55,8 +55,8 @@ $(document).ready(function () {
 
     $("#openLoginModal").click(function () {
         $.ajax({
-            url: "/Home/Login",  // Call the Login action in HomeController
-            type: "GET",
+            url: "/Account/Login",  // Call the Login action in HomeController
+            type: "POST",
             success: function (data) {
                 $("#loginContent").html(data); // Inject response into modal
                 $("#loginModal").modal("show"); // Show the modal

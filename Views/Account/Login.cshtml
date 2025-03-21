@@ -1,0 +1,21 @@
+﻿@model LoginModel
+@{
+    Layout = null;  // This ensures it's loaded as a partial view
+}
+
+<form method="post" asp-controller="Account" asp-action="Login">
+    <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input type="email" asp-for="Email" class="form-control" id="email" placeholder="Enter your email" name="Email">
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <input type="password" asp-for="Password" class="form-control" id="password" placeholder="Enter your password" name="Password">
+        <span asp-validation-for="Password" class="text-danger"></span>
+
+    </div>
+
+    <button type="submit" class="btn btn-primary" style="width:100%;" name="submit">Login</button>
+    
+</form>

@@ -34,16 +34,32 @@ namespace WebApplication1.Controllers
 
         public IActionResult Property_details()
         {
-            ViewData["ActivePage"] = "Property_details";
+            ViewData["ActivePage"] = "Privacy";
             return View();
         }
 
-        public IActionResult Login()
-        {
-            return View();
-        }
+        //public IActionResult Dashboard() { 
+        //    return View();
+        //}
 
+        //[HttpGet]
+        //public IActionResult Login()
+        //{
+        //    return View();
+        //}
 
+        //[HttpPost]
+        //public IActionResult Login(LoginModel model)
+        //{
+        //    if (model.Email == "admin@gmail.com" && model.Password == "111")
+        //    {
+        //        Console.WriteLine("Login Successfull");
+        //        return RedirectToAction("Dashboard", "Semi_admin");
+        //    }
+
+        //    ViewBag.Error = "Invalid";
+        //    return View();
+        //}
         public IActionResult Register()
         {
             return View();
