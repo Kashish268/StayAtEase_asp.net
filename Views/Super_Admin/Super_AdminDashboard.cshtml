@@ -1,10 +1,13 @@
 ﻿
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
 @{
-    Layout = "_SuperAdminLayout";
-    ViewData["Title"] = "Super Admin Dashboard";
-    ViewData["ActivePage"] = "Super_AdminDashboard"; // Ensure ActivePage is set
 }
-
+@{
+    ViewBag.Title = "Super Admin Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
 
 <link rel="stylesheet" href="~/Content/site.css" />
 
@@ -119,38 +122,25 @@
             <h4>Latest Reviews</h4>
             <a href="#" class="sad-view-all">View All</a>
         </div>
-        <!-- Reviews Section -->
         <div class="sad-reviews-container">
             <div class="sad-review-card">
-                <img src="profile1.jpg" alt="User Profile" class="sad-review-profile">
-                <div class="sad-review-content">
-                    <h5>John Doe</h5>
-                    <span class="sad-review-date">March 20, 2025</span>
-                    <p>Great platform! Found my rental easily.</p>
-                    <small>⭐⭐⭐⭐⭐</small>
-                </div>
+                <h5>John Smith</h5>
+                <span class="sad-review-date">Feb 10, 2024</span>
+                <p>⭐⭐⭐⭐⭐ Amazing property with stunning views. Highly recommended!</p>
+                <small>Lakefront Cottage</small>
             </div>
-
             <div class="sad-review-card">
-                <img src="profile2.jpg" alt="User Profile" class="sad-review-profile">
-                <div class="sad-review-content">
-                    <h5>Sarah Smith</h5>
-                    <span class="sad-review-date">March 18, 2025</span>
-                    <p>Very user-friendly and smooth experience.</p>
-                    <small>⭐⭐⭐⭐</small>
-                </div>
+                <h5>Lisa Anderson</h5>
+                <span class="sad-review-date">Feb 8, 2024</span>
+                <p>⭐⭐⭐⭐⭐ Great location and comfortable stay. Would visit again.</p>
+                <small>Downtown Loft</small>
             </div>
-
             <div class="sad-review-card">
-                <img src="profile3.jpg" alt="User Profile" class="sad-review-profile">
-                <div class="sad-review-content">
-                    <h5>Michael Lee</h5>
-                    <span class="sad-review-date">March 15, 2025</span>
-                    <p>Customer support was really helpful.</p>
-                    <small>⭐⭐⭐⭐⭐</small>
-                </div>
+                <h5>David Wilson</h5>
+                <span class="sad-review-date">Feb 7, 2024</span>
+                <p>⭐⭐⭐⭐⭐  Perfect getaway spot. Everything was exactly as described.</p>
+                <small>Mountain View Cabin</small>
             </div>
         </div>
+    </div>
 </div>
-
-
