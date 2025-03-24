@@ -10,7 +10,15 @@ namespace WebApplication1.Controllers
     {
         public IActionResult Super_AdminDashboard()
         {
-            
+            ViewData["ActivePage"] = "Super_AdminDashboard";
+
+
+            return View();
+        }
+
+        public IActionResult Total_User()
+        {
+            ViewData["ActivePage"] = "Total_User";
             return View();
         }
     }

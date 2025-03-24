@@ -1,0 +1,152 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@{
+    ViewBag.Title = "Super Admin Dashboard";
+    Layout = "~/Views/Shared/_SuperAdminLayout.cshtml";
+}
+
+<link rel="stylesheet" href="~/Content/site.css" />
+
+
+<body>
+    <div class="total-users-container">
+        <h2 class="total-users-title">Total Users</h2>
+
+        <div class="total-users-wrapper">
+            <input type="text" class="total-users-search" placeholder="🔍 Search users...">
+
+            <div class="total-users-table-container">
+                <table class="total-users-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Mobile</th>
+                            <th>Last Activity</th>
+                            <th>Created</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>
+                                <div class="total-users-info">
+                                    <img src="admin.jpg" alt="Admin" class="total-users-profile-pic">
+                                    <div>
+                                        <strong>Admin</strong>
+                                        <p>admin@example.com</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>+1 888 888 8888</td>
+                            <td>2 mins ago</td>
+                            <td>30 Sep 2023</td>
+                            <td><span class="total-users-status active">Active</span></td>
+                            <td>
+                                <button class="total-users-action-btn edit"><i class="fas fa-edit"></i></button>
+                                <button class="total-users-action-btn delete"><i class="fas fa-trash-alt"></i></button>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>2</td>
+                            <td>
+                                <div class="total-users-info">
+                                    <img src="admin.jpg" alt="Admin" class="total-users-profile-pic">
+                                    <div>
+                                        <strong>Admin</strong>
+                                        <p>admin@example.com</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>+1 888 888 8888</td>
+                            <td>2 mins ago</td>
+                            <td>30 Sep 2023</td>
+                            <td><span class="total-users-status active">Active</span></td>
+                            <td>
+                                <button class="total-users-action-btn edit"><i class="fas fa-edit"></i></button>
+                                <button class="total-users-action-btn delete"><i class="fas fa-trash-alt"></i></button>
+                            </td>
+                        </tr>
+
+                         <tr>
+                            <td>3</td>
+                            <td>
+                                <div class="total-users-info">
+                                    <img src="admin.jpg" alt="Admin" class="total-users-profile-pic">
+                                    <div>
+                                        <strong>Admin</strong>
+                                        <p>admin@example.com</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>+1 888 888 8888</td>
+                            <td>2 mins ago</td>
+                            <td>30 Sep 2023</td>
+                            <td><span class="total-users-status active">Active</span></td>
+                            <td>
+                                <button class="total-users-action-btn edit"><i class="fas fa-edit"></i></button>
+                                <button class="total-users-action-btn delete"><i class="fas fa-trash-alt"></i></button>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>4</td>
+                            <td>
+                                <div class="total-users-info">
+                                    <img src="admin.jpg" alt="Admin" class="total-users-profile-pic">
+                                    <div>
+                                        <strong>Admin</strong>
+                                        <p>admin@example.com</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>+1 888 888 8888</td>
+                            <td>2 mins ago</td>
+                            <td>30 Sep 2023</td>
+                            <td><span class="total-users-status active">Active</span></td>
+                            <td>
+                                <button class="total-users-action-btn edit"><i class="fas fa-edit"></i></button>
+                                <button class="total-users-action-btn delete"><i class="fas fa-trash-alt"></i></button>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>5</td>
+                            <td>
+                                <div class="total-users-info">
+                                    <img src="admin.jpg" alt="Admin" class="total-users-profile-pic">
+                                    <div>
+                                        <strong>Admin</strong>
+                                        <p>admin@example.com</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>+1 888 888 8888</td>
+                            <td>2 mins ago</td>
+                            <td>30 Sep 2023</td>
+                            <td><span class="total-users-status active">Active</span></td>
+                            <td>
+                                <button class="total-users-action-btn edit"><i class="fas fa-edit"></i></button>
+                                <button class="total-users-action-btn delete"><i class="fas fa-trash-alt"></i></button>
+                            </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="total-users-pagination">
+            <span>1 - 3 of 3 items</span>
+            <button class="total-users-pagination-btn">1</button>
+        </div>
+    </div>
+</body>
+
+

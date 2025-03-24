@@ -889,3 +889,147 @@ footer {
         flex-direction: column;
     }
 }
+/*------------total_user--------------------------------*/
+
+/* Total Users Dashboard */
+.total-users-container {
+    max-width: 90%;
+    margin: auto;
+    font-family: 'Arial', sans-serif;
+    background: #fff;
+    padding: 20px;
+}
+
+/* Title */
+.total-users-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+/* Search Bar */
+.total-users-search {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    font-size: 16px;
+}
+
+/* Table Wrapper */
+.total-users-table-container {
+    overflow-x: auto;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Table Styles */
+.total-users-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px;
+}
+
+    .total-users-table th,
+    .total-users-table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .total-users-table th {
+        background: #f4f6f9;
+        font-weight: bold;
+    }
+
+    .total-users-table tbody tr:hover {
+        background: #f9f9f9;
+    }
+
+/* Profile Picture & Name */
+.total-users-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.total-users-profile-pic {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+/* Status Badge */
+.total-users-status {
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+    .total-users-status.active {
+        background: #e7f9ee;
+        color: #28a745;
+    }
+
+/* Online Indicator */
+.total-users-online {
+    color: green;
+    font-weight: bold;
+}
+
+/* Action Buttons */
+.total-users-action-btn {
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    margin-right: 8px;
+}
+
+    .total-users-action-btn.edit {
+        color: #007bff;
+    }
+
+    .total-users-action-btn.delete {
+        color: #dc3545;
+    }
+
+/* Pagination */
+.total-users-pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 10px;
+}
+
+.total-users-pagination-btn {
+    background: #007bff;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .total-users-table-container {
+        overflow-x: auto;
+    }
+
+    .total-users-table {
+        width: 100%;
+    }
+
+    .total-users-container {
+        max-width: 100%;
+        padding: 10px;
+    }
+
+    .total-users-pagination {
+        flex-direction: column;
+        gap: 5px;
+    }
+}
