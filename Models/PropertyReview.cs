@@ -2,12 +2,16 @@
 {
     public class PropertyReview
     {
-        public int Id { get; set; }
+        public int Id { get; set; }  // Ensure Id is an integer
         public string Name { get; set; }
         public string Date { get; set; }
-        public string Rating { get; set; }
-        public string Review { get; set; }
-        public string Image { get; set; }
+        public int Rating { get; set; }  // Change Rating to an integer
+        public string Text { get; set; }
+        public string Property { get; set; } 
+        public string ImageUrl { get; set; }
+ 
+ 
+
     }
 
     public class PropertyReviewViewModel
@@ -16,6 +20,7 @@
         public string SearchTerm { get; set; }
         public int CurrentPage { get; set; }
         public int TotalPages { get; set; }
+        public string Property { get; set; }
         public int TotalReviews { get; set; }
     }
 }

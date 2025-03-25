@@ -7,8 +7,26 @@ namespace WebApplication1.Controllers
     {
         public IActionResult Dashboard()
         {
-            ViewData["ActivePage"] = "Semi_AdminDashboard";
-            return View();
+            var model = new DashboardViewModel
+            {
+                TotalProperties = 24,
+                ActiveListings = 18,
+                TotalInquiries = 156,
+                ReviewRating = 4.8,
+                Messages = new List<PropertyMessageViewModel>
+                {
+                    new PropertyMessageViewModel { Name = "Sarah Johnson", PropertyId = "P_101", Email = "sarahjohnson@gmail.com", Contact = "1236547890", Message = "Are there any restrictions on lease agreements?" },
+                    new PropertyMessageViewModel { Name = "Michael Brown", PropertyId = "P_102", Email = "michaelbrown@gmail.com", Contact = "9874563210", Message = "Are there any restrictions on lease agreements?" },
+                    new PropertyMessageViewModel { Name = "Emma Davis", PropertyId = "P_103", Email = "emmadavis@gmail.com", Contact = "7410258963", Message = "What documents are required for booking?" }
+                },
+                Reviews = new List<PropertyReview>
+                {
+                    new PropertyReview { Name = "John Smith", Date = "Feb 10, 2024", Rating = 5, Text = "Amazing property with stunning views. Highly recommended!", Property = "Lakefront Cottage", ImageUrl = "/images/user1.jpg" },
+                    new PropertyReview { Name = "Lisa Anderson", Date = "Feb 8, 2024", Rating = 4, Text = "Great location and comfortable stay. Would visit again.", Property = "Downtown Loft", ImageUrl = "/images/user2.jpg" },
+                    new PropertyReview { Name = "David Wilson", Date = "Feb 7, 2024", Rating = 5, Text = "Perfect getaway spot. Everything was exactly as described.", Property = "Mountain View Cabin", ImageUrl = "/images/user3.jpg" }
+                }
+            };
+            return View("Dashboard", model);
         }
 
         public IActionResult Add_Properties() { 
