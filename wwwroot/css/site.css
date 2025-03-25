@@ -21,6 +21,7 @@ body {
     font-family: "Open Sans", sans-serif;
     /*  margin-bottom: 60px;*/
     padding-top: 70px; /* Adjust based on navbar height */
+    background-color :whitesmoke; 
 }
 
 /* Ensure navbar uses flex layout */
@@ -666,7 +667,7 @@ footer {
         color: white;
         font-size: 14px;
         padding: 5px 10px;
-        border-radius: 3px;
+        border-radius: 5px;
     }
 
 
@@ -715,7 +716,7 @@ h2 {
     form input {
         width: 100%;
         padding: 10px 15px;
-        border: 1px solid #ccc;
+        
         border-radius: 25px;
         font-size: 14px;
     }

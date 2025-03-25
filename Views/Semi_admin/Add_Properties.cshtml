@@ -9,7 +9,7 @@
 
 <div class="container mt-5">
     <div class="card p-4 shadow-sm">
-        <h2 class="text-center mb-4">Add New Property</h2>
+        <h2 class="text-left mb-4">Add New Property</h2>
         <form asp-action="Create" method="post" enctype="multipart/form-data">
             <div class="mb-3">
                 <label class="form-label fw-bold">Property Title</label>
@@ -61,8 +61,9 @@
 
             <!-- Amenities with Icons -->
             <div class="mb-3">
-                <label class="form-label fw-bold"><i class="fas fa-list me-2"></i>Amenities</label>
-                <div class="row">
+                <label class="form-label fw-bold">Amenities</label>
+                <div class="row gy-3">
+                    <!-- Added 'gy-3' for row spacing -->
                     @foreach (var amenity in new List<(string, string)>{
                     ("WiFi", "fa-wifi"), ("Parking Space", "fa-car"),
                     ("Fitness Center", "fa-dumbbell"), ("Swimming Pool", "fa-person-swimming"),
@@ -82,14 +83,15 @@
                 </div>
             </div>
 
-            <div class="mb-3 text-center">
-                <label class="form-label fw-bold"></i>Property Images</label>
-                <div class="border p-4 rounded bg-light text-center" style="cursor: pointer;">
-                    <i class="fas fa-cloud-upload-alt fs-3"></i>
+
+            <div class="mb-3 text-left">
+                <label class="form-label fw-bold "></i>Property Images</label>
+                <div class=" p-4 rounded  text-center" style="cursor: pointer;">
+                    <i class="fas fa-cloud-upload-alt bg-light fs-3"></i>
                     <p>Drag & drop images here or click to upload</p>
                     <p class="text-muted">Maximum 8 images allowed</p>
                     <input type="file" asp-for="Images" multiple class="form-control d-none" accept="image/*">
-                    <button type="button" class="btn btn-outline-primary mt-2">Select Files</button>
+                    <button type="button" class="btn btn-light mt-2">Select Files</button>
                 </div>
             </div>
             <div class="text-center">

@@ -55,7 +55,7 @@ namespace WebApplication1.Controllers
                 Area = 1200,
                 Address = "Downtown, City",
                 IsAvailable = true,
-                ImageUrl = "https://via.placeholder.com/50"
+                ImageUrl = "/assets/Property1.jpg"
             },
             new PropertyViewModel
             {
@@ -65,7 +65,7 @@ namespace WebApplication1.Controllers
                 Area = 2000,
                 Address = "Uptown, City",
                 IsAvailable = false,
-                ImageUrl = "https://via.placeholder.com/50"
+                ImageUrl = "/assets/Property2.jpg"
             }
         }
             };

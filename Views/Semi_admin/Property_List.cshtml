@@ -11,41 +11,76 @@
 
     <!-- Summary Cards -->
     <div class="row mb-4">
+        <!-- Total Properties -->
         <div class="col-md-4">
-            <div class="card text-center p-3">
-                <p class="text-muted">Total Properties</p>
+            <div class="card text-left p-3">
+                <p class="text-muted d-flex justify-content-between align-items-center">
+                    Total Properties
+                    <i class="fas fa-home text-primary"></i>
+                </p>
                 <h3>@Model.TotalProperties</h3>
             </div>
         </div>
+
+        <!-- Active Listings -->
         <div class="col-md-4">
-            <div class="card text-center p-3">
-                <p class="text-muted">Active Listings</p>
+            <div class="card text-left p-3">
+                <p class="text-muted d-flex justify-content-between align-items-center">
+                    Active Listings
+                    <i class="fas fa-chart-bar text-primary"></i>
+                </p>
                 <h3>@Model.ActiveListings</h3>
             </div>
         </div>
+
+        <!-- Inquiries -->
         <div class="col-md-4">
-            <div class="card text-center p-3">
-                <p class="text-muted">Inquiries</p>
+            <div class="card text-left p-3">
+                <p class="text-muted d-flex justify-content-between align-items-center">
+                    Inquiries
+                    <i class="fas fa-calendar-alt text-primary"></i>
+                </p>
                 <h3>@Model.TotalInquiries</h3>
             </div>
         </div>
     </div>
 
+
     <!-- Search Bar and Add Property Button -->
-    <div class="d-flex justify-content-between align-items-center p-3  mb-3 rounded">
+    <div class="d-flex justify-content-between align-items-center p-3 mb-3 rounded shadow-sm bg-white">
+        <!-- Search Form -->
         <form method="get" class="flex-grow-1 me-3">
             <div class="input-group">
-                <input type="text" name="searchTerm" class="form-control" placeholder="Search properties..." value="@Model.SearchTerm">
-                <button class="btn btn-outline-secondary" type="submit">🔍</button>
+                <span class="input-group-text bg-transparent border-0">
+                    <i class="fas fa-search text-muted"></i>
+                </span>
+                <input type="text" name="searchTerm" class="form-control border-0" placeholder="Search properties..." value="@Model.SearchTerm">
             </div>
         </form>
-        <a asp-action="AddProperty" class="btn btn-primary">+ Add Property</a>
+
+        <!-- Filter Dropdown -->
+        <div class="dropdown me-3">
+            <button class="btn btn-light border dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">
+                All
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="filterDropdown">
+                <li><a class="dropdown-item" href="?filter=all">All</a></li>
+                <li><a class="dropdown-item" href="?filter=available">Available</a></li>
+                <li><a class="dropdown-item" href="?filter=unavailable">Unavailable</a></li>
+            </ul>
+        </div>
+
+
+        <!-- Add Property Button -->
+        <a asp-action="AddProperty" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add Property
+        </a>
     </div>
 
+
     <!-- Listings Table -->
-    <div class="d-flex >
     <div class="table-responsive">
-        <table class="table  table-hover">
+        <table class="table align-middle table-hover">
             <thead class="table-light">
                 <tr>
                     <th>Image</th>
@@ -63,20 +98,39 @@
                     @foreach (var property in Model.Properties)
                     {
                         <tr>
+                            <!-- Property Image -->
                             <td>
-                                <img src="@(property.ImageUrl ?? "https://via.placeholder.com/50")" alt="Property" class="img-thumbnail" width="50">
+                                <img src="@(property.ImageUrl ?? "https://via.placeholder.com/70")"
+                                     alt="Property" class="rounded img-fluid" width="70">
                             </td>
-                            <td>@property.Title</td>
-                            <td><strong>₹ @property.Price</strong></td>
-                            <td>@property.Area sq ft</td>
-                            <td>@property.Address</td>
+
+                            <!-- Property Title -->
                             <td>
-                                <span class="badge @(property.IsAvailable ? "bg-success" : "bg-danger")">
+                                <div class="fw-semibold">@property.Title</div>
+                                <small class="text-muted">ID: @property.Id</small>
+                            </td>
+
+                            <!-- Price -->
+                            <td class="fw-bold">₹ @property.Price</td>
+
+                            <!-- Area -->
+                            <td>@property.Area sq ft</td>
+
+                            <!-- Address -->
+                            <td>@property.Address</td>
+
+                            <!-- Status -->
+                            <td>
+                                <span class="badge @(property.IsAvailable ? "text-success bg-success bg-opacity-10" : "text-danger bg-danger bg-opacity-10")">
                                     @(property.IsAvailable ? "Available" : "Unavailable")
                                 </span>
                             </td>
+
+                            <!-- Action -->
                             <td>
-                                <a asp-action="ViewProperty" asp-route-id="@property.Id" class="btn btn-sm btn-primary">View</a>
+                                <a asp-action="ViewProperty" asp-route-id="@property.Id" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-eye"></i> View
+                                </a>
                             </td>
                         </tr>
                     }
@@ -90,8 +144,9 @@
             </tbody>
         </table>
     </div>
-</div>
+
 </div>
 
-<!-- Footer -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 
