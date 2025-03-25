@@ -5,8 +5,10 @@
         public int TotalProperties { get; set; }
         public int ActiveListings { get; set; }
         public int TotalInquiries { get; set; }
-        public string? SearchTerm { get; set; }
-        public List<PropertyViewModel> Properties { get; set; } = new();
+        public string SearchTerm { get; set; }
+        public List<PropertyViewModel> Properties { get; set; } = new List<PropertyViewModel>(); // Ensure it's never null
     }
 
-}
+    }
+
+
