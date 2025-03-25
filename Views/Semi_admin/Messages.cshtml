@@ -1,9 +1,28 @@
-﻿@model PropertyMessageViewModel
-
-@{
+﻿@{
     Layout = "_AdminLayout";
     ViewData["Title"] = "Admin Dashboard";
     ViewData["ActivePage"] = "Messages";
+}
+
+@* Static List of Messages *@
+@functions {
+    public class PropertyMessage
+    {
+        public string Name { get; set; }
+        public string PropertyId { get; set; }
+        public string Email { get; set; }
+        public string Contact { get; set; }
+        public string Message { get; set; }
+    }
+
+    List<PropertyMessage> messages = new List<PropertyMessage>
+    {
+        new PropertyMessage { Name = "Sarah Johnson", PropertyId = "P-101", Email = "sarah@example.com", Contact = "1234567890", Message = "Is this property still available?" },
+        new PropertyMessage { Name = "Michael Brown", PropertyId = "P-102", Email = "michael@example.com", Contact = "9876543210", Message = "Can I schedule a visit?" },
+        new PropertyMessage { Name = "Victoria Gibson", PropertyId = "P-103", Email = "victoria@example.com", Contact = "9182736450", Message = "What are the lease terms?" },
+        new PropertyMessage { Name = "Ethan Wilson", PropertyId = "P-104", Email = "ethan@example.com", Contact = "5647382910", Message = "Are there any nearby schools?" },
+        new PropertyMessage { Name = "Robert Johnson", PropertyId = "P-105", Email = "robert@example.com", Contact = "1122334455", Message = "What is the security deposit?" }
+    };
 }
 
 <div class="container mx-auto mt-6 p-6">
@@ -24,58 +43,27 @@
         <table class="min-w-full border">
             <thead class="bg-gray-100 text-left">
                 <tr>
-                    <th class="p-3 border">Guest Name</th>
-                    <th class="p-3 border">Property Id</th>
-                    <th class="p-3 border">Email Address</th>
-                    <th class="p-3 border">Contact No</th>
-                    <th class="p-3 border">Message</th>
+                    <th class="p-3 ">Guest Name</th>
+                    <th class="p-3 ">Property Id</th>
+                    <th class="p-3 ">Email Address</th>
+                    <th class="p-3 ">Contact No</th>
+                    <th class="p-3 ">Message</th>
                 </tr>
             </thead>
             <tbody id="messagesTable">
-                @if (Model?.PagedMessages != null && Model.PagedMessages.Any())
+                @foreach (var msg in messages)
                 {
-                    @foreach (var msg in Model.PagedMessages)
-                    {
-                        <tr class="border even:bg-gray-50 hover:bg-gray-50">
-                            <td class="p-3 border">@msg.Name</td>
-                            <td class="p-3 border">@msg.PropertyId</td>
-                            <td class="p-3 border">@msg.Email</td>
-                            <td class="p-3 border">@msg.Contact</td>
-                            <td class="p-3 border">@msg.Message</td>
-                        </tr>
-                    }
-                }
-                else
-                {
-                    <tr>
-                        <td colspan="5" class="text-center text-gray-500 p-4">No messages found.</td>
+                    <tr class="border even:bg-gray-50 hover:bg-gray-50">
+                        <td class="p-3 ">@msg.Name</td>
+                        <td class="p-3 ">@msg.PropertyId</td>
+                        <td class="p-3 ">@msg.Email</td>
+                        <td class="p-3 ">@msg.Contact</td>
+                        <td class="p-3 ">@msg.Message</td>
                     </tr>
                 }
             </tbody>
         </table>
     </div>
-
-    <!-- Pagination -->
-    @if (Model != null && Model.TotalPages > 1)
-    {
-        <div class="flex justify-between items-center mt-6 pb-6">
-            <p class="text-gray-500 text-sm">
-                Showing @Model.FirstItemIndex to @Model.LastItemIndex of @Model.TotalMessages messages
-            </p>
-
-            <nav class="flex space-x-2">
-                <a asp-action="Index" asp-route-page="@(Model.CurrentPage - 1)"
-                   class="px-4 py-2 text-gray-500 bg-gray-100 hover:bg-gray-200 disabled:opacity-50 rounded-lg @(Model.CurrentPage == 1 ? "pointer-events-none opacity-50" : "")">
-                    Previous
-                </a>
-                <span class="px-4 py-2 rounded-lg text-white bg-blue-500">@Model.CurrentPage</span>
-                <a asp-action="Index" asp-route-page="@(Model.CurrentPage + 1)"
-                   class="px-4 py-2 text-gray-500 bg-gray-100 hover:bg-gray-200 disabled:opacity-50 rounded-lg @(Model.CurrentPage == Model.TotalPages ? "pointer-events-none opacity-50" : "")">
-                    Next
-                </a>
-            </nav>
-        </div>
-    }
 </div>
 
 <script>

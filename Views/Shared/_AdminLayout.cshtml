@@ -60,6 +60,18 @@
                                Messages
                             </a>
                         </li>
+                        <li class="profile-container">
+                            <a class="nav-link @(ViewData["ActivePage"] == "MyProfile" ? "active" : "")"
+                               asp-controller="Semi_admin" asp-action="MyProfile">
+                                <img src="/profile.png" class="profile-image" alt="User" />
+                            </a>
+                            <li />
+                            <li >
+                            <a class="nav-link @(ViewData["ActivePage"] == "Home" ? "active" : "")" asp-area="" asp-controller="Home" asp-action="Index">
+                                <i class="fas fa-sign-out-alt"></i> <!-- Font Awesome Logout Icon -->
+                            </a>
+                        </l>
+
 
                         @* <li class="nav-item"> *@
                         @*     <a class="nav-link @(ViewData["ActivePage"] == "WishList" ? "active" : "")" asp-area="" asp-controller="Home" asp-action="WishList">My Listing</a> *@

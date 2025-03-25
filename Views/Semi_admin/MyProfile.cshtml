@@ -1,0 +1,96 @@
+﻿
+
+@model ProfileDetailsViewModel
+
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "MyProfile";
+}
+
+<div class="container">
+    <h2 class="title">Profile Details</h2>
+
+    <!-- Profile Image -->
+    <div class="profile-image-section">
+        <img src="@Model.ProfileImageUrl" alt="Profile" class="profile-image" />
+        <label class="file-upload">
+            Change Picture
+            <input type="file" name="profileImage" onchange="previewImage(event)" />
+        </label>
+    </div>
+
+    <form method="post" class="profile-form">
+        <h3 class="section-title">Profile Details</h3>
+        <div class="grid-container">
+            <div>
+                <label>First Name</label>
+                <input type="text" name="FirstName" value="@Model.FirstName" />
+            </div>
+            <div>
+                <label>Last Name</label>
+                <input type="text" name="LastName" value="@Model.LastName" />
+            </div>
+            <div>
+                <label>Email Address</label>
+                <input type="email" name="Email" value="@Model.Email" />
+            </div>
+            <div>
+                <label>Phone Number</label>
+                <input type="text" name="Phone" value="@Model.Phone" />
+            </div>
+            <div>
+                <label>Location</label>
+                <input type="text" name="Location" value="@Model.Location" />
+            </div>
+            <div>
+                <label>Time Zone</label>
+                <input type="text" name="Timezone" value="@Model.Timezone" />
+            </div>
+        </div>
+
+        <div>
+            <label>Bio</label>
+            <textarea name="Bio">@Model.Bio</textarea>
+        </div>
+
+        <button type="submit" class="save-button">Save Changes</button>
+    </form>
+
+    <!-- Change Password Section -->
+    <div class="change-password">
+        <h3 class="section-title">Change Password</h3>
+        <form method="post">
+            <div>
+                <label>Current Password</label>
+                <input type="password" name="CurrentPassword" />
+            </div>
+            <div>
+                <label>New Password</label>
+                <input type="password" name="NewPassword" />
+            </div>
+            <div>
+                <label>Confirm Password</label>
+                <input type="password" name="ConfirmPassword" />
+            </div>
+            <button type="submit" class="save-button">Update Password</button>
+        </form>
+    </div>
+
+    <!-- Logout Section -->
+    <div class="logout-section">
+        <p>End your current session and sign out securely</p>
+        <button class="logout-button">Logout</button>
+    </div>
+</div>
+
+<script>
+    function previewImage(event) {
+        const reader = new FileReader();
+        reader.onload = function () {
+            document.querySelector(".profile-image").src = reader.result;
+        };
+        reader.readAsDataURL(event.target.files[0]);
+    }
+</script>
+
+
