@@ -210,7 +210,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     <td><span class="total-users-status ${user.status.toLowerCase()}">${user.status}</span></td>
                     <td>
                         <button class="total-users-action-btn edit"><i class="fas fa-edit"></i></button>
-                        <button class="total-users-action-btn delete"><i class="fas fa-trash-alt"></i></button>
+                        <button class="total-users-action-btn delete"><i class="fas fa-trash"></i></button>
                     </td>
                 </tr>
             `;
@@ -259,7 +259,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
-
     const pageSize = 4;
     let currentPage = 1;
 
@@ -288,7 +287,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     <td><span class="total-users-status ${admin.status.toLowerCase()}">${admin.status}</span></td>
                     <td>
                         <button class="total-users-action-btn edit"><i class="fas fa-edit"></i></button>
-                        <button class="total-users-action-btn delete"><i class="fas fa-trash-alt"></i></button>
+                        <button class="total-users-action-btn delete"><i class="fas fa-trash"></i></button>
                     </td>
                 </tr>
             `;
@@ -316,4 +315,167 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     renderTable();
+});
+
+
+//---------------------------- property reviews ---------------------------
+
+document.addEventListener("DOMContentLoaded", function () {
+    const reviews = [
+        { propertyId: 101, title: "Luxury Apartment", reviewer: "John Smith", date: "Feb 15, 2024", rating: 5, review: "Great property with excellent amenities.", profilePic: "https://randomuser.me/api/portraits/men/1.jpg" },
+        { propertyId: 102, title: "Cozy Condo", reviewer: "Emma Wilson", date: "Feb 14, 2024", rating: 5, review: "Absolutely love living here!", profilePic: "https://randomuser.me/api/portraits/women/2.jpg" },
+        { propertyId: 103, title: "Spacious Home", reviewer: "Michael Brown", date: "Feb 13, 2024", rating: 4, review: "Good value for money.", profilePic: "https://randomuser.me/api/portraits/men/3.jpg" },
+        { propertyId: 104, title: "Modern Studio", reviewer: "Sarah Davis", date: "Feb 12, 2024", rating: 5, review: "Beautiful property with great views.", profilePic: "https://randomuser.me/api/portraits/women/4.jpg" },
+        { propertyId: 105, title: "Green Villas", reviewer: "Robert Johnson", date: "Feb 11, 2024", rating: 3, review: "Decent place, could improve on noise insulation.", profilePic: "https://randomuser.me/api/portraits/men/5.jpg" },
+        { propertyId: 106, title: "Skyline Residences", reviewer: "Lisa Anderson", date: "Feb 10, 2024", rating: 5, review: "Exceptional property management!", profilePic: "https://randomuser.me/api/portraits/women/6.jpg" },
+        { propertyId: 107, title: "Seaside Apartments", reviewer: "David Wilson", date: "Feb 9, 2024", rating: 5, review: "Great community events and friendly neighbors.", profilePic: "https://randomuser.me/api/portraits/men/7.jpg" },
+        { propertyId: 108, title: "The Grand Suites", reviewer: "Jennifer Taylor", date: "Feb 8, 2024", rating: 5, review: "Modern apartments with great features.", profilePic: "https://randomuser.me/api/portraits/women/8.jpg" },
+        { propertyId: 109, title: "Hilltop Haven", reviewer: "James Martinez", date: "Feb 7, 2024", rating: 4, review: "Good location but parking can be a challenge.", profilePic: "https://randomuser.me/api/portraits/men/9.jpg" },
+        { propertyId: 110, title: "Urban Oasis", reviewer: "Patricia Thomas", date: "Feb 6, 2024", rating: 5, review: "Excellent property! Friendly staff and well-maintained.", profilePic: "https://randomuser.me/api/portraits/women/10.jpg" }
+    ];
+
+    const tableBody = document.getElementById("reviewsTableBody");
+    const paginationButtons = document.getElementById("pagination-buttons");
+    const paginationInfo = document.getElementById("pagination-info");
+
+    let currentPage = 1;
+    const rowsPerPage = 6;
+
+    function displayReviews() {
+        tableBody.innerHTML = "";
+
+        const start = (currentPage - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+        const paginatedReviews = reviews.slice(start, end);
+
+        paginatedReviews.forEach(review => {
+            const row = document.createElement("tr");
+
+            row.innerHTML = `
+                <td>${review.propertyId}</td>
+                <td>${review.title}</td>
+                <td class="total-users-info">
+                    <img src="${review.profilePic}" alt="${review.reviewer}" class="total-users-profile-pic">
+                    ${review.reviewer}
+                </td>
+                <td>${review.date}</td>
+                <td>${generateStars(review.rating)}</td>
+                <td>${review.review}</td>
+                <td><button class="total-users-action-btn delete"><i class="fas fa-trash"></i></button></td>
+            `;
+
+            tableBody.appendChild(row);
+        });
+
+        updatePagination();
+    }
+
+    function updatePagination() {
+        paginationButtons.innerHTML = "";
+        const totalPages = Math.ceil(reviews.length / rowsPerPage);
+
+        paginationInfo.innerText = `Showing ${Math.min(reviews.length, currentPage * rowsPerPage)} of ${reviews.length} reviews`;
+
+        for (let i = 1; i <= totalPages; i++) {
+            const pageButton = document.createElement("button");
+            pageButton.innerText = i;
+            pageButton.className = `pagination-btn ${i === currentPage ? "active" : ""}`;
+            pageButton.addEventListener("click", function () {
+                currentPage = i;
+                displayReviews();
+            });
+            paginationButtons.appendChild(pageButton);
+        }
+    }
+
+    function generateStars(rating) {
+        let starsHTML = "";
+        for (let i = 1; i <= 5; i++) {
+            if (i <= rating) {
+                starsHTML += `<i class="fas fa-star"style="color:gold" ></i>`;  // Filled star
+            } else {
+                starsHTML += `<i class="far fa-star"></i>`;  // Empty star
+            }
+        }
+        return starsHTML;
+    }
+
+
+    displayReviews();
+});
+
+
+
+//-------------------------------- inquires -----------------------------
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    const messageTableBody = document.getElementById("messageTableBody");
+    const paginationButtons = document.getElementById("pagination-buttons");
+    const paginationInfo = document.getElementById("pagination-info");
+
+    // Sample Data - Replace with API Fetch if needed
+    const messages = [
+        { guest: "Sarah Johnson", propertyId: "P_107", email: "sarahjohnson@gmail.com", contact: "1236547890", message: "Are there any restrictions on lease agreements?" },
+        { guest: "Michael Brown", propertyId: "P_109", email: "michaelbrown@gmail.com", contact: "9874563210", message: "Are there any restrictions on lease agreements?" },
+        { guest: "Emma Davis", propertyId: "P_110", email: "emmadavis@gmail.com", contact: "7410258963", message: "What documents are required for booking?" },
+        { guest: "Michael Brown", propertyId: "P_105", email: "michaelbrown@gmail.com", contact: "9874563210", message: "Are there any restrictions on lease agreements?" },
+        { guest: "Sarah Johnson", propertyId: "P_101", email: "sarahjohnson@gmail.com", contact: "1236547890", message: "Are there any restrictions on lease agreements?" },
+        { guest: "Michael Brown", propertyId: "P_102", email: "michaelbrown@gmail.com", contact: "9874563210", message: "Are there any restrictions on lease agreements?" },
+        { guest: "Emma Davis", propertyId: "P_103", email: "emmadavis@gmail.com", contact: "7410258963", message: "What documents are required for booking?" },
+        { guest: "Michael Brown", propertyId: "P_105", email: "michaelbrown@gmail.com", contact: "9874563210", message: "Are there any restrictions on lease agreements?" },
+        { guest: "Sarah Johnson", propertyId: "P_101", email: "sarahjohnson@gmail.com", contact: "1236547890", message: "Are there any restrictions on lease agreements?" },
+        { guest: "Michael Brown", propertyId: "P_102", email: "michaelbrown@gmail.com", contact: "9874563210", message: "Are there any restrictions on lease agreements?" }
+    ];
+
+    let currentPage = 1;
+    const rowsPerPage = 6;
+
+    function loadMessages() {
+        messageTableBody.innerHTML = ""; // Clear existing rows
+
+        let start = (currentPage - 1) * rowsPerPage;
+        let end = start + rowsPerPage;
+        let paginatedItems = messages.slice(start, end);
+
+        paginatedItems.forEach((msg, index) => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${msg.guest}</td>
+                <td>${msg.propertyId}</td>
+                <td>${msg.email}</td>
+                <td>${msg.contact}</td>
+                <td>${msg.message}</td>
+                <td>
+                    <button class="total-users-action-btn delete"><i class="fas fa-trash"></i></button>                  
+                </td>
+            `;
+            messageTableBody.appendChild(row);
+        });
+
+        paginationInfo.textContent = `Showing ${start + 1} to ${Math.min(end, messages.length)} of ${messages.length} messages`
+
+      updatePagination();
+    }
+
+    function updatePagination() {
+        paginationButtons.innerHTML = "";
+        const totalPages = Math.ceil(messages.length / rowsPerPage);
+
+        paginationInfo.innerText = `Showing ${Math.min(messages.length, currentPage * rowsPerPage)} of ${messages.length} reviews`;
+
+        for (let i = 1; i <= totalPages; i++) {
+            const pageButton = document.createElement("button");
+            pageButton.innerText = i;
+            pageButton.className = `pagination-btn ${i === currentPage ? "active" : ""}`;
+            pageButton.addEventListener("click", function () {
+                currentPage = i;
+                loadMessages();
+            });
+            paginationButtons.appendChild(pageButton);
+        }
+    }
+
+
+    loadMessages();
 });

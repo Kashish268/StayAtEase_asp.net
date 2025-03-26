@@ -46,9 +46,15 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link @(ViewData["ActivePage"] == "Reviews" ? "active" : "")"
-                               asp-controller="Super_Admin" asp-action="Reviews">
+                            <a class="nav-link @(ViewData["ActivePage"] == "Property_Reviews" ? "active" : "")"
+                               asp-controller="Super_Admin" asp-action="Property_Reviews">
                                 Reviews
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewData["ActivePage"] == "Inquiries" ? "active" : "")"
+                               asp-controller="Super_Admin" asp-action="Inquiries">
+                                Inquiries
                             </a>
                         </li>
                         @* <li class="nav-item"> *@
