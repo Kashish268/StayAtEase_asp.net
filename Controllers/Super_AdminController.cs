@@ -21,5 +21,11 @@ namespace WebApplication1.Controllers
             ViewData["ActivePage"] = "Total_User";
             return View();
         }
+        public IActionResult Total_Admin()
+        {
+            ViewData["ActivePage"] = "Total_Admin";
+            return View();
+        }
+
     }
 }
