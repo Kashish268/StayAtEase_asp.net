@@ -7,7 +7,7 @@
 @functions {
     public class Review
     {
-        public int Id { get; set; } // Added Id property
+        public int Id { get; set; }
         public string Name { get; set; }
         public string Date { get; set; }
         public int Rating { get; set; }
@@ -19,11 +19,11 @@
     {
         return new List<Review>
         {
-            new Review { Id = 1, Name = "Alice Johnson", Date = "2025-03-10", Rating = 5, ReviewText = "Great experience!", Image = "https://via.placeholder.com/40" },
-            new Review { Id = 2, Name = "Michael Smith", Date = "2025-03-12", Rating = 4, ReviewText = "Good service, but room for improvement.", Image = "https://via.placeholder.com/40" },
-            new Review { Id = 3, Name = "Sophie Brown", Date = "2025-03-15", Rating = 3, ReviewText = "Average stay, nothing special.", Image = "https://via.placeholder.com/40" },
-            new Review { Id = 4, Name = "Daniel White", Date = "2025-03-17", Rating = 5, ReviewText = "Absolutely loved it!", Image = "https://via.placeholder.com/40" },
-            new Review { Id = 5, Name = "Emma Green", Date = "2025-03-18", Rating = 4, ReviewText = "Nice place, would visit again.", Image = "https://via.placeholder.com/40" }
+            new Review { Id = 1, Name = "Alice Johnson", Date = "2025-03-10", Rating = 5, ReviewText = "Great experience!", Image = "/assets/profile.png" },
+            new Review { Id = 2, Name = "Michael Smith", Date = "2025-03-12", Rating = 4, ReviewText = "Good service, but room for improvement.", Image = "/assets/profile.png" },
+            new Review { Id = 3, Name = "Sophie Brown", Date = "2025-03-15", Rating = 3, ReviewText = "Average stay, nothing special.", Image = "/assets/profile.png" },
+            new Review { Id = 4, Name = "Daniel White", Date = "2025-03-17", Rating = 5, ReviewText = "Absolutely loved it!", Image = "/assets/profile.png" },
+            new Review { Id = 5, Name = "Emma Green", Date = "2025-03-18", Rating = 4, ReviewText = "Nice place, would visit again.", Image = "/assets/profile.png" }
         };
     }
 }
@@ -36,62 +36,57 @@
     int totalPages = (int)Math.Ceiling((double)totalReviews / pageSize);
 }
 
-<div class="container mx-auto p-6 px-7 mt-6">
-    <h2 class="text-2xl font-bold text-gray-800">Property Reviews</h2>
-    <p class="text-gray-500">Sunset Heights Apartments</p>
+<div class="container mt-4">
+    <h2 class="mb-2 text-dark">Property Reviews</h2>
+    <p class="text-muted">Sunset Heights Apartments</p>
+
 
     <!-- Search Bar -->
-    <form method="get" class="relative w-full max-w-md my-4">
+    <div class="mb-3 position-relative">
+        <i class="fas fa-search position-absolute top-50 start-0 ps-3 translate-middle-y text-secondary"></i>
         <input type="text"
-               name="searchTerm"
-               class="border border-gray-300 rounded-full py-2 pl-10 pr-4 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full"
-               placeholder="Search reviews..." />
-        <button type="submit" class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500">
-            🔍
-        </button>
-    </form>
-
+               id="searchInput"
+               class="form-control ps-5"
+               placeholder="Search messages..."
+               onkeyup="filterMessages()">
+    </div>
     <!-- Review Table -->
-    <div class="overflow-x-auto">
-        <table class="min-w-full ">
-            <thead class="bg-gray-100 text-left">
+    <div class="table-responsive">
+        <table class="table">
+            <thead class="bg-light">
                 <tr>
-                    <th class="p-3">Reviewer</th>
-                    <th class="p-3">Date</th>
-                    <th class="p-3">Rating</th>
-                    <th class="p-3">Review</th>
-                    <th class="p-3">Action</th>
+                    <th class="py-3">Reviewer</th>
+                    <th class="py-3">Date</th>
+                    <th class="py-3">Rating</th>
+                    <th class="py-3">Review</th>
+                    <th class="py-3">Action</th>
                 </tr>
             </thead>
             <tbody>
                 @if (reviews.Any())
                 {
-                    @foreach (var review in reviews)
+                    @foreach (var review in reviews.Select((r, index) => new { r, index }))
                     {
-                        <tr class="even:bg-gray-50">
-                            <td class="p-3 flex items-center">
-                                <img src="@review.Image" alt="Reviewer" class="w-10 h-10 rounded-full mr-3" />
-                                <span class="font-medium">@review.Name</span>
+                        <tr class="@(review.index % 2 == 0 ? "bg-white" : "bg-light")">
+                            <td class="py-3 d-flex align-items-center">
+                                <img src="@review.r.Image" alt="Reviewer" class="rounded-circle me-2" width="40" height="40" />
+                                <span class="fw-medium">@review.r.Name</span>
                             </td>
-                            <td class="p-3">@review.Date</td>
-                            <td class="p-3">
-                                <span class="text-yellow-500">
-                                    @for (int i = 0; i < review.Rating; i++)
-                                    {
-                                        <span>★</span>
-                                    }
-                                    @for (int i = review.Rating; i < 5; i++)
-                                    {
-                                        <span class="text-gray-300">★</span>
-                                    }
-                                </span>
+                            <td class="py-3">@review.r.Date</td>
+                            <td class="py-3">
+                                @for (int i = 0; i < review.r.Rating; i++)
+                                {
+                                    <i class="fas fa-star text-warning"></i>
+                                }
+                                @for (int i = review.r.Rating; i < 5; i++)
+                                {
+                                    <i class="far fa-star text-muted"></i>
+                                }
                             </td>
-                            <td class="p-3">@review.ReviewText</td>
-                            <td class="p-3">
-                                <button class="text-red-500 font-semibold hover:text-red-600 hover:underline"
-                                        data-review-id="@review.Id"
-                                        onclick="openReportModal(this)">
-                                    🚨 Report
+                            <td class="py-3">@review.r.ReviewText</td>
+                            <td class="py-3">
+                                <button class="btn text-danger fw-semibold" data-review-id="@review.r.Id" onclick="openReportModal(this)">
+                                    <i class="fas fa-flag"></i> Report
                                 </button>
                             </td>
                         </tr>
@@ -100,7 +95,7 @@
                 else
                 {
                     <tr>
-                        <td colspan="5" class="text-center text-gray-500 p-4">No reviews found.</td>
+                        <td colspan="5" class="text-center text-muted py-4">No reviews found.</td>
                     </tr>
                 }
             </tbody>
@@ -108,22 +103,24 @@
     </div>
 
     <!-- Pagination -->
-    <div class="flex justify-between items-center mt-6 pb-6">
-        <p class="text-gray-500 text-sm">
+    <div class="d-flex justify-content-between align-items-center mt-4 pb-4">
+        <p class="text-muted small">
             Showing @(Math.Min(((currentPage - 1) * pageSize) + 1, totalReviews))
             to @(Math.Min(currentPage * pageSize, totalReviews))
             of @totalReviews reviews
         </p>
-        <nav class="flex space-x-2">
-            <a href="?page=@(currentPage - 1)"
-               class="px-4 py-2 text-gray-500 bg-gray-100 hover:bg-gray-200 rounded-lg @(currentPage == 1 ? "pointer-events-none opacity-50" : "")">
-                Previous
-            </a>
-            <span class="px-4 py-2 rounded-lg text-white bg-blue-500">@currentPage</span>
-            <a href="?page=@(currentPage + 1)"
-               class="px-4 py-2 text-gray-500 bg-gray-100 hover:bg-gray-200 rounded-lg @(currentPage == totalPages ? "pointer-events-none opacity-50" : "")">
-                Next
-            </a>
+        <nav>
+            <ul class="pagination mb-0">
+                <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                    <a class="page-link" href="?page=@(currentPage - 1)">Previous</a>
+                </li>
+                <li class="page-item active">
+                    <span class="page-link">@currentPage</span>
+                </li>
+                <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                    <a class="page-link" href="?page=@(currentPage + 1)">Next</a>
+                </li>
+            </ul>
         </nav>
     </div>
 </div>
@@ -132,16 +129,29 @@
     function openReportModal(button) {
         var reviewId = button.getAttribute("data-review-id");
         document.getElementById("selectedReviewId").value = reviewId;
-        document.getElementById("reportModal").style.display = "block";
+        var modal = new bootstrap.Modal(document.getElementById("reportModal"));
+        modal.show();
     }
 </script>
 
 <!-- Hidden modal -->
-<div id="reportModal" style="display:none;">
-    <form method="post" action="/Reviews/Report">
-        <input type="hidden" id="selectedReviewId" name="reviewId" />
-        <p>Are you sure you want to report this review?</p>
-        <button type="submit">Confirm</button>
-        <button type="button" onclick="document.getElementById('reportModal').style.display='none'">Cancel</button>
-    </form>
+<div class="modal fade" id="reportModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Report Review</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to report this review?</p>
+            </div>
+            <div class="modal-footer">
+                <form method="post" action="/Reviews/Report">
+                    <input type="hidden" id="selectedReviewId" name="reviewId" />
+                    <button type="submit" class="btn btn-danger">Confirm</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>

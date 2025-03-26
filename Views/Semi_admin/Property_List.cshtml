@@ -80,55 +80,39 @@
 
     <!-- Listings Table -->
     <div class="table-responsive">
-        <table class="table align-middle table-hover">
+        <table class="table align-middle">
             <thead class="table-light">
                 <tr>
-                    <th>Image</th>
-                    <th>Title</th>
-                    <th>Price / month</th>
-                    <th>Area (sq ft)</th>
-                    <th>Address</th>
-                    <th>Status</th>
-                    <th>Action</th>
+                    <th class="py-3">Image</th>
+                    <th class="py-3">Title</th>
+                    <th class="py-3">Price / month</th>
+                    <th class="py-3">Area (sq ft)</th>
+                    <th class="py-3">Address</th>
+                    <th class="py-3">Status</th>
+                    <th class="py-3">Action</th>
                 </tr>
             </thead>
             <tbody>
                 @if (Model.Properties != null && Model.Properties.Any())
                 {
-                    @foreach (var property in Model.Properties)
+                    @foreach (var property in Model.Properties.Select((p, index) => new { p, index }))
                     {
-                        <tr>
-                            <!-- Property Image -->
-                            <td>
-                                <img src="@(property.ImageUrl ?? "https://via.placeholder.com/70")"
-                                     alt="Property" class="rounded img-fluid" width="70">
+                        <tr class="@(property.index % 2 == 0 ? "bg-white" : "bg-light")">
+                            <td class="py-3"><img src="@(property.p.ImageUrl ?? "https://via.placeholder.com/70")" class="rounded img-fluid" width="70"></td>
+                            <td class="py-3">
+                                <div class="fw-semibold">@property.p.Title</div>
+                                <small class="text-muted">ID: @property.p.Id</small>
                             </td>
-
-                            <!-- Property Title -->
-                            <td>
-                                <div class="fw-semibold">@property.Title</div>
-                                <small class="text-muted">ID: @property.Id</small>
-                            </td>
-
-                            <!-- Price -->
-                            <td class="fw-bold">₹ @property.Price</td>
-
-                            <!-- Area -->
-                            <td>@property.Area sq ft</td>
-
-                            <!-- Address -->
-                            <td>@property.Address</td>
-
-                            <!-- Status -->
-                            <td>
-                                <span class="badge @(property.IsAvailable ? "text-success bg-success bg-opacity-10" : "text-danger bg-danger bg-opacity-10")">
-                                    @(property.IsAvailable ? "Available" : "Unavailable")
+                            <td class="py-3 fw-bold">₹ @property.p.Price</td>
+                            <td class="py-3">@property.p.Area sq ft</td>
+                            <td class="py-3">@property.p.Address</td>
+                            <td class="py-3">
+                                <span class="badge @(property.p.IsAvailable ? "text-success bg-success bg-opacity-10" : "text-danger bg-danger bg-opacity-10")">
+                                    @(property.p.IsAvailable ? "Available" : "Unavailable")
                                 </span>
                             </td>
-
-                            <!-- Action -->
-                            <td>
-                                <a asp-action="ViewProperty" asp-route-id="@property.Id" class="btn btn-sm btn-primary">
+                            <td class="py-3">
+                                <a asp-action="ViewProperty" asp-route-id="@property.p.Id" class="btn btn-sm btn-primary">
                                     <i class="fas fa-eye"></i> View
                                 </a>
                             </td>
@@ -138,11 +122,13 @@
                 else
                 {
                     <tr>
-                        <td colspan="7" class="text-center text-muted">No properties found.</td>
+                        <td colspan="7" class="text-center text-muted py-4">No properties found.</td>
                     </tr>
                 }
             </tbody>
         </table>
+
+
     </div>
 
 </div>
