@@ -4,6 +4,24 @@
     ViewData["ActivePage"] = "Messages";
 }
 
+@{
+    var messagesList = messages; // Renaming to avoid confusion
+    int pageSize = 8;
+    int currentPage = 1;
+
+    if (Context.Request.Query.ContainsKey("page"))
+    {
+        int.TryParse(Context.Request.Query["page"], out currentPage);
+        currentPage = Math.Max(currentPage, 1);
+    }
+
+    int totalMessages = messagesList.Count;
+    int totalPages = (int)Math.Ceiling((double)totalMessages / pageSize);
+
+    // Get only the records for the current page
+    var paginatedMessages = messagesList.Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+}
+
 @functions {
     public class PropertyMessage
     {
@@ -20,7 +38,12 @@
         new PropertyMessage { Name = "Michael Brown", PropertyId = "P-102", Email = "michael@example.com", Contact = "9876543210", Message = "Can I schedule a visit?" },
         new PropertyMessage { Name = "Victoria Gibson", PropertyId = "P-103", Email = "victoria@example.com", Contact = "9182736450", Message = "What are the lease terms?" },
         new PropertyMessage { Name = "Ethan Wilson", PropertyId = "P-104", Email = "ethan@example.com", Contact = "5647382910", Message = "Are there any nearby schools?" },
-        new PropertyMessage { Name = "Robert Johnson", PropertyId = "P-105", Email = "robert@example.com", Contact = "1122334455", Message = "What is the security deposit?" }
+        new PropertyMessage { Name = "Robert Johnson", PropertyId = "P-105", Email = "robert@example.com", Contact = "1122334455", Message = "What is the security deposit?" },
+             new PropertyMessage { Name = "Sarah Johnson", PropertyId = "P-101", Email = "sarah@example.com", Contact = "1234567890", Message = "Is this property still available?" },
+        new PropertyMessage { Name = "Michael Brown", PropertyId = "P-102", Email = "michael@example.com", Contact = "9876543210", Message = "Can I schedule a visit?" },
+        new PropertyMessage { Name = "Victoria Gibson", PropertyId = "P-103", Email = "victoria@example.com", Contact = "9182736450", Message = "What are the lease terms?" },
+        new PropertyMessage { Name = "Ethan Wilson", PropertyId = "P-104", Email = "ethan@example.com", Contact = "5647382910", Message = "Are there any nearby schools?" },
+        new PropertyMessage { Name = "Robert Johnson", PropertyId = "P-105", Email = "robert@example.com", Contact = "1122334455", Message = "What is the security deposit?" },
     };
 }
 
@@ -37,7 +60,6 @@
                onkeyup="filterMessages()">
     </div>
 
-
     <!-- Table -->
     <div class="table-responsive">
         <table class="table">
@@ -51,9 +73,9 @@
                 </tr>
             </thead>
             <tbody id="messagesTable">
-                @if (messages.Any())
+                @if (paginatedMessages.Any())
                 {
-                    @foreach (var msg in messages.Select((m, index) => new { m, index }))
+                    @foreach (var msg in paginatedMessages.Select((m, index) => new { m, index }))
                     {
                         <tr class="@(msg.index % 2 == 0 ? "bg-white" : "bg-light") align-middle">
                             <td class="py-3 fw-medium">@msg.m.Name</td>
@@ -72,18 +94,29 @@
                 }
             </tbody>
         </table>
-
     </div>
 
-
     <!-- Pagination -->
-    <div class="d-flex justify-content-between align-items-center mt-3">
-        <span>Showing 1 to 10 of 10 reviews</span>
+    <div class="d-flex justify-content-between align-items-center mt-4 pb-4">
+        <p class="text-muted small">
+            Showing @(Math.Min(((currentPage - 1) * pageSize) + 1, totalMessages))
+            to @(Math.Min(currentPage * pageSize, totalMessages))
+            of @totalMessages messages
+        </p>
         <nav>
             <ul class="pagination mb-0">
-                <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
-                <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                    <a class="page-link" href="?page=@(currentPage - 1)">Previous</a>
+                </li>
+                @for (int i = 1; i <= totalPages; i++)
+                {
+                    <li class="page-item @(currentPage == i ? "active" : "")">
+                        <a class="page-link" href="?page=@i">@i</a>
+                    </li>
+                }
+                <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                    <a class="page-link" href="?page=@(currentPage + 1)">Next</a>
+                </li>
             </ul>
         </nav>
     </div>
@@ -103,17 +136,16 @@
         }
     }
 </script>
+
 <style>
     .custom-striped tbody tr:nth-child(odd) {
         background-color: white !important;
     }
 
     .custom-striped tbody tr:nth-child(even) {
-        background-color: #f8f9fa !important; /* Light gray */
+        background-color: #f8f9fa !important;
     }
 </style>
 
-
 <!-- Bootstrap & FontAwesome -->
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

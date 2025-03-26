@@ -2,15 +2,14 @@
 {
     public class PropertyReview
     {
-        public int Id { get; set; }  // Ensure Id is an integer
+        public int Id { get; set; }
         public string Name { get; set; }
         public string Date { get; set; }
-        public int Rating { get; set; }  // Change Rating to an integer
+        public int Rating { get; set; }
+        public string ReviewText { get; set; }
+        public string Property {  get; set; }
         public string Text { get; set; }
-        public string Property { get; set; } 
         public string ImageUrl { get; set; }
- 
- 
 
     }
 

@@ -6,7 +6,7 @@
 
 @model MyListingsViewModel
 
-<div class="container mt-4 bg-light">
+<div class="container mt-4 bg-light" >
     <h2 class="mb-6 p-4">My Listings</h2>
 
     <!-- Summary Cards -->
@@ -72,7 +72,8 @@
 
 
         <!-- Add Property Button -->
-        <a asp-action="AddProperty" class="btn btn-primary">
+        <a  class="btn btn-primary @(ViewData["ActivePage"] == "Add_Properties" ? "active" : "")"
+                               asp-controller="Semi_admin" asp-action="Add_Properties">
             <i class="fas fa-plus"></i> Add Property
         </a>
     </div>

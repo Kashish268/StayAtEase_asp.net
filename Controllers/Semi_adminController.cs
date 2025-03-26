@@ -66,7 +66,88 @@ namespace WebApplication1.Controllers
                 Address = "Uptown, City",
                 IsAvailable = false,
                 ImageUrl = "/assets/Property2.jpg"
-            }
+            },
+            new PropertyViewModel
+            {
+                Id = 1,
+                Title = "Luxury Apartment",
+                Price = "25000",
+                Area = 1200,
+                Address = "Downtown, City",
+                IsAvailable = true,
+                ImageUrl = "/assets/Property1.jpg"
+            },
+            new PropertyViewModel
+            {
+                Id = 2,
+                Title = "Modern Villa",
+                Price = "50000",
+                Area = 2000,
+                Address = "Uptown, City",
+                IsAvailable = false,
+                ImageUrl = "/assets/Property2.jpg"
+
+            },
+            new PropertyViewModel
+            {
+                Id = 1,
+                Title = "Luxury Apartment",
+                Price = "25000",
+                Area = 1200,
+                Address = "Downtown, City",
+                IsAvailable = true,
+                ImageUrl = "/assets/Property1.jpg"
+            },
+            new PropertyViewModel
+            {
+                Id = 2,
+                Title = "Modern Villa",
+                Price = "50000",
+                Area = 2000,
+                Address = "Uptown, City",
+                IsAvailable = false,
+                ImageUrl = "/assets/Property2.jpg"
+            },
+            new PropertyViewModel
+            {
+                Id = 1,
+                Title = "Luxury Apartment",
+                Price = "25000",
+                Area = 1200,
+                Address = "Downtown, City",
+                IsAvailable = true,
+                ImageUrl = "/assets/Property1.jpg"
+            },
+            new PropertyViewModel
+            {
+                Id = 2,
+                Title = "Modern Villa",
+                Price = "50000",
+                Area = 2000,
+                Address = "Uptown, City",
+                IsAvailable = false,
+                ImageUrl = "/assets/Property2.jpg"
+            },
+            new PropertyViewModel
+            {
+                Id = 1,
+                Title = "Luxury Apartment",
+                Price = "25000",
+                Area = 1200,
+                Address = "Downtown, City",
+                IsAvailable = true,
+                ImageUrl = "/assets/Property1.jpg"
+            },
+            new PropertyViewModel
+            {
+                Id = 2,
+                Title = "Modern Villa",
+                Price = "50000",
+                Area = 2000,
+                Address = "Uptown, City",
+                IsAvailable = false,
+                ImageUrl = "/assets/Property2.jpg"
+            },
         }
             };
             return View(model); 

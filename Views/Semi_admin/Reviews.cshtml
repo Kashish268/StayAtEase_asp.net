@@ -3,6 +3,24 @@
     ViewData["Title"] = "Admin Dashboard";
     ViewData["ActivePage"] = "Reviews";
 }
+@{
+    var reviews = GetReviews();
+    int pageSize = 8; // Show 8 records per page
+    int currentPage = 1;
+
+    // Read current page from query string (default to 1 if missing)
+    if (Context.Request.Query.ContainsKey("page"))
+    {
+        int.TryParse(Context.Request.Query["page"], out currentPage);
+        currentPage = Math.Max(currentPage, 1); // Ensure at least page 1
+    }
+
+    int totalReviews = reviews.Count;
+    int totalPages = (int)Math.Ceiling((double)totalReviews / pageSize);
+
+    // Get only the records for the current page
+    var paginatedReviews = reviews.Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+}
 
 @functions {
     public class Review
@@ -23,18 +41,21 @@
             new Review { Id = 2, Name = "Michael Smith", Date = "2025-03-12", Rating = 4, ReviewText = "Good service, but room for improvement.", Image = "/assets/profile.png" },
             new Review { Id = 3, Name = "Sophie Brown", Date = "2025-03-15", Rating = 3, ReviewText = "Average stay, nothing special.", Image = "/assets/profile.png" },
             new Review { Id = 4, Name = "Daniel White", Date = "2025-03-17", Rating = 5, ReviewText = "Absolutely loved it!", Image = "/assets/profile.png" },
-            new Review { Id = 5, Name = "Emma Green", Date = "2025-03-18", Rating = 4, ReviewText = "Nice place, would visit again.", Image = "/assets/profile.png" }
+            new Review { Id = 5, Name = "Emma Green", Date = "2025-03-18", Rating = 4, ReviewText = "Nice place, would visit again.", Image = "/assets/profile.png" },
+             new Review { Id = 1, Name = "Alice Johnson", Date = "2025-03-10", Rating = 5, ReviewText = "Great experience!", Image = "/assets/profile.png" },
+            new Review { Id = 2, Name = "Michael Smith", Date = "2025-03-12", Rating = 4, ReviewText = "Good service, but room for improvement.", Image = "/assets/profile.png" },
+            new Review { Id = 3, Name = "Sophie Brown", Date = "2025-03-15", Rating = 3, ReviewText = "Average stay, nothing special.", Image = "/assets/profile.png" },
+            new Review { Id = 4, Name = "Daniel White", Date = "2025-03-17", Rating = 5, ReviewText = "Absolutely loved it!", Image = "/assets/profile.png" },
+             new Review { Id = 1, Name = "Alice Johnson", Date = "2025-03-10", Rating = 5, ReviewText = "Great experience!", Image = "/assets/profile.png" },
+            new Review { Id = 2, Name = "Michael Smith", Date = "2025-03-12", Rating = 4, ReviewText = "Good service, but room for improvement.", Image = "/assets/profile.png" },
+            new Review { Id = 3, Name = "Sophie Brown", Date = "2025-03-15", Rating = 3, ReviewText = "Average stay, nothing special.", Image = "/assets/profile.png" },
+            new Review { Id = 4, Name = "Daniel White", Date = "2025-03-17", Rating = 5, ReviewText = "Absolutely loved it!", Image = "/assets/profile.png" },
+            new Review { Id = 5, Name = "Emma Green", Date = "2025-03-18", Rating = 4, ReviewText = "Nice place, would visit again.", Image = "/assets/profile.png" },
+            new Review { Id = 5, Name = "Emma Green", Date = "2025-03-18", Rating = 4, ReviewText = "Nice place, would visit again.", Image = "/assets/profile.png" },
         };
     }
 }
 
-@{
-    var reviews = GetReviews();
-    int currentPage = 1;
-    int pageSize = 5;
-    int totalReviews = reviews.Count;
-    int totalPages = (int)Math.Ceiling((double)totalReviews / pageSize);
-}
 
 <div class="container mt-4">
     <h2 class="mb-2 text-dark">Property Reviews</h2>
@@ -63,9 +84,9 @@
                 </tr>
             </thead>
             <tbody>
-                @if (reviews.Any())
+                @if (paginatedReviews.Any())
                 {
-                    @foreach (var review in reviews.Select((r, index) => new { r, index }))
+                    @foreach (var review in paginatedReviews.Select((r, index) => new { r, index }))
                     {
                         <tr class="@(review.index % 2 == 0 ? "bg-white" : "bg-light")">
                             <td class="py-3 d-flex align-items-center">
@@ -114,9 +135,12 @@
                 <li class="page-item @(currentPage == 1 ? "disabled" : "")">
                     <a class="page-link" href="?page=@(currentPage - 1)">Previous</a>
                 </li>
-                <li class="page-item active">
-                    <span class="page-link">@currentPage</span>
-                </li>
+                @for (int i = 1; i <= totalPages; i++)
+                {
+                    <li class="page-item @(currentPage == i ? "active" : "")">
+                        <a class="page-link" href="?page=@i">@i</a>
+                    </li>
+                }
                 <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
                     <a class="page-link" href="?page=@(currentPage + 1)">Next</a>
                 </li>
@@ -124,34 +148,105 @@
         </nav>
     </div>
 </div>
+</div>
 
 <script>
+    // Open Report Modal
     function openReportModal(button) {
+        var modalElement = document.getElementById("reportModal");
+
+        if (!modalElement) {
+            console.error("Modal element not found!");
+            return;
+        }
+
         var reviewId = button.getAttribute("data-review-id");
         document.getElementById("selectedReviewId").value = reviewId;
-        var modal = new bootstrap.Modal(document.getElementById("reportModal"));
-        modal.show();
+
+        reportModal = new bootstrap.Modal(modalElement);
+        reportModal.show();
+    }
+
+    // Submit Report Function
+    function submitReport() {
+        var reviewId = document.getElementById("selectedReviewId").value;
+        var reportDescription = document.getElementById("reportDescription").value.trim();
+
+        if (!reportDescription) {
+            alert("Please enter a report description.");
+            return;
+        }
+
+        fetch("/Reviews/Report", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ reviewId, description: reportDescription })
+        })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+
+                // Close the modal after the alert
+                setTimeout(() => {
+                    var modalElement = document.getElementById("reportModal");
+                    var modalInstance = bootstrap.Modal.getInstance(modalElement);
+
+                    if (modalInstance) {
+                        modalInstance.hide();
+                    } else {
+                        // Forcefully hide the modal if Bootstrap instance fails
+                        modalElement.classList.remove("show");
+                        modalElement.style.display = "none";
+                        document.body.classList.remove("modal-open");
+                        document.querySelector(".modal-backdrop")?.remove();
+                    }
+                }, 100); // Small delay to ensure modal closes after alert
+            })
+            .catch(error => console.error("Error reporting review:", error));
+    }
+
+    // Filter Reviews Function
+    function filterReviews() {
+        var input = document.getElementById("searchInput").value.toLowerCase();
+        var rows = document.querySelectorAll("tbody tr");
+
+        rows.forEach(row => {
+            var name = row.querySelector("td span").innerText.toLowerCase();
+            var review = row.querySelector("td:nth-child(4)").innerText.toLowerCase();
+            if (name.includes(input) || review.includes(input)) {
+                row.style.display = "";
+            } else {
+                row.style.display = "none";
+            }
+        });
     }
 </script>
 
-<!-- Hidden modal -->
+<!-- Report Modal -->
 <div class="modal fade" id="reportModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Report Review</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>Are you sure you want to report this review?</p>
-            </div>
-            <div class="modal-footer">
-                <form method="post" action="/Reviews/Report">
-                    <input type="hidden" id="selectedReviewId" name="reviewId" />
-                    <button type="submit" class="btn btn-danger">Confirm</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                </form>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content p-4 rounded-lg shadow-lg">
+            <!-- Close Button (Top-Right) -->
+            <button type="button" class="btn-close position-absolute top-0 end-0 m-3" data-bs-dismiss="modal"></button>
+
+            <!-- Modal Header -->
+            <h3 class="modal-title fw-bold mb-2">Write Report</h3>
+            <p class="text-muted">Enter your description:</p>
+
+            <!-- Hidden Input for Selected Review ID -->
+            <input type="hidden" id="selectedReviewId" />
+
+            <!-- Textarea Input -->
+            <textarea id="reportDescription" class="form-control mt-2" rows="4" placeholder="Enter here..."></textarea>
+
+            <!-- Submit Button -->
+            <div class="d-grid mt-4">
+                <button type="button" class="btn btn-primary" onclick="submitReport()">Submit</button>
             </div>
         </div>
     </div>
 </div>
+
+

@@ -25,7 +25,7 @@
     };
 }
 
-<div class="container mt-4  p-2">
+<div class="container mt-4  p-2 ">
     <!-- Dashboard Cards -->
     <div class="row g-4 text-left">
         <div class="col-md-3">
@@ -164,7 +164,8 @@
 
             <!-- Add New Property Button -->
             <div class="text-center mt-4">
-                <a href="#" class="btn btn-primary px-4 py-2">
+                <a  class="btn btn-primary px-4 py-2 @(ViewData["ActivePage"] == "Add_Properties" ? "active" : "")"
+                               asp-controller="Semi_admin" asp-action="Add_Properties">
                     <i class="fas fa-plus"></i> Add New Property
                 </a>
             </div>
