@@ -36,13 +36,19 @@
                         <li class="nav-item">
                             <a class="nav-link @(ViewData["ActivePage"] == "Total_User" ? "active" : "")"
                                asp-controller="Super_Admin" asp-action="Total_User">
-                                Total User
+                                Tenants
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link @(ViewData["ActivePage"] == "Total_Admin" ? "active" : "")"
                                asp-controller="Super_Admin" asp-action="Total_Admin">
-                                Total Admin
+                                Property Owners
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewData["ActivePage"] == "Reviews" ? "active" : "")"
+                               asp-controller="Super_Admin" asp-action="Reviews">
+                                Reviews
                             </a>
                         </li>
                         @* <li class="nav-item"> *@
