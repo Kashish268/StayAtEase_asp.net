@@ -479,3 +479,86 @@ document.addEventListener("DOMContentLoaded", function () {
 
     loadMessages();
 });
+
+//--------------------------------------------total property ---------------------------
+
+document.addEventListener("DOMContentLoaded", function () {
+    const propertyTableBody = document.getElementById("propertyTableBody");
+    const totalProperties = document.getElementById("total-properties");
+    const activeListings = document.getElementById("active-listings");
+    const totalInquiries = document.getElementById("total-inquiries");
+
+    const properties = [
+        { id: "P001", title: "Modern Apartment", price: "₹250,000", address: "Sector 1", addedBy: "Robert", image: "https://images.pexels.com/photos/271624/pexels-photo-271624.jpeg", status: "Available", reviews: 10, inquiries: 4 },
+        { id: "P002", title: "Luxury Villa", price: "₹450,000", address: "Pipera", addedBy: "Sharonda", image: "https://images.pexels.com/photos/439391/pexels-photo-439391.jpeg", status: "Unavailable", reviews: 7, inquiries: 2 },
+        { id: "P003", title: "Penthouse Suite", price: "₹600,000", address: "Băneasa", addedBy: "Robert", image: "https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg", status: "Unavailable", reviews: 12, inquiries: 3 },
+        { id: "P004", title: "2-BHK Apartment", price: "₹180,000", address: "Sector 3", addedBy: "Pricilla", image: "https://images.pexels.com/photos/259588/pexels-photo-259588.jpeg", status: "Available", reviews: 8, inquiries: 5 },
+        { id: "P005", title: "Cozy Cottage", price: "₹350,000", address: "Voluntari", addedBy: "Sharonda", image: "https://images.pexels.com/photos/462024/pexels-photo-462024.jpeg", status: "Available", reviews: 6, inquiries: 1 },
+        { id: "P006", title: "Modern Loft", price: "₹120,000", address: "Sector 4", addedBy: "Michael", image: "https://images.pexels.com/photos/1643389/pexels-photo-1643389.jpeg", status: "Available", reviews: 9, inquiries: 2 },
+        { id: "P007", title: "Beachfront Villa", price: "₹500,000", address: "Snagov", addedBy: "Emily", image: "https://images.pexels.com/photos/2029738/pexels-photo-2029738.jpeg", status: "Unavailable", reviews: 11, inquiries: 4 },
+        { id: "P008", title: "Seaside Bungalow", price: "₹750,000", address: "Mamaia", addedBy: "Jonathan", image: "https://images.pexels.com/photos/439227/pexels-photo-439227.jpeg", status: "Available", reviews: 14, inquiries: 6 },
+        { id: "P009", title: "Elegant Duplex", price: "₹300,000", address: "Sector 2", addedBy: "Alice", image: "https://images.pexels.com/photos/439391/pexels-photo-439391.jpeg", status: "Available", reviews: 5, inquiries: 1 },
+        { id: "P010", title: "Classic House", price: "₹400,000", address: "Ilfov", addedBy: "David", image: "https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg", status: "Unavailable", reviews: 6, inquiries: 2 },
+        { id: "P011", title: "Furnished Apartment", price: "₹280,000", address: "Sector 5", addedBy: "Olivia", image: "https://images.pexels.com/photos/186077/pexels-photo-186077.jpeg", status: "Available", reviews: 7, inquiries: 3 },
+        { id: "P012", title: "Lakeview Cabin", price: "₹650,000", address: "Snagov", addedBy: "Lucas", image: "https://images.pexels.com/photos/271624/pexels-photo-271624.jpeg", status: "Unavailable", reviews: 10, inquiries: 5 }
+    ];
+
+    let currentPage = 1;
+    const rowsPerPage = 6;
+    const paginationButtons = document.getElementById("pagination-buttons");
+    const paginationInfo = document.getElementById("pagination-info");
+
+    function loadProperties() {
+        propertyTableBody.innerHTML = ""; // Clear existing rows
+
+        let start = (currentPage - 1) * rowsPerPage;
+        let end = start + rowsPerPage;
+        let paginatedItems = properties.slice(start, end);
+
+        paginatedItems.forEach((property) => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td><img src="${property.image}" alt="Property Image" style="width:50px; height:50px; border-radius:5px;"></td>
+                <td>${property.title}</td>
+                <td>${property.price}</td>
+                <td>${property.address}</td>
+                <td>${property.addedBy}</td>
+                <td class="${property.status === 'Available' ? 'property-status-available' : 'property-status-unavailable'}">
+                        ${property.status}
+                    </td>
+                <td>${property.reviews}</td>
+                <td>${property.inquiries}</td>
+                <td>
+                    <button class="total-users-action-btn view "><i class="fas fa-eye"></i> View </button>
+                </td>
+            `;
+            propertyTableBody.appendChild(row);
+        });
+
+        paginationInfo.textContent = `Showing ${start + 1} to ${Math.min(end, properties.length)} of ${properties.length} properties`;
+
+        totalProperties.textContent = properties.length;
+        activeListings.textContent = properties.filter(p => p.status === "Available").length;
+        totalInquiries.textContent = properties.reduce((acc, p) => acc + p.inquiries, 0);
+
+        updatePagination(); 
+    }
+
+    function updatePagination() {
+        paginationButtons.innerHTML = "";
+        const totalPages = Math.ceil(properties.length / rowsPerPage);
+
+        for (let i = 1; i <= totalPages; i++) {
+            const pageButton = document.createElement("button");
+            pageButton.innerText = i;
+            pageButton.className = `pagination-btn ${i === currentPage ? "active" : ""}`;
+            pageButton.addEventListener("click", function () {
+                currentPage = i;
+                loadProperties();
+            });
+            paginationButtons.appendChild(pageButton);
+        }
+    }
+
+    loadProperties(); 
+});

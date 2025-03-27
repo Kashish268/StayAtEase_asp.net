@@ -1,0 +1,68 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewBag.Title = "Super Admin Dashboard";
+    Layout = "~/Views/Shared/_SuperAdminLayout.cshtml";
+}
+
+<link rel="stylesheet" href="~/Content/site.css" />
+
+<div class="property-container">
+    <h1 class="property-title">Total Properties</h1>
+
+    <div class="property-stats-container">
+        <div class="property-stat-box">
+            <i class="fas fa-building fa-2x"></i>
+            <p>Total Properties</p>
+            <h2 id="total-properties">0</h2>
+        </div>
+        <div class="property-stat-box">
+            <i class="fas fa-list-alt fa-2x"></i>
+            <p>Active Listings</p>
+            <h2 id="active-listings">0</h2>
+        </div>
+        <div class="property-stat-box">
+            <i class="fas fa-comments fa-2x"></i>
+            <p>Inquiries</p>
+            <h2 id="total-inquiries">0</h2>
+        </div>
+    </div>
+
+    <div class="property-search-container">
+        <div class="property-search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" class="property-search-input" placeholder="Search properties...">
+        </div>
+        <select class="property-search-select">
+            <option value="">Property Type</option>
+        </select>
+    </div>
+    <div class="property-table-container">
+    <table class="property-table">
+        <thead>
+            <tr>
+                <th>Image</th>
+                <th>Title</th>
+                <th>Price / Month</th>
+                <th>Address</th>
+                <th>Added By</th>
+                <th>Status</th>
+                <th>Total Reviews</th>
+                <th>Total Inquiries</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="propertyTableBody"></tbody>
+    </table>
+</div>
+<div class="total-users-pagination">
+    <span id="pagination-info"></span>
+    <div id="pagination-buttons"></div>
+</div>
+</div>
+
+
+
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+<script src="~/js/site.js"></script>
