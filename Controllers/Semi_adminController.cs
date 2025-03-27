@@ -37,121 +37,33 @@ namespace WebApplication1.Controllers
         
                  return View();
         }
-        public IActionResult Property_List()
+        public IActionResult Property_List(int currentPage = 1, int pageSize = 8)
         {
+            var properties = new List<PropertyViewModel>
+    {
+        new PropertyViewModel { Id = 1, Title = "Luxury Apartment", Price = "25000", Area = 1200, Address = "Downtown, City", IsAvailable = true, ImageUrl = "/assets/Property1.jpg" },
+        new PropertyViewModel { Id = 2, Title = "Modern Villa", Price = "50000", Area = 2000, Address = "Uptown, City", IsAvailable = false, ImageUrl = "/assets/Property2.jpg" },
+    new PropertyViewModel { Id = 3, Title = "Luxury Apartment", Price = "25000", Area = 1200, Address = "Downtown, City", IsAvailable = true, ImageUrl = "/assets/Property1.jpg" },
+        new PropertyViewModel { Id = 4, Title = "Modern Villa", Price = "50000", Area = 2000, Address = "Uptown, City", IsAvailable = false, ImageUrl = "/assets/Property2.jpg" },
+
+            };
+
+            var totalProperties = properties.Count;
+
             var model = new MyListingsViewModel
             {
-                TotalProperties = 10,
-                ActiveListings = 7,
+                TotalProperties = totalProperties,
+                ActiveListings = properties.Count(p => p.IsAvailable),
                 TotalInquiries = 25,
-                SearchTerm = "",
-                Properties = new List<PropertyViewModel>
-        {
-            new PropertyViewModel
-            {
-                Id = 1,
-                Title = "Luxury Apartment",
-                Price = "25000",
-                Area = 1200,
-                Address = "Downtown, City",
-                IsAvailable = true,
-                ImageUrl = "/assets/Property1.jpg"
-            },
-            new PropertyViewModel
-            {
-                Id = 2,
-                Title = "Modern Villa",
-                Price = "50000",
-                Area = 2000,
-                Address = "Uptown, City",
-                IsAvailable = false,
-                ImageUrl = "/assets/Property2.jpg"
-            },
-            new PropertyViewModel
-            {
-                Id = 1,
-                Title = "Luxury Apartment",
-                Price = "25000",
-                Area = 1200,
-                Address = "Downtown, City",
-                IsAvailable = true,
-                ImageUrl = "/assets/Property1.jpg"
-            },
-            new PropertyViewModel
-            {
-                Id = 2,
-                Title = "Modern Villa",
-                Price = "50000",
-                Area = 2000,
-                Address = "Uptown, City",
-                IsAvailable = false,
-                ImageUrl = "/assets/Property2.jpg"
-
-            },
-            new PropertyViewModel
-            {
-                Id = 1,
-                Title = "Luxury Apartment",
-                Price = "25000",
-                Area = 1200,
-                Address = "Downtown, City",
-                IsAvailable = true,
-                ImageUrl = "/assets/Property1.jpg"
-            },
-            new PropertyViewModel
-            {
-                Id = 2,
-                Title = "Modern Villa",
-                Price = "50000",
-                Area = 2000,
-                Address = "Uptown, City",
-                IsAvailable = false,
-                ImageUrl = "/assets/Property2.jpg"
-            },
-            new PropertyViewModel
-            {
-                Id = 1,
-                Title = "Luxury Apartment",
-                Price = "25000",
-                Area = 1200,
-                Address = "Downtown, City",
-                IsAvailable = true,
-                ImageUrl = "/assets/Property1.jpg"
-            },
-            new PropertyViewModel
-            {
-                Id = 2,
-                Title = "Modern Villa",
-                Price = "50000",
-                Area = 2000,
-                Address = "Uptown, City",
-                IsAvailable = false,
-                ImageUrl = "/assets/Property2.jpg"
-            },
-            new PropertyViewModel
-            {
-                Id = 1,
-                Title = "Luxury Apartment",
-                Price = "25000",
-                Area = 1200,
-                Address = "Downtown, City",
-                IsAvailable = true,
-                ImageUrl = "/assets/Property1.jpg"
-            },
-            new PropertyViewModel
-            {
-                Id = 2,
-                Title = "Modern Villa",
-                Price = "50000",
-                Area = 2000,
-                Address = "Uptown, City",
-                IsAvailable = false,
-                ImageUrl = "/assets/Property2.jpg"
-            },
-        }
+                CurrentPage = currentPage,
+                PageSize = pageSize,
+                Properties = properties.Skip((currentPage - 1) * pageSize).Take(pageSize).ToList()
             };
-            return View(model); 
+
+            return View(model);
         }
+
+
         public IActionResult Messages() {
             return View();
         }
@@ -170,6 +82,16 @@ namespace WebApplication1.Controllers
                 Bio = "Property dealer"
             };
             return View(model);
+        }
+
+        public IActionResult Property_Details()
+        {
+
+        return View(); 
+        }
+      public IActionResult Edit_Property()
+        {
+            return View();
         }
     }
 }

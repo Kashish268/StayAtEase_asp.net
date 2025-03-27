@@ -188,24 +188,30 @@
             .then(data => {
                 alert(data.message);
 
-                // Close the modal after the alert
-                setTimeout(() => {
-                    var modalElement = document.getElementById("reportModal");
-                    var modalInstance = bootstrap.Modal.getInstance(modalElement);
+                // Ensure Bootstrap modal instance is closed properly
+                var modalElement = document.getElementById("reportModal");
+                var modalInstance = bootstrap.Modal.getInstance(modalElement);
 
-                    if (modalInstance) {
-                        modalInstance.hide();
-                    } else {
-                        // Forcefully hide the modal if Bootstrap instance fails
-                        modalElement.classList.remove("show");
-                        modalElement.style.display = "none";
-                        document.body.classList.remove("modal-open");
-                        document.querySelector(".modal-backdrop")?.remove();
-                    }
-                }, 100); // Small delay to ensure modal closes after alert
+                if (!modalInstance) {
+                    modalInstance = new bootstrap.Modal(modalElement);
+                }
+
+                modalInstance.hide();
+
+                // Ensure backdrop and modal-open class are removed
+                setTimeout(() => {
+                    modalElement.classList.remove("show");
+                    modalElement.style.display = "none";
+                    document.body.classList.remove("modal-open");
+                    document.querySelector(".modal-backdrop")?.remove();
+                }, 300);
+
+                // Clear the textarea after closing
+                document.getElementById("reportDescription").value = "";
             })
             .catch(error => console.error("Error reporting review:", error));
     }
+
 
     // Filter Reviews Function
     function filterReviews() {

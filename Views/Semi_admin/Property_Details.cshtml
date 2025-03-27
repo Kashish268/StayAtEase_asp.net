@@ -1,0 +1,267 @@
+﻿
+
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Property Details";
+}
+
+@functions {
+    List<Views_Semi_admin_Messages.PropertyMessage> messages = new List<Views_Semi_admin_Messages.PropertyMessage>
+    {
+        new Views_Semi_admin_Messages.PropertyMessage { Name = "Sarah Johnson", PropertyId = "P-101", Email = "sarah@example.com", Contact = "1234567890", Message = "Is this property still available?" },
+        new Views_Semi_admin_Messages.PropertyMessage  { Name = "Michael Brown", PropertyId = "P-102", Email = "michael@example.com", Contact = "9876543210", Message = "Can I schedule a visit?" },
+        new Views_Semi_admin_Messages.PropertyMessage  { Name = "Victoria Gibson", PropertyId = "P-103", Email = "victoria@example.com", Contact = "9182736450", Message = "What are the lease terms?" },
+        new Views_Semi_admin_Messages.PropertyMessage  { Name = "Ethan Wilson", PropertyId = "P-104", Email = "ethan@example.com", Contact = "5647382910", Message = "Are there any nearby schools?" },
+        new Views_Semi_admin_Messages.PropertyMessage  { Name = "Robert Johnson", PropertyId = "P-105", Email = "robert@example.com", Contact = "1122334455", Message = "What is the security deposit?" }
+    };
+}
+<div class="container mt-4">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-start mb-4">
+        <div>
+            <h1 class="h3 fw-bold">Modern Apartment</h1>
+            <div class="badge text-success" style="background-color: #D4EDDA;">Available</div>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+            <span class="fw-bold h4">4.8</span>
+            <span class="text-warning">★★★★★</span>
+            <span class="text-muted">(28 reviews)</span>
+            <a  class="text-primary text-decoration-none @(ViewData["ActivePage"] == "Edit_Property" ? "active" : "")"
+                               asp-controller="Semi_admin" asp-action="Edit_Property"><i class="fas fa-edit"></i> Edit</a>
+            <button class="btn btn-link text-danger text-decoration-none"><i class="fas fa-trash"></i> Delete</button>
+        </div>
+    </div>
+
+
+    <!-- Image Gallery -->
+    <div class="row mb-4">
+        <!-- Main Image -->
+        <div class="col-12">
+            <img src="~/assets/Property5.jpg" class="img-fluid rounded w-100" style="height: 500px; object-fit: cover;" alt="Main Image">
+        </div>
+    </div>
+
+    <!-- Thumbnail Images -->
+    <div class="row mb-4">
+        <div class="col-3">
+            <img src="~/assets/Property1.jpg" class="img-fluid rounded w-100" style="height: 120px; object-fit: cover;" alt="Thumbnail">
+        </div>
+        <div class="col-3">
+            <img src="~/assets/Property2.jpg" class="img-fluid rounded w-100" style="height: 120px; object-fit: cover;" alt="Thumbnail">
+        </div>
+        <div class="col-3">
+            <img src="~/assets/Property3.jpg" class="img-fluid rounded w-100" style="height: 120px; object-fit: cover;" alt="Thumbnail">
+        </div>
+        <div class="col-3">
+            <img src="~/assets/Property4.jpg" class="img-fluid rounded w-100" style="height: 120px; object-fit: cover;" alt="Thumbnail">
+        </div>
+    </div>
+
+    <!-- About Section -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h2 class="h4 fw-bold">About Property</h2>
+            <p>This stunning apartment offers modern living at its finest. With breathtaking city views, premium amenities, and a prime location, it's designed for luxury and convenience.</p>
+        </div>
+    </div>
+
+    <!-- Price Section -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h3 class="h3 fw-bold">₹250,000<br /> <span class="fs-5 text-muted">per month</span></h3>
+        </div>
+    </div>
+
+    <!--Property Details Section-->
+    <div class="card shadow-sm p-4 mb-4 bg-white rounded">
+        <h3 class="fw-bold mb-3">Property Details</h3>
+        <div class="row text-secondary">
+            <div class="col-md-4 d-flex align-items-center">
+                <i class="fas fa-ruler-combined text-primary fs-4 me-2"></i>
+                <div>
+                    <span class="fw-bold">75 mp</span><br>
+                    <span class="text-muted">Square Footage</span>
+                </div>
+            </div>
+            <div class="col-md-4 d-flex align-items-center">
+                <i class="fas fa-map-marker-alt text-primary fs-4 me-2"></i>
+                <div>
+                    <span class="fw-bold">Sector 1, București</span><br>
+                    <span class="text-muted">Address</span>
+                </div>
+            </div>
+            <div class="col-md-4 d-flex align-items-center">
+                <i class="fas fa-home text-primary fs-4 me-2"></i>
+                <div>
+                    <span class="fw-bold">Apartment</span><br>
+                    <span class="text-muted">Property Type</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Specifications Section -->
+    <div class="card shadow-sm p-4 mb-4 bg-white rounded">
+        <h3 class="fw-bold mb-3">Specifications</h3>
+        <div class="row text-secondary">
+            <div class="col-md-6 d-flex align-items-center">
+                <i class="fas fa-bed text-primary fs-4 me-2"></i>
+                <div>
+                    <span class="fw-bold">2 Bedrooms</span><br>
+                    <span class="text-muted">Spacious rooms</span>
+                </div>
+            </div>
+            <div class="col-md-6 d-flex align-items-center">
+                <i class="fas fa-bath text-primary fs-4 me-2"></i>
+                <div>
+                    <span class="fw-bold">1 Bathroom</span><br>
+                    <span class="text-muted">Modern fixtures</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Amenities -->
+    <div class="card shadow-sm p-4 mb-4 bg-white rounded">
+        <h3 class="fw-bold mb-3">Amenities</h3>
+        <div class="row text-secondary">
+            <div class="col-md-3 d-flex align-items-center mb-3">
+                <i class="fas fa-wifi text-primary fs-4 me-2"></i>
+                <span>High-speed WiFi</span>
+            </div>
+            <div class="col-md-3 d-flex align-items-center mb-3">
+                <i class="fas fa-parking text-primary fs-4 me-2"></i>
+                <span>Parking Space</span>
+            </div>
+            <div class="col-md-3 d-flex align-items-center mb-3">
+                <i class="fas fa-dumbbell text-primary fs-4 me-2"></i>
+                <span>Fitness Center</span>
+            </div>
+            <div class="col-md-3 d-flex align-items-center mb-3">
+                <i class="fas fa-tv text-primary fs-4 me-2"></i>
+                <span>Smart TV</span>
+            </div>
+            <div class="col-md-3 d-flex align-items-center mb-3">
+                <i class="fas fa-swimmer text-primary fs-4 me-2"></i>
+                <span>Swimming Pool</span>
+            </div>
+            <div class="col-md-3 d-flex align-items-center mb-3">
+                <i class="fas fa-elevator text-primary fs-4 me-2"></i>
+                <span>Elevator</span>
+            </div>
+            <div class="col-md-3 d-flex align-items-center mb-3">
+                <i class="fas fa-tshirt text-primary fs-4 me-2"></i>
+                <span>Laundry</span>
+            </div>
+            <div class="col-md-3 d-flex align-items-center mb-3">
+                <i class="fas fa-utensils text-primary fs-4 me-2"></i>
+                <span>Kitchen</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Review section-->
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h3 class="h4 fw-bold">Reviews For Modern Apartment</h3>
+            </div>
+            </div>
+
+    <div class="card mb-4">
+        <div class="card">
+            
+            <table class="table">
+                <tbody>
+                    <tr class="bg-white p-2">
+                        <td class=" py-3 d-flex justify-content-center align-items-center bg-primary text-white text-center rounded-circle fw-bold"
+                            style="width: 40px; height: 40px; font-size: 14px; background-color: #DDEBFF;">
+                            SJ
+                        </td>
+
+                        <td class="py-3">Sarah Johnson</td>
+                        <td class="py-3">Jan 15, 2024</td>
+                        <td class="text-warning py-3">★★★★★</td>
+                        <td class="py-3">Absolutely love this property! The amenities are top-notch.</td>
+                        <td class="text-danger py-3">
+                            <button class="btn text-danger border-0 p-0">Report</button>
+                        </td>
+
+                    </tr>
+                    <tr class="bg-light p-2">
+                        <td class=" py-3 d-flex justify-content-center align-items-center bg-primary text-white text-center rounded-circle fw-bold"
+                            style="width: 40px; height: 40px; font-size: 14px; background-color: #DDEBFF;">
+                            SR
+                        </td>
+
+                        <td class="py-3">Sarah Raval</td>
+                        <td class="py-3">Jan 15, 2024</td>
+                        <td class="text-warning py-3">★★★★</td>
+                        <td class="py-3">Absolutely love this property! The amenities are top-notch.</td>
+                        <td class="text-danger py-3"
+                            <button class="btn text-danger border-0 p-0">Report</button>
+                        </td>
+
+                    </tr>
+                    <tr class="bg-white p-2">
+                        <td class="py-3 d-flex justify-content-center align-items-center bg-primary text-white text-center rounded-circle fw-bold"
+                            style="width: 40px; height: 40px; font-size: 14px; background-color: #DDEBFF;">
+                            RJ
+                        </td>
+
+                        <td class="py-3">Ronit Johnson</td>
+                        <td class="py-3">Jan 15, 2024</td>
+                        <td class="text-warning py-3">★★★</td>
+                        <td class="py-3">Absolutely love this property! The amenities are top-notch.</td>
+                        <td class="text-danger py-3">
+                            <button class="btn text-danger border-0 p-0">Report</button>
+                        </td>
+
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Inquiries Section -->
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h3 class="h4 fw-bold">  Inquiries For Modern Apartment</h3>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0 rounded-3 p-4 mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-3 px-3">
+            <h5 class="fw-bold mb-0">Latest Messages</h5>
+            <a href="#" class="text-primary text-decoration-none">View All</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th class="py-3">Guest Name</th>
+                        <th class="py-3">Property Id</th>
+                        <th class="py-3">Email Address</th>
+                        <th class="py-3">Contact No</th>
+                        <th class="py-3">Message</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var msg in messages.Select((m, index) => new { m, index }))
+                    {
+                        <tr class="@(msg.index % 2 == 0 ? "bg-white" : "bg-light")">
+                            <td class="py-3 fw-medium">@msg.m.Name</td>
+                            <td class="py-3">@msg.m.PropertyId</td>
+                            <td class="py-3">@msg.m.Email</td>
+                            <td class="py-3">@msg.m.Contact</td>
+                            <td class="py-3">@msg.m.Message</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+</div>
+</div>

@@ -2,16 +2,20 @@
     Layout = "_AdminLayout";
     ViewData["Title"] = "Admin Dashboard";
     ViewData["ActivePage"] = "Property_List";
+
+    int pageSize = 8;
+    int currentPage = Model.CurrentPage;
+    int totalProperties = Model.TotalProperties;
+    int totalPages = (int)Math.Ceiling((double)totalProperties / pageSize);
 }
 
 @model MyListingsViewModel
 
-<div class="container mt-4 bg-light" >
+<div class="container mt-4 bg-light">
     <h2 class="mb-6 p-4">My Listings</h2>
 
     <!-- Summary Cards -->
     <div class="row mb-4">
-        <!-- Total Properties -->
         <div class="col-md-4">
             <div class="card text-left p-3">
                 <p class="text-muted d-flex justify-content-between align-items-center">
@@ -21,8 +25,6 @@
                 <h3>@Model.TotalProperties</h3>
             </div>
         </div>
-
-        <!-- Active Listings -->
         <div class="col-md-4">
             <div class="card text-left p-3">
                 <p class="text-muted d-flex justify-content-between align-items-center">
@@ -32,8 +34,6 @@
                 <h3>@Model.ActiveListings</h3>
             </div>
         </div>
-
-        <!-- Inquiries -->
         <div class="col-md-4">
             <div class="card text-left p-3">
                 <p class="text-muted d-flex justify-content-between align-items-center">
@@ -45,10 +45,8 @@
         </div>
     </div>
 
-
     <!-- Search Bar and Add Property Button -->
     <div class="d-flex justify-content-between align-items-center p-3 mb-3 rounded shadow-sm bg-white">
-        <!-- Search Form -->
         <form method="get" class="flex-grow-1 me-3">
             <div class="input-group">
                 <span class="input-group-text bg-transparent border-0">
@@ -58,9 +56,8 @@
             </div>
         </form>
 
-        <!-- Filter Dropdown -->
         <div class="dropdown me-3">
-            <button class="btn btn-light border dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">
+            <button class="btn btn-light border dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                 All
             </button>
             <ul class="dropdown-menu" aria-labelledby="filterDropdown">
@@ -70,14 +67,11 @@
             </ul>
         </div>
 
-
-        <!-- Add Property Button -->
-        <a  class="btn btn-primary @(ViewData["ActivePage"] == "Add_Properties" ? "active" : "")"
-                               asp-controller="Semi_admin" asp-action="Add_Properties">
+        <a class="btn btn-primary @(ViewData["ActivePage"] == "Add_Properties" ? "active" : "")"
+           asp-controller="Semi_admin" asp-action="Add_Properties">
             <i class="fas fa-plus"></i> Add Property
         </a>
     </div>
-
 
     <!-- Listings Table -->
     <div class="table-responsive">
@@ -96,7 +90,8 @@
             <tbody>
                 @if (Model.Properties != null && Model.Properties.Any())
                 {
-                    @foreach (var property in Model.Properties.Select((p, index) => new { p, index }))
+                    var pagedProperties = Model.Properties.Skip((currentPage - 1) * pageSize).Take(pageSize);
+                    @foreach (var property in pagedProperties.Select((p, index) => new { p, index }))
                     {
                         <tr class="@(property.index % 2 == 0 ? "bg-white" : "bg-light")">
                             <td class="py-3"><img src="@(property.p.ImageUrl ?? "https://via.placeholder.com/70")" class="rounded img-fluid" width="70"></td>
@@ -113,7 +108,8 @@
                                 </span>
                             </td>
                             <td class="py-3">
-                                <a asp-action="ViewProperty" asp-route-id="@property.p.Id" class="btn btn-sm btn-primary">
+                                <a asp-route-id="@property.p.Id" class="btn btn-sm btn-primary @(ViewData["ActivePage"] == "Property_Details" ? "active" : "")"
+                                   asp-controller="Semi_admin" asp-action="Property_Details">
                                     <i class="fas fa-eye"></i> View
                                 </a>
                             </td>
@@ -128,12 +124,33 @@
                 }
             </tbody>
         </table>
+    </div>
 
-
+    <!-- Pagination -->
+    <div class="d-flex justify-content-between align-items-center mt-4 pb-4">
+        <p class="text-muted small">
+            Showing @(Math.Min(((currentPage - 1) * pageSize) + 1, totalProperties))
+            to @(Math.Min(currentPage * pageSize, totalProperties))
+            of @totalProperties properties
+        </p>
+        <nav>
+            <ul class="pagination mb-0">
+                <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                    <a class="page-link" href="?page=@(currentPage - 1)">Previous</a>
+                </li>
+                @for (int i = 1; i <= totalPages; i++)
+                {
+                    <li class="page-item @(currentPage == i ? "active" : "")">
+                        <a class="page-link" href="?page=@i">@i</a>
+                    </li>
+                }
+                <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                    <a class="page-link" href="?page=@(currentPage + 1)">Next</a>
+                </li>
+            </ul>
+        </nav>
     </div>
 
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-

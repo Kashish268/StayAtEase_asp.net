@@ -41,12 +41,12 @@
     <div class="row g-4">
         @foreach (var property in new[]
         {
-        new {Image="property1.jpg", Title="Modern Luxury Apartment", Location="Downtown, New York", Price="$2,500/month", Rating="4.8"},
-        new {Image="property2.jpg", Title="Cozy Studio Apartment", Location="Brooklyn, New York", Price="$1,800/month", Rating="4.5"},
-        new {Image="property3.jpg", Title="Spacious Family Home", Location="Queens, New York", Price="$3,200/month", Rating="4.9"},
-        new {Image="property4.jpg", Title="Penthouse with City View", Location="Manhattan, New York", Price="$5,000/month", Rating="4.7"},
-        new {Image="property5.jpg", Title="Garden Apartment", Location="Staten Island, New York", Price="$2,200/month", Rating="4.6"},
-        new {Image="property6.jpg", Title="Historic Brownstone", Location="Brooklyn Heights, New York", Price="$4,500/month", Rating="4.8"}
+        new {Image="/assets/Property5.jpg", Title="Modern Luxury Apartment", Location="Downtown, New York", Price="$2,500/month", Rating="4.8"},
+        new {Image="/assets/Property4.jpg", Title="Cozy Studio Apartment", Location="Brooklyn, New York", Price="$1,800/month", Rating="4.5"},
+        new {Image="/assets/Property3.jpg", Title="Spacious Family Home", Location="Queens, New York", Price="$3,200/month", Rating="4.9"},
+        new {Image="/assets/Property2.jpg", Title="Penthouse with City View", Location="Manhattan, New York", Price="$5,000/month", Rating="4.7"},
+        new {Image="/assets/Property1.jpg", Title="Garden Apartment", Location="Staten Island, New York", Price="$2,200/month", Rating="4.6"},
+        new {Image="/assets/Property6.jpg", Title="Historic Brownstone", Location="Brooklyn Heights, New York", Price="$4,500/month", Rating="4.8"}
         })
         {
             <div class="col-md-4">
@@ -81,7 +81,7 @@
             </div>
         </div>
         <div class="col-md-5">
-            <img src="assets/image.png" class="img-fluid rounded-end about-image" alt="StayAtEase">
+            <img src="/assets/Property5.jpg" class="img-fluid rounded-end about-image" alt="StayAtEase">
         </div>
     </div>
 </div>

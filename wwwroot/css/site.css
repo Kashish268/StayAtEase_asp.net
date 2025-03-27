@@ -344,8 +344,7 @@ footer {
 /*==============HOME PAGE ===================*/
 
 .hero {
-    background: url('your-image.jpg') no-repeat center center/cover;
-    height: 100vh;
+    background: url("/assets/Property5.jpg") no-repeat center center/cover; height: 100vh;
     position: relative;
     width: 100%;
 }
@@ -833,7 +832,7 @@ td {
     margin-top: 20px;
 }
 
-.section-title {
+.section-title {131f cv
     font-size: 18px;
     font-weight: bold;
     margin-bottom: 10px;
