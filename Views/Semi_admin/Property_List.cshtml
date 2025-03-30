@@ -1,0 +1,156 @@
+﻿@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Admin Dashboard";
+    ViewData["ActivePage"] = "Property_List";
+
+    int pageSize = 8;
+    int currentPage = Model.CurrentPage;
+    int totalProperties = Model.TotalProperties;
+    int totalPages = (int)Math.Ceiling((double)totalProperties / pageSize);
+}
+
+@model MyListingsViewModel
+
+<div class="container mt-4 bg-light">
+    <h2 class="mb-6 p-4">My Listings</h2>
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-left p-3">
+                <p class="text-muted d-flex justify-content-between align-items-center">
+                    Total Properties
+                    <i class="fas fa-home text-primary"></i>
+                </p>
+                <h3>@Model.TotalProperties</h3>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-left p-3">
+                <p class="text-muted d-flex justify-content-between align-items-center">
+                    Active Listings
+                    <i class="fas fa-chart-bar text-primary"></i>
+                </p>
+                <h3>@Model.ActiveListings</h3>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-left p-3">
+                <p class="text-muted d-flex justify-content-between align-items-center">
+                    Inquiries
+                    <i class="fas fa-calendar-alt text-primary"></i>
+                </p>
+                <h3>@Model.TotalInquiries</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Bar and Add Property Button -->
+    <div class="d-flex justify-content-between align-items-center p-3 mb-3 rounded shadow-sm bg-white">
+        <form method="get" class="flex-grow-1 me-3">
+            <div class="input-group">
+                <span class="input-group-text bg-transparent border-0">
+                    <i class="fas fa-search text-muted"></i>
+                </span>
+                <input type="text" name="searchTerm" class="form-control border-0" placeholder="Search properties..." value="@Model.SearchTerm">
+            </div>
+        </form>
+
+        <div class="dropdown me-3">
+            <button class="btn btn-light border dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                All
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="filterDropdown">
+                <li><a class="dropdown-item" href="?filter=all">All</a></li>
+                <li><a class="dropdown-item" href="?filter=available">Available</a></li>
+                <li><a class="dropdown-item" href="?filter=unavailable">Unavailable</a></li>
+            </ul>
+        </div>
+
+        <a class="btn btn-primary @(ViewData["ActivePage"] == "Add_Properties" ? "active" : "")"
+           asp-controller="Semi_admin" asp-action="Add_Properties">
+            <i class="fas fa-plus"></i> Add Property
+        </a>
+    </div>
+
+    <!-- Listings Table -->
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th class="py-3">Image</th>
+                    <th class="py-3">Title</th>
+                    <th class="py-3">Price / month</th>
+                    <th class="py-3">Area (sq ft)</th>
+                    <th class="py-3">Address</th>
+                    <th class="py-3">Status</th>
+                    <th class="py-3">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Properties != null && Model.Properties.Any())
+                {
+                    var pagedProperties = Model.Properties.Skip((currentPage - 1) * pageSize).Take(pageSize);
+                    @foreach (var property in pagedProperties.Select((p, index) => new { p, index }))
+                    {
+                        <tr class="@(property.index % 2 == 0 ? "bg-white" : "bg-light")">
+                            <td class="py-3"><img src="@(property.p.ImageUrl ?? "https://via.placeholder.com/70")" class="rounded img-fluid" width="70"></td>
+                            <td class="py-3">
+                                <div class="fw-semibold">@property.p.Title</div>
+                                <small class="text-muted">ID: @property.p.Id</small>
+                            </td>
+                            <td class="py-3 fw-bold">₹ @property.p.Price</td>
+                            <td class="py-3">@property.p.Area sq ft</td>
+                            <td class="py-3">@property.p.Address</td>
+                            <td class="py-3">
+                                <span class="badge @(property.p.IsAvailable ? "text-success bg-success bg-opacity-10" : "text-danger bg-danger bg-opacity-10")">
+                                    @(property.p.IsAvailable ? "Available" : "Unavailable")
+                                </span>
+                            </td>
+                            <td class="py-3">
+                                <a asp-route-id="@property.p.Id" class="btn btn-sm btn-primary @(ViewData["ActivePage"] == "Property_Details" ? "active" : "")"
+                                   asp-controller="Semi_admin" asp-action="Property_Details">
+                                    <i class="fas fa-eye"></i> View
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4">No properties found.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="d-flex justify-content-between align-items-center mt-4 pb-4">
+        <p class="text-muted small">
+            Showing @(Math.Min(((currentPage - 1) * pageSize) + 1, totalProperties))
+            to @(Math.Min(currentPage * pageSize, totalProperties))
+            of @totalProperties properties
+        </p>
+        <nav>
+            <ul class="pagination mb-0">
+                <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                    <a class="page-link" href="?page=@(currentPage - 1)">Previous</a>
+                </li>
+                @for (int i = 1; i <= totalPages; i++)
+                {
+                    <li class="page-item @(currentPage == i ? "active" : "")">
+                        <a class="page-link" href="?page=@i">@i</a>
+                    </li>
+                }
+                <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                    <a class="page-link" href="?page=@(currentPage + 1)">Next</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
