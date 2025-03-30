@@ -7,6 +7,7 @@ namespace WebApplication1.Controllers
     {
         public IActionResult Dashboard()
         {
+
             var model = new DashboardViewModel
             {
                 TotalProperties = 24,
