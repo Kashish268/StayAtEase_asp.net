@@ -1,21 +1,83 @@
 ﻿@model LoginModel
 @{
-    Layout = null;  // This ensures it's loaded as a partial view
+    Layout = null;
 }
 
-<form method="post" asp-controller="Account" asp-action="Login">
+<form method="post" asp-controller="Account" asp-action="Login" id="loginForm">
     <div class="mb-3">
-        <label for="email" class="form-label">Email</label>
-        <input type="email" asp-for="Email" class="form-control" id="email" placeholder="Enter your email" name="Email">
-        <span asp-validation-for="Email" class="text-danger"></span>
+        <label for="phone" class="form-label">Phone number</label>
+        <input type="tel" class="form-control" id="phone" name="phone" placeholder="Enter your phone number">
+        <span id="phoneError" class="text-danger"></span>
     </div>
     <div class="mb-3">
         <label for="password" class="form-label">Password</label>
-        <input type="password" asp-for="Password" class="form-control" id="password" placeholder="Enter your password" name="Password">
-        <span asp-validation-for="Password" class="text-danger"></span>
-
+        <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password"  minlength="6">
+        <span id="passwordError" class="text-danger"></span>
     </div>
 
-    <button type="submit" class="btn btn-primary" style="width:100%;" name="submit">Login</button>
-    
+    <button type="submit" class="btn btn-primary" style="width:100%;">Login</button>
 </form>
+
+<script>
+    $(document).ready(function() {
+        // Custom phone validation
+        function validatePhone(phone) {
+            return /^[\d\s\+\-\(\)]{10,15}$/.test(phone);
+        }
+
+        // Form submission handler
+        $('#loginForm').on('submit', function(e) {
+            let isValid = true;
+            const phone = $('#phone').val().trim();
+            const password = $('#password').val().trim();
+
+            // Reset error messages
+            $('.text-danger').text('');
+
+            // Validate phone
+            if (!phone) {
+                $('#phoneError').text('Phone number is required');
+                isValid = false;
+            } else if (!validatePhone(phone)) {
+                $('#phoneError').text('Please enter a valid phone number');
+                isValid = false;
+            }
+
+            // Validate password
+            if (!password) {
+                $('#passwordError').text('Password is required');
+                isValid = false;
+            } else if (password.length < 6) {
+                $('#passwordError').text('Password must be at least 6 characters');
+                isValid = false;
+            }
+
+            if (!isValid) {
+                e.preventDefault();
+            }
+        });
+
+        // Real-time validation on blur
+        $('#phone').on('blur', function() {
+            const phone = $(this).val().trim();
+            if (!phone) {
+                $('#phoneError').text('Phone number is required');
+            } else if (!validatePhone(phone)) {
+                $('#phoneError').text('Please enter a valid phone number');
+            } else {
+                $('#phoneError').text('');
+            }
+        });
+
+        $('#password').on('blur', function() {
+            const password = $(this).val().trim();
+            if (!password) {
+                $('#passwordError').text('Password is required');
+            } else if (password.length < 6) {
+                $('#passwordError').text('Password must be at least 6 characters');
+            } else {
+                $('#passwordError').text('');
+            }
+        });
+    });
+</script>
