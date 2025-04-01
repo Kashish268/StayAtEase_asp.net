@@ -66,6 +66,7 @@ namespace WebApplication1.Controllers
 
 
         public IActionResult Messages() {
+            ViewData["ActivePage"] = "Messages";
             return View();
         }
 

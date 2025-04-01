@@ -1,27 +1,26 @@
 html {
-  font-size: 14px;
+    font-size: 14px;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
 }
 
 body {
     font-family: "Open Sans", sans-serif;
     /*  margin-bottom: 60px;*/
     padding-top: 70px; /* Adjust based on navbar height */
-    background-color :whitesmoke; 
 }
 
 /* Ensure navbar uses flex layout */
@@ -79,7 +78,7 @@ body {
 
     .nav-logo {
         height: 45px; /* Smaller logo on mobile */
-        width:45px;
+        width: 45px;
     }
 }
 /* Default styling for navbar links */
@@ -100,9 +99,9 @@ body {
     transition: transform 0.1s ease-in-out;
 }
 
-.navbar-nav .nav-item:hover {
-    transform: scale(1.1); /* Slight zoom effect */
-}
+    .navbar-nav .nav-item:hover {
+        transform: scale(1.1); /* Slight zoom effect */
+    }
 
     /* Active tab - text becomes bold and changes color */
     .navbar-nav .nav-item .nav-link.active {
@@ -145,7 +144,7 @@ footer {
             font-size: 14px;
             line-height: 24px;
             color: #fff;
-            letter-spacing:0.7px;
+            letter-spacing: 0.7px;
         }
 
         footer .footer-top .social-links a {
@@ -176,7 +175,7 @@ footer {
             text-transform: uppercase;
             position: relative;
             padding-bottom: 12px;
-            letter-spacing:0.7px;
+            letter-spacing: 0.7px;
         }
 
             footer .footer-top h4::before, footer .footer-top h4::after {
@@ -279,16 +278,7 @@ footer {
     #registerForm .verification-code {
         display: flex;
         gap: 8px;
-        
     }
-.otp-input {
-    width: 40px !important;
-    height: 45px;
-    font-size: 18px;
-    text-align: center;
-    margin: 0 3px; /* Reduce spacing between OTP inputs */
-    padding: 5px;
-}
 
     #registerForm .code-input {
         width: 45px;
@@ -352,7 +342,8 @@ footer {
 /*==============HOME PAGE ===================*/
 
 .hero {
-    background: url("/assets/Property5.jpg") no-repeat center center/cover; height: 100vh;
+    background: url('/assets/Property2.jpg') no-repeat center center/cover;
+    height: 100vh;
     position: relative;
     width: 100%;
 }
@@ -393,12 +384,12 @@ footer {
     overflow: hidden;
 }
 
-.card img {
-    height: 200px;
-    object-fit: cover;
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
-}
+    .card img {
+        height: 200px;
+        object-fit: cover;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+    }
 
 .like-btn {
     background: white;
@@ -408,17 +399,17 @@ footer {
     font-size: 18px;
     color: gray;
     cursor: pointer;
-/*    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);*/
+    /*    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);*/
     transition: all 0.3s ease-in-out;
 }
 
-/*.like-btn:hover {
+    /*.like-btn:hover {
     background: rgba(255, 0, 0, 0.1);
 }*/
 
-.like-btn.liked {
-    color: red;
-}
+    .like-btn.liked {
+        color: red;
+    }
 
 .btn-outline-primary {
     font-weight: bold;
@@ -498,14 +489,14 @@ footer {
     }
 
     .feature-card h5 {
-        font-weight:bolder;
+        font-weight: bolder;
         margin-bottom: 8px;
     }
 
     .feature-card p {
         font-size: 14px;
         color: #555;
-        margin-bottom : -1rem;
+        margin-bottom: -1rem;
     }
 
     .feature-card:hover {
@@ -536,8 +527,8 @@ footer {
 }
 
 .search-input {
-        height: 38px;
-    }
+    height: 38px;
+}
 
 /*===========property details============*/
 
@@ -674,9 +665,29 @@ footer {
         color: white;
         font-size: 14px;
         padding: 5px 10px;
-
         border-radius: 3px;
     }
+
+.profile-image-section {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.profile-image {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ccc;
+}
+
+.file-upload {
+    display: gray;
+    margin-top: 10px;
+    color: blue;
+    cursor: pointer;
+    font-weight: bold;
+}
 
 
 /*    =================== Super Admin css ====================*/
@@ -690,7 +701,6 @@ footer {
 
 /* Dashboard Stats */
 .sad-dashboard-stats {
-  
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 15px;
@@ -723,14 +733,14 @@ footer {
         color: #0056b3;
         transform: scale(1.1);
     }
-    /* Tables */
-    .sad-dashboard-tables {
-        display: flex;
-        gap: 20px;
-        flex-wrap: wrap;
-        margin-top: 20px;
-        overflow-x: auto; /* Enables horizontal scrolling */
-    }
+/* Tables */
+.sad-dashboard-tables {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+    overflow-x: auto; /* Enables horizontal scrolling */
+}
 
 .sad-table-container {
     flex: 1;
@@ -784,15 +794,17 @@ footer {
         text-align: left;
         transition: background 0.3s ease;
     }
+
     .sad-table td {
         border-bottom: 1px solid #ddd;
     }
-        .sad-table th {
-            background-color: #b2d7ff;
-            color: #323232;
-        }
 
-  
+    .sad-table th {
+        background-color: #b2d7ff;
+        color: #323232;
+    }
+
+
     .sad-table tr:hover {
         background: #f1f1f1;
     }
@@ -912,13 +924,12 @@ footer {
     max-width: 1200px;
     margin: auto;
     padding: 20px;
-
 }
 
 .total-users-title {
     font-size: 26px;
     font-weight: bold;
-/*    text-align: center;*/
+    /*    text-align: center;*/
     margin-bottom: 3px;
     color: #333;
 }
@@ -948,27 +959,11 @@ footer {
 }
 
 .total-users-table {
-=======
-        border-radius: 5px;
-    }
-
-
-
-
-
-    margin-bottom: 15px;
-}
-
-   
-/* Table Styling */
-table {
-
-/*     width: 100%;
+    width: 100%;
     border-collapse: collapse;
     background: white;
     border-radius: 8px;
-    overflow: hidden; */
-
+    overflow: hidden;
     box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.1);
 }
 
@@ -983,22 +978,9 @@ table {
     .total-users-table td {
         padding: 12px;
         border-bottom: 1px solid #ddd;
-
-    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-thead {
-    background: #f2f2f2;
-}
-
-    thead th {
-        padding: 12px;
-        text-align: left;
-
-/*         font-size: 14px;
-        color: #555; */
+        font-size: 14px;
+        color: #555;
     }
-
 
     /* Alternating Row Colors */
     .total-users-table tbody tr:nth-child(even) {
@@ -1017,7 +999,6 @@ thead {
     border-radius: 50%;
     margin-right: 10px;
     box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.15);
-
 }
 
 /* Status Styles */
@@ -1025,7 +1006,7 @@ thead {
     font-weight: bold;
 }
 
-    .total-users-pagination {
+.total-users-pagination {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -1130,10 +1111,12 @@ thead {
     font-size: 16px;
     box-shadow: inset 0px 2px 6px rgba(0, 0, 0, 0.1);
 }
+
 .search-container {
     position: relative;
-/*    display: inline-block;*/
+    /*    display: inline-block;*/
 }
+
 .search-icon {
     position: absolute;
     left: 15px;
@@ -1142,7 +1125,6 @@ thead {
     color: #888;
     font-size: 16px;
     padding-left: 20px;
-   
 }
 
 /*---------------------------------- total property -------------------------*/
@@ -1152,71 +1134,15 @@ thead {
     width: 90%;
     margin: 20px auto;
     padding: 20px;
-    
 }
 
 /* Title */
 .property-title {
-    
     font-size: 28px;
     color: #333;
-=======
-tbody tr {
-    border-bottom: 1px solid #ddd;
-}
-
-    tbody tr:hover {
-        background: #f9f9f9;
-    }
-
-td {
-    padding: 12px;
-    font-size: 14px;
-    color: #444;
-}
-
-/* Status Badge */
-.status-badge {
-    padding: 5px 10px;
-    border-radius: 15px;
-    font-size: 12px;
-    color: white;
-    display: inline-block;
-}
-
-.bg-green {
-    background: #28a745;
-}
-
-.bg-red {
-    background: #dc3545;
-}
-
-/* Buttons */
-.view-btn {
-    background: #007bff;
-    color: white;
-    padding: 8px 12px;
-    text-decoration: none;
-    border-radius: 5px;
-    font-size: 14px;
-    transition: 0.3s ease;
-}
-
-    .view-btn:hover {
-        background: #0056b3;
-    }
-
-/* Footer */
-
-.title {
-    text-align: center;
-    font-size: 24px;
-
     font-weight: bold;
     margin-bottom: 20px;
 }
-
 
 /* Stats Container */
 .property-stats-container {
@@ -1474,6 +1400,7 @@ td {
     color: green;
     font-weight: bold;
 }
+
 .property-status-unavailable {
     color: red;
     font-weight: bold;
@@ -1510,7 +1437,7 @@ td {
     margin: auto;
     background: #fff;
     padding: 20px;
-/*    border-radius: 10px;
+    /*    border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);*/
 }
 
@@ -1532,24 +1459,28 @@ td {
     font-weight: bold;
     color: green;
 }
- .detail-icon, .spec-icon {
+
+.detail-icon, .spec-icon {
     margin-right: 8px;
     color: #007bff;
     font-size: 18px;
 }
+
 .action-icon {
     margin-right: 8px;
     font-size: 15px;
 }
+
 .rating-icon {
     margin-right: 8px;
-    color:gold;
+    color: gold;
     font-size: 22px;
 }
+
 .apartment-rating {
-    font-size:1.5em;
+    font-size: 1.5em;
     font-weight: bold;
-    margin-bottom:5px;
+    margin-bottom: 5px;
 }
 
 .apartment-actions button {
@@ -1558,7 +1489,6 @@ td {
     margin: 5px;
     cursor: pointer;
     border-radius: 5px;
-
 }
 
 .apartment-edit {
@@ -1570,17 +1500,18 @@ td {
     background: #f44336;
     color: white;
 }
+
 .review-button {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 10px;
 }
+
 .apartment-user {
     display: flex;
     align-items: center;
     margin-top: 5px;
-   
 }
 
 .user-avatar {
@@ -1588,14 +1519,14 @@ td {
     height: 40px;
     border-radius: 50%;
     margin-right: 10px;
-    margin-bottom:10px;
+    margin-bottom: 10px;
 }
 
 .apartment-main-image img {
     width: 100%;
     border-radius: 10px;
-    object-fit:fill;
-    max-height:75vh;
+    object-fit: fill;
+    max-height: 75vh;
 }
 
 .apartment-gallery {
@@ -1603,7 +1534,7 @@ td {
     gap: 15px;
     margin: 10px 0;
     object-fit: fill;
-    max-height:28vh;
+    max-height: 28vh;
 }
 
 .gallery-image {
@@ -1637,7 +1568,7 @@ td {
     padding: 15px;
     background: #f0f0f0;
     border-radius: 8px;
-    font-size:20px;
+    font-size: 20px;
 }
 
 @media (max-width: 768px) {
@@ -1653,28 +1584,3 @@ td {
         flex-direction: column;
     }
 }
-
-
-.profile-image-section {
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-.profile-image {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid #ccc;
-}
-
-.file-upload {
-    display: gray;
-    margin-top: 10px;
-    color: blue;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-
-

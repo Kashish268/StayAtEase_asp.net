@@ -47,5 +47,19 @@ namespace WebApplication1.Controllers
             ViewData["ActivePage"] = "Total_Properties";
             return View();
         }
+        public IActionResult AdminProfile() {
+            var model = new ProfileDetailsViewModel
+            {
+                ProfileImageUrl = "/profile.png",
+                FirstName = "John",
+                LastName = "Doe",
+                Email = "john.doe@example.com",
+                Phone = "+1 (555) 000-0000",
+                Location = "San Francisco, CA",
+                Timezone = "(GMT-08:00) Pacific Time",
+                Bio = "Property dealer"
+            };
+            return View(model);
+        }
     }
 }
