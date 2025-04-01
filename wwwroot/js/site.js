@@ -322,16 +322,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
 document.addEventListener("DOMContentLoaded", function () {
     const reviews = [
-        { propertyId: 101, title: "Luxury Apartment", reviewer: "John Smith", date: "Feb 15, 2024", rating: 5, review: "Great property with excellent amenities.", profilePic: "https://randomuser.me/api/portraits/men/1.jpg" },
-        { propertyId: 102, title: "Cozy Condo", reviewer: "Emma Wilson", date: "Feb 14, 2024", rating: 5, review: "Absolutely love living here!", profilePic: "https://randomuser.me/api/portraits/women/2.jpg" },
-        { propertyId: 103, title: "Spacious Home", reviewer: "Michael Brown", date: "Feb 13, 2024", rating: 4, review: "Good value for money.", profilePic: "https://randomuser.me/api/portraits/men/3.jpg" },
-        { propertyId: 104, title: "Modern Studio", reviewer: "Sarah Davis", date: "Feb 12, 2024", rating: 5, review: "Beautiful property with great views.", profilePic: "https://randomuser.me/api/portraits/women/4.jpg" },
-        { propertyId: 105, title: "Green Villas", reviewer: "Robert Johnson", date: "Feb 11, 2024", rating: 3, review: "Decent place, could improve on noise insulation.", profilePic: "https://randomuser.me/api/portraits/men/5.jpg" },
-        { propertyId: 106, title: "Skyline Residences", reviewer: "Lisa Anderson", date: "Feb 10, 2024", rating: 5, review: "Exceptional property management!", profilePic: "https://randomuser.me/api/portraits/women/6.jpg" },
-        { propertyId: 107, title: "Seaside Apartments", reviewer: "David Wilson", date: "Feb 9, 2024", rating: 5, review: "Great community events and friendly neighbors.", profilePic: "https://randomuser.me/api/portraits/men/7.jpg" },
-        { propertyId: 108, title: "The Grand Suites", reviewer: "Jennifer Taylor", date: "Feb 8, 2024", rating: 5, review: "Modern apartments with great features.", profilePic: "https://randomuser.me/api/portraits/women/8.jpg" },
-        { propertyId: 109, title: "Hilltop Haven", reviewer: "James Martinez", date: "Feb 7, 2024", rating: 4, review: "Good location but parking can be a challenge.", profilePic: "https://randomuser.me/api/portraits/men/9.jpg" },
-        { propertyId: 110, title: "Urban Oasis", reviewer: "Patricia Thomas", date: "Feb 6, 2024", rating: 5, review: "Excellent property! Friendly staff and well-maintained.", profilePic: "https://randomuser.me/api/portraits/women/10.jpg" }
+        { propertyId: "P_101", title: "Luxury Apartment", reviewer: "John Smith", date: "Feb 15, 2024", rating: 5, review: "Great property with excellent amenities.", profilePic: "https://randomuser.me/api/portraits/men/1.jpg" },
+        { propertyId: "P_102", title: "Cozy Condo", reviewer: "Emma Wilson", date: "Feb 14, 2024", rating: 5, review: "Absolutely love living here!", profilePic: "https://randomuser.me/api/portraits/women/2.jpg" },
+        { propertyId: "P_103", title: "Spacious Home", reviewer: "Michael Brown", date: "Feb 13, 2024", rating: 4, review: "Good value for money.", profilePic: "https://randomuser.me/api/portraits/men/3.jpg" },
+        { propertyId: "P_104", title: "Modern Studio", reviewer: "Sarah Davis", date: "Feb 12, 2024", rating: 5, review: "Beautiful property with great views.", profilePic: "https://randomuser.me/api/portraits/women/4.jpg" },
+        { propertyId: "P_105", title: "Green Villas", reviewer: "Robert Johnson", date: "Feb 11, 2024", rating: 3, review: "Decent place, could improve on noise insulation.", profilePic: "https://randomuser.me/api/portraits/men/5.jpg" },
+        { propertyId: "P_106", title: "Skyline Residences", reviewer: "Lisa Anderson", date: "Feb 10, 2024", rating: 5, review: "Exceptional property management!", profilePic: "https://randomuser.me/api/portraits/women/6.jpg" },
+        { propertyId: "P_107", title: "Seaside Apartments", reviewer: "David Wilson", date: "Feb 9, 2024", rating: 5, review: "Great community events and friendly neighbors.", profilePic: "https://randomuser.me/api/portraits/men/7.jpg" },
+        { propertyId: "P_108", title: "The Grand Suites", reviewer: "Jennifer Taylor", date: "Feb 8, 2024", rating: 5, review: "Modern apartments with great features.", profilePic: "https://randomuser.me/api/portraits/women/8.jpg" },
+        { propertyId: "P_109", title: "Hilltop Haven", reviewer: "James Martinez", date: "Feb 7, 2024", rating: 4, review: "Good location but parking can be a challenge.", profilePic: "https://randomuser.me/api/portraits/men/9.jpg" },
+        { propertyId: "P_110", title: "Urban Oasis", reviewer: "Patricia Thomas", date: "Feb 6, 2024", rating: 5, review: "Excellent property! Friendly staff and well-maintained.", profilePic: "https://randomuser.me/api/portraits/women/10.jpg" }
     ];
 
     const tableBody = document.getElementById("reviewsTableBody");
@@ -533,6 +533,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 </td>
             `;
             propertyTableBody.appendChild(row);
+        });
+        // Add event listener for "View" button clicks
+        document.querySelectorAll(".view").forEach((button) => {
+            button.addEventListener("click", function () {
+                // Redirect to the static ParticularProperty page
+                window.location.href = "/Super_Admin/Particular_property";
+            });
         });
 
         paginationInfo.textContent = `Showing ${start + 1} to ${Math.min(end, properties.length)} of ${properties.length} properties`;

@@ -41,5 +41,11 @@ namespace WebApplication1.Controllers
             ViewData["ActivePage"] = "Total_Properties";
             return View();
         }
+
+        public IActionResult Particular_property()
+        {
+            ViewData["ActivePage"] = "Total_Properties";
+            return View();
+        }
     }
 }
