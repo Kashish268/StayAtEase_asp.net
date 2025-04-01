@@ -1,0 +1,130 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    Layout = "_SuperAdminLayout";
+    ViewData["Title"] = "Super Admin Dashboard";
+    ViewData["ActivePage"] = "Super_AdminDashboard";
+}
+
+<link rel="stylesheet" href="~/Content/site.css" />
+
+<div class="apartment-container">
+    <header class="apartment-header">
+        <div class="header-left">
+            <h1 class="apartment-title">Modern Apartment</h1>
+            <span class="apartment-status"><i class="fas fa-check-circle status-icon"></i> Available</span>
+        </div>
+        <div class="header-right">
+            <div class="review-button">
+            <div class="apartment-rating"><i class="fas fa-star rating-icon"></i> 4.8 (28 reviews)</div>
+            <div class="apartment-actions">
+                <button class="apartment-edit"><i class="fas fa-edit action-icon"></i> Edit</button>
+                <button class="apartment-delete"><i class="fas fa-trash-alt action-icon"></i> Delete</button>
+            </div>
+            </div>
+            <div class="apartment-user">
+                <img src="https://randomuser.me/api/portraits/men/47.jpg" alt="User" class="user-avatar">
+                <span class="user-name">Robert</span>
+                <span class="user-id">ID: 1</span>
+            </div>
+        </div>
+    </header>
+    <section class="apartment-main-image">
+        <img src="https://i.pinimg.com/1200x/2f/b7/c2/2fb7c221598f1f1395c0a89f349064e2.jpg" alt="Apartment Image" class="main-image">
+    </section>
+    <section class="apartment-gallery">
+        <img src="https://i.pinimg.com/236x/d3/79/b3/d379b35fbd14a9b3131af9c06358bd31.jpg" alt="Interior 1" class="gallery-image">
+        <img src="https://i.pinimg.com/236x/d8/b0/e7/d8b0e7b49b7c67b86f5471af5e41b663.jpg" alt="Interior 2" class="gallery-image">
+        <img src="https://i.pinimg.com/236x/13/28/f6/1328f6276dc11aa2ec2051ebba27a3a2.jpg" alt="Interior 3" class="gallery-image">
+        <img src="https://i.pinimg.com/236x/6a/88/9c/6a889cd7dc9f5fe3814b96330dc8ab6a.jpg" alt="Interior 4" class="gallery-image">
+    </section>
+    <section class="apartment-about">
+        <h2 class="about-title">About Property</h2>
+        <p class="about-description">This stunning apartment offers modern living at its finest. With breathtaking city views, premium amenities, and a luxurious ambiance, this property is perfect for those seeking style and convenience.</p>
+    </section>
+    <section class="apartment-price">
+        <h2 class="price-amount">₹250,000</h2>
+        <p class="price-duration">per month</p>
+    </section>
+    <section class="apartment-details">
+        <div class="detail-item">
+            <h4 class="detail-title"><i class="fas fa-home detail-icon"></i> 75 m²</h4>
+            <p class="detail-text">Square Footage</p>
+        </div>
+        <div class="detail-item">
+            <h4 class="detail-title"><i class="fas fa-map-marker-alt detail-icon"></i> Sector 1, București</h4>
+            <p class="detail-text">Address</p>
+        </div>
+        <div class="detail-item">
+            <h4 class="detail-title"><i class="fas fa-building detail-icon"></i> Apartment</h4>
+            <p class="detail-text">Property Type</p>
+        </div>
+    </section>
+    <section class="apartment-specs">
+        <div class="spec-item">
+            <h4 class="spec-title"><i class="fas fa-bed spec-icon"></i> 2 Bedrooms</h4>
+            <p class="spec-text">Spacious rooms</p>
+        </div>
+        <div class="spec-item">
+            <h4 class="spec-title"><i class="fas fa-bath spec-icon"></i> 1 Bathroom</h4>
+            <p class="spec-text">Modern fixtures</p>
+        </div>
+    </section>
+</div>
+
+<div class="total-users-container" style="max-width: 1400px;">
+    <h2 class="total-users-title" style="margin-bottom:30px;">Reviews For Modern Apartment</h2>
+    <div class="total-users-table-container">
+        <table class="total-users-table">
+            <thead>
+                <tr>
+                    <th>Property ID</th>
+                    <th>Property Title</th>
+                    <th>Reviewer</th>
+                    <th>Date</th>
+                    <th>Rating</th>
+                    <th>Review</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="reviewsTableBody">
+                <!-- Data will be inserted here dynamically -->
+            </tbody>
+        </table>
+    </div>
+
+    <div class="total-users-pagination">
+        <span id="pagination-info"></span>
+        <div id="pagination-buttons"></div>
+    </div>
+</div>
+
+<div class="total-users-container" style="max-width: 1400px;">
+    <h2 class="total-users-title" style="margin-bottom:30px;">Inquiries For Modern Apartment</h2>
+
+    <div class="total-users-table-container">
+        <table class="total-users-table">
+            <thead>
+                <tr>
+                    <th>Guest Name</th>
+                    <th>Property ID</th>
+                    <th>Email Address</th>
+                    <th>Contact No</th>
+                    <th>Message</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="messageTableBody">
+                <!-- Data will be inserted here dynamically -->
+            </tbody>
+        </table>
+    </div>
+
+    <div class="total-users-pagination">
+        <span id="pagination-info"></span>
+        <div id="pagination-buttons"></div>
+    </div>
+</div>
+
+<script src="~/js/site.js"></script>

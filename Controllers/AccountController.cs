@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using WebApplication1.Models;
 
 namespace WebApplication1.Controllers
@@ -14,13 +15,14 @@ namespace WebApplication1.Controllers
         [HttpPost]
         public IActionResult Login(LoginModel model)
         {
-            if (model.Email == "admin@gmail.com" && model.Password == "111")
+            if (model.Phone == "9080605040" && model.Password == "111111")
             {
                 return RedirectToAction("Dashboard", "Account");
-                
+
             }
 
-            else if (model.Email == "superadmin@gmail.com" && model.Password == "123") {
+            else if (model.Phone == "superadmin@gmail.com" && model.Password == "123")
+            {
                 return RedirectToAction("Super_AdminDashboard", "Account");
             }
 

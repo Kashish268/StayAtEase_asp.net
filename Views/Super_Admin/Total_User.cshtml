@@ -1,0 +1,52 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@{
+    ViewBag.Title = "Super Admin Dashboard";
+    Layout = "~/Views/Shared/_SuperAdminLayout.cshtml";
+}
+
+<link rel="stylesheet" href="~/Content/site.css" />
+
+
+<div class="total-users-container">
+    <h2 class="total-users-title">Tenants</h2>
+
+    <div class="total-users-wrapper">
+        
+        <div class="search-container">
+            <i class="fas fa-search search-icon"></i>  <!-- Font Awesome icon -->
+            <input type="text" class="total-users-search" placeholder="Search users...">
+        </div>
+
+        <div class="total-users-table-container">
+            <table class="total-users-table">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Name</th>
+                        <th>Mobile</th>
+                        <th>Created</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="userTableBody">
+                    <!-- Rows will be inserted dynamically -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="total-users-pagination">
+        <span id="pagination-info"></span>
+        <div id="pagination-buttons"></div>
+    </div>
+</div>
+
+<!-- Include External JavaScript -->
+<script src="~/js/site.js"></script>
+
+
