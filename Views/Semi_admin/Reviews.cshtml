@@ -1,0 +1,258 @@
+﻿@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Admin Dashboard";
+    ViewData["ActivePage"] = "Reviews";
+}
+@{
+    var reviews = GetReviews();
+    int pageSize = 8; // Show 8 records per page
+    int currentPage = 1;
+
+    // Read current page from query string (default to 1 if missing)
+    if (Context.Request.Query.ContainsKey("page"))
+    {
+        int.TryParse(Context.Request.Query["page"], out currentPage);
+        currentPage = Math.Max(currentPage, 1); // Ensure at least page 1
+    }
+
+    int totalReviews = reviews.Count;
+    int totalPages = (int)Math.Ceiling((double)totalReviews / pageSize);
+
+    // Get only the records for the current page
+    var paginatedReviews = reviews.Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+}
+
+@functions {
+    public class Review
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Date { get; set; }
+        public int Rating { get; set; }
+        public string ReviewText { get; set; }
+        public string Image { get; set; }
+    }
+
+    public List<Review> GetReviews()
+    {
+        return new List<Review>
+        {
+            new Review { Id = 1, Name = "Alice Johnson", Date = "2025-03-10", Rating = 5, ReviewText = "Great experience!", Image = "/assets/profile.png" },
+            new Review { Id = 2, Name = "Michael Smith", Date = "2025-03-12", Rating = 4, ReviewText = "Good service, but room for improvement.", Image = "/assets/profile.png" },
+            new Review { Id = 3, Name = "Sophie Brown", Date = "2025-03-15", Rating = 3, ReviewText = "Average stay, nothing special.", Image = "/assets/profile.png" },
+            new Review { Id = 4, Name = "Daniel White", Date = "2025-03-17", Rating = 5, ReviewText = "Absolutely loved it!", Image = "/assets/profile.png" },
+            new Review { Id = 5, Name = "Emma Green", Date = "2025-03-18", Rating = 4, ReviewText = "Nice place, would visit again.", Image = "/assets/profile.png" },
+             new Review { Id = 1, Name = "Alice Johnson", Date = "2025-03-10", Rating = 5, ReviewText = "Great experience!", Image = "/assets/profile.png" },
+            new Review { Id = 2, Name = "Michael Smith", Date = "2025-03-12", Rating = 4, ReviewText = "Good service, but room for improvement.", Image = "/assets/profile.png" },
+            new Review { Id = 3, Name = "Sophie Brown", Date = "2025-03-15", Rating = 3, ReviewText = "Average stay, nothing special.", Image = "/assets/profile.png" },
+            new Review { Id = 4, Name = "Daniel White", Date = "2025-03-17", Rating = 5, ReviewText = "Absolutely loved it!", Image = "/assets/profile.png" },
+             new Review { Id = 1, Name = "Alice Johnson", Date = "2025-03-10", Rating = 5, ReviewText = "Great experience!", Image = "/assets/profile.png" },
+            new Review { Id = 2, Name = "Michael Smith", Date = "2025-03-12", Rating = 4, ReviewText = "Good service, but room for improvement.", Image = "/assets/profile.png" },
+            new Review { Id = 3, Name = "Sophie Brown", Date = "2025-03-15", Rating = 3, ReviewText = "Average stay, nothing special.", Image = "/assets/profile.png" },
+            new Review { Id = 4, Name = "Daniel White", Date = "2025-03-17", Rating = 5, ReviewText = "Absolutely loved it!", Image = "/assets/profile.png" },
+            new Review { Id = 5, Name = "Emma Green", Date = "2025-03-18", Rating = 4, ReviewText = "Nice place, would visit again.", Image = "/assets/profile.png" },
+            new Review { Id = 5, Name = "Emma Green", Date = "2025-03-18", Rating = 4, ReviewText = "Nice place, would visit again.", Image = "/assets/profile.png" },
+        };
+    }
+}
+
+
+<div class="container mt-4">
+    <h2 class="mb-2 text-dark">Property Reviews</h2>
+    <p class="text-muted">Sunset Heights Apartments</p>
+
+
+    <!-- Search Bar -->
+    <div class="mb-3 position-relative">
+        <i class="fas fa-search position-absolute top-50 start-0 ps-3 translate-middle-y text-secondary"></i>
+        <input type="text"
+               id="searchInput"
+               class="form-control ps-5"
+               placeholder="Search messages..."
+               onkeyup="filterMessages()">
+    </div>
+    <!-- Review Table -->
+    <div class="table-responsive">
+        <table class="table">
+            <thead class="bg-light">
+                <tr>
+                    <th class="py-3">Reviewer</th>
+                    <th class="py-3">Date</th>
+                    <th class="py-3">Rating</th>
+                    <th class="py-3">Review</th>
+                    <th class="py-3">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (paginatedReviews.Any())
+                {
+                    @foreach (var review in paginatedReviews.Select((r, index) => new { r, index }))
+                    {
+                        <tr class="@(review.index % 2 == 0 ? "bg-white" : "bg-light")">
+                            <td class="py-3 d-flex align-items-center">
+                                <img src="@review.r.Image" alt="Reviewer" class="rounded-circle me-2" width="40" height="40" />
+                                <span class="fw-medium">@review.r.Name</span>
+                            </td>
+                            <td class="py-3">@review.r.Date</td>
+                            <td class="py-3">
+                                @for (int i = 0; i < review.r.Rating; i++)
+                                {
+                                    <i class="fas fa-star text-warning"></i>
+                                }
+                                @for (int i = review.r.Rating; i < 5; i++)
+                                {
+                                    <i class="far fa-star text-muted"></i>
+                                }
+                            </td>
+                            <td class="py-3">@review.r.ReviewText</td>
+                            <td class="py-3">
+                                <button class="btn text-danger fw-semibold" data-review-id="@review.r.Id" onclick="openReportModal(this)">
+                                    <i class="fas fa-flag"></i> Report
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-4">No reviews found.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="d-flex justify-content-between align-items-center mt-4 pb-4">
+        <p class="text-muted small">
+            Showing @(Math.Min(((currentPage - 1) * pageSize) + 1, totalReviews))
+            to @(Math.Min(currentPage * pageSize, totalReviews))
+            of @totalReviews reviews
+        </p>
+        <nav>
+            <ul class="pagination mb-0">
+                <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                    <a class="page-link" href="?page=@(currentPage - 1)">Previous</a>
+                </li>
+                @for (int i = 1; i <= totalPages; i++)
+                {
+                    <li class="page-item @(currentPage == i ? "active" : "")">
+                        <a class="page-link" href="?page=@i">@i</a>
+                    </li>
+                }
+                <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                    <a class="page-link" href="?page=@(currentPage + 1)">Next</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+</div>
+
+<script>
+    // Open Report Modal
+    function openReportModal(button) {
+        var modalElement = document.getElementById("reportModal");
+
+        if (!modalElement) {
+            console.error("Modal element not found!");
+            return;
+        }
+
+        var reviewId = button.getAttribute("data-review-id");
+        document.getElementById("selectedReviewId").value = reviewId;
+
+        reportModal = new bootstrap.Modal(modalElement);
+        reportModal.show();
+    }
+
+    // Submit Report Function
+    function submitReport() {
+        var reviewId = document.getElementById("selectedReviewId").value;
+        var reportDescription = document.getElementById("reportDescription").value.trim();
+
+        if (!reportDescription) {
+            alert("Please enter a report description.");
+            return;
+        }
+
+        fetch("/Reviews/Report", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ reviewId, description: reportDescription })
+        })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+
+                // Ensure Bootstrap modal instance is closed properly
+                var modalElement = document.getElementById("reportModal");
+                var modalInstance = bootstrap.Modal.getInstance(modalElement);
+
+                if (!modalInstance) {
+                    modalInstance = new bootstrap.Modal(modalElement);
+                }
+
+                modalInstance.hide();
+
+                // Ensure backdrop and modal-open class are removed
+                setTimeout(() => {
+                    modalElement.classList.remove("show");
+                    modalElement.style.display = "none";
+                    document.body.classList.remove("modal-open");
+                    document.querySelector(".modal-backdrop")?.remove();
+                }, 300);
+
+                // Clear the textarea after closing
+                document.getElementById("reportDescription").value = "";
+            })
+            .catch(error => console.error("Error reporting review:", error));
+    }
+
+
+    // Filter Reviews Function
+    function filterReviews() {
+        var input = document.getElementById("searchInput").value.toLowerCase();
+        var rows = document.querySelectorAll("tbody tr");
+
+        rows.forEach(row => {
+            var name = row.querySelector("td span").innerText.toLowerCase();
+            var review = row.querySelector("td:nth-child(4)").innerText.toLowerCase();
+            if (name.includes(input) || review.includes(input)) {
+                row.style.display = "";
+            } else {
+                row.style.display = "none";
+            }
+        });
+    }
+</script>
+
+<!-- Report Modal -->
+<div class="modal fade" id="reportModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content p-4 rounded-lg shadow-lg">
+            <!-- Close Button (Top-Right) -->
+            <button type="button" class="btn-close position-absolute top-0 end-0 m-3" data-bs-dismiss="modal"></button>
+
+            <!-- Modal Header -->
+            <h3 class="modal-title fw-bold mb-2">Write Report</h3>
+            <p class="text-muted">Enter your description:</p>
+
+            <!-- Hidden Input for Selected Review ID -->
+            <input type="hidden" id="selectedReviewId" />
+
+            <!-- Textarea Input -->
+            <textarea id="reportDescription" class="form-control mt-2" rows="4" placeholder="Enter here..."></textarea>
+
+            <!-- Submit Button -->
+            <div class="d-grid mt-4">
+                <button type="button" class="btn btn-primary" onclick="submitReport()">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+

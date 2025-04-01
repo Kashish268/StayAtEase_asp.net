@@ -8,5 +8,10 @@
         public string Price { get; set; }
         public double Rating { get; set; }
         public string ImageUrl { get; set; }
+
+        public int Area { get; set; }  // Ensure this property exists
+        public string Address { get; set; } = string.Empty; // Ensure this property exists
+        public bool IsAvailable { get; set; } // Ensure this property exists
+     
     }
 }
