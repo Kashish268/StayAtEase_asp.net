@@ -30,5 +30,10 @@ app.MapControllerRoute(
     pattern: "Account/{action=Dashboard}/{id?}",
     defaults: new { controller = "Account", action = "Dashboard" }
 );
+app.MapControllerRoute(
+    name: "super_admin",
+    pattern: "Account/{action=Super_AdminDashboard}/{id?}",
+    defaults: new { controller = "Account", action = "Super_AdminDashboard" }
+);
 
 app.Run();

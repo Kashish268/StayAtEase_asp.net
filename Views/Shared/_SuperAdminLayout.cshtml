@@ -29,16 +29,41 @@
                     <ul class="navbar-nav">
                         <li class="nav-item">
                             <a class="nav-link @(ViewData["ActivePage"] == "Super_AdminDashboard" ? "active" : "")"
-                               asp-controller="Semi_admin" asp-action="Dashboard">
-                                Home
+                               asp-controller="Super_Admin" asp-action="Super_AdminDashboard">
+                                Dashboard
                             </a>
                         </li>
-                        @* <li class="nav-item"> *@
-                        @*     <a class="nav-link @(ViewData["ActivePage"] == "Add_Properties" ? "active" : "")" *@
-                        @*        asp-controller="Semi_admin" asp-action="Add_Properties"> *@
-                        @*         Add Properties *@
-                        @*     </a> *@
-                        @* </li> *@
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewData["ActivePage"] == "Total_User" ? "active" : "")"
+                               asp-controller="Super_Admin" asp-action="Total_User">
+                                Tenants
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewData["ActivePage"] == "Total_Admin" ? "active" : "")"
+                               asp-controller="Super_Admin" asp-action="Total_Admin">
+                                Property Owners
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewData["ActivePage"] == "Property_Reviews" ? "active" : "")"
+                               asp-controller="Super_Admin" asp-action="Property_Reviews">
+                                Reviews
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewData["ActivePage"] == "Inquiries" ? "active" : "")"
+                               asp-controller="Super_Admin" asp-action="Inquiries">
+                                Inquiries
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewData["ActivePage"] == "Total_Properties" ? "active" : "")"
+                               asp-controller="Super_Admin" asp-action="Total_Properties">
+                                Properties
+                            </a>
+                        </li>
+                        
                         @* <li class="nav-item"> *@
                         @*     <a class="nav-link @(ViewData["ActivePage"] == "WishList" ? "active" : "")" asp-area="" asp-controller="Home" asp-action="WishList">My Listing</a> *@
                         @* </li> *@

@@ -674,6 +674,281 @@ footer {
         color: white;
         font-size: 14px;
         padding: 5px 10px;
+
+        border-radius: 3px;
+    }
+
+
+/*    =================== Super Admin css ====================*/
+
+/* Super Admin Dashboard Styles */
+.sad-dashboard-container {
+    padding: 20px;
+    font-family: 'Arial', sans-serif;
+    background: #f4f6f9;
+}
+
+/* Dashboard Stats */
+.sad-dashboard-stats {
+  
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.sad-card {
+    flex: 1;
+    min-width: 200px;
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+    .sad-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    }
+
+.sad-card-icon {
+    color: #007bff;
+    margin-bottom: 12px;
+    font-size: 30px;
+    transition: 0.3s ease-in-out;
+}
+
+    .sad-card-icon:hover {
+        color: #0056b3;
+        transform: scale(1.1);
+    }
+    /* Tables */
+    .sad-dashboard-tables {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+        margin-top: 20px;
+        overflow-x: auto; /* Enables horizontal scrolling */
+    }
+
+.sad-table-container {
+    flex: 1;
+    min-width: 300px;
+    background: #fff;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    overflow-x: auto; /* Ensures scrolling inside the table container */
+}
+
+.sad-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+}
+
+    .sad-section-header h4 {
+        margin: 0;
+        color: #333;
+    }
+
+.sad-view-all {
+    text-decoration: none;
+    color: #007bff;
+    font-size: 14px;
+    transition: color 0.3s ease;
+}
+
+    .sad-view-all:hover {
+        color: #0056b3;
+    }
+
+.sad-table-wrapper {
+    overflow-x: auto;
+    width: 100%;
+}
+
+.sad-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px; /* Prevents tables from shrinking */
+}
+
+    .sad-table th,
+    .sad-table td {
+        padding: 10px;
+        text-align: left;
+        transition: background 0.3s ease;
+    }
+    .sad-table td {
+        border-bottom: 1px solid #ddd;
+    }
+        .sad-table th {
+            background-color: #b2d7ff;
+            color: #323232;
+        }
+
+  
+    .sad-table tr:hover {
+        background: #f1f1f1;
+    }
+
+/* Horizontal Scroll for Small Screens */
+.sad-latest-section {
+    background: #fff;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+    overflow-x: auto;
+}
+
+    .sad-latest-section .sad-table-wrapper {
+        overflow-x: auto;
+    }
+
+    .sad-latest-section table {
+        width: 100%;
+        min-width: 600px;
+        white-space: nowrap; /* Prevents text from wrapping */
+    }
+
+    .sad-latest-section th {
+        background-color: #b2d7ff;
+        color: #323232;
+    }
+
+    .sad-latest-section td {
+        min-width: 120px;
+    }
+
+/* Reviews */
+.sad-reviews-container {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+
+.sad-review-card {
+    flex: 1;
+    min-width: 250px;
+    background: #fff;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+    .sad-review-card:hover {
+        transform: scale(1.05);
+    }
+
+.sad-review-profile {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ddd;
+}
+
+.sad-review-content {
+    flex: 1;
+}
+
+    .sad-review-content h5 {
+        margin: 0;
+        font-size: 16px;
+        color: #333;
+    }
+
+    .sad-review-content .sad-review-date {
+        font-size: 12px;
+        color: #666;
+    }
+
+    .sad-review-content p {
+        margin: 5px 0;
+        font-size: 14px;
+    }
+
+    .sad-review-content small i {
+        color: #FFD700;
+    }
+
+/* Small Screens */
+@media (max-width: 768px) {
+    .sad-dashboard-stats {
+        flex-direction: column;
+    }
+
+    .sad-dashboard-tables {
+        flex-direction: column;
+    }
+
+    .sad-table-container {
+        overflow-x: auto;
+    }
+
+    .sad-latest-section .sad-table-wrapper {
+        overflow-x: auto;
+    }
+
+    .sad-reviews-container {
+        flex-direction: column;
+    }
+}
+/*------------total_user   and    total admins--------------------------------*/
+
+/* Total Users Dashboard */
+.total-users-container {
+    max-width: 1200px;
+    margin: auto;
+    padding: 20px;
+
+}
+
+.total-users-title {
+    font-size: 26px;
+    font-weight: bold;
+/*    text-align: center;*/
+    margin-bottom: 3px;
+    color: #333;
+}
+
+.total-users-table-container {
+    overflow-x: auto;
+    background: #ffffff;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+}
+
+
+/*.total-users-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+    .total-users-table th, .total-users-table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }*/
+
+/* Table Styling */
+.total-users-table-container {
+    overflow-x: auto;
+}
+
+.total-users-table {
+=======
         border-radius: 5px;
     }
 
@@ -740,11 +1015,28 @@ h2 {
    
 /* Table Styling */
 table {
-    width: 100%;
+
+/*     width: 100%;
     border-collapse: collapse;
     background: white;
     border-radius: 8px;
-    overflow: hidden;
+    overflow: hidden; */
+
+    box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+    .total-users-table th {
+        background-color: #b2d7ff;
+        color: #323232;
+        padding: 14px;
+        text-align: left;
+        font-size: 16px;
+    }
+
+    .total-users-table td {
+        padding: 12px;
+        border-bottom: 1px solid #ddd;
+
     box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
 }
 
@@ -755,10 +1047,173 @@ thead {
     thead th {
         padding: 12px;
         text-align: left;
-        font-size: 14px;
-        color: #555;
+
+/*         font-size: 14px;
+        color: #555; */
     }
 
+
+    /* Alternating Row Colors */
+    .total-users-table tbody tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+/* User Info Section */
+.total-users-info {
+    display: flex;
+    align-items: center;
+}
+
+.total-users-profile-pic {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    margin-right: 10px;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.15);
+
+}
+
+/* Status Styles */
+.total-users-status {
+    font-weight: bold;
+}
+
+    .total-users-pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+}
+
+
+/* Action Buttons */
+.total-users-action-btn {
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 18px;
+    padding: 6px;
+    border-radius: 5px;
+    transition: 0.2s;
+}
+
+    .total-users-action-btn.edit {
+        color: #007bff;
+    }
+
+    .total-users-action-btn.delete {
+        color: #dc3545;
+    }
+
+    .total-users-action-btn:hover {
+        background: rgba(0, 0, 0, 0.05);
+    }
+
+
+/* Pagination Styling */
+.total-users-pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+}
+
+#pagination-info {
+    font-size: 14px;
+    color: #666;
+}
+
+/* Pagination Buttons */
+.pagination-btn {
+    background: #007bff;
+    color: white;
+    padding: 8px 14px;
+    margin: 0 5px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: 0.3s;
+}
+
+    .pagination-btn.active {
+        background: #0056b3;
+    }
+
+    .pagination-btn:hover {
+        background: #0056b3;
+    }
+
+/*.total-users-profile-pic {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+}*/
+
+.total-users-info {
+    display: flex;
+    align-items: center;
+}
+
+.total-users-status.active {
+    color: green;
+}
+
+.total-users-status.inactive {
+    color: red;
+}
+
+.total-users-action-btn {
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 16px;
+    margin: 0 5px;
+}
+
+/* Search Input */
+.total-users-search {
+    width: 100%;
+    padding: 12px;
+    padding-left: 40px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    box-shadow: inset 0px 2px 6px rgba(0, 0, 0, 0.1);
+}
+.search-container {
+    position: relative;
+/*    display: inline-block;*/
+}
+.search-icon {
+    position: absolute;
+    left: 15px;
+    top: 45%;
+    transform: translateY(-50%);
+    color: #888;
+    font-size: 16px;
+    padding-left: 20px;
+   
+}
+
+/*---------------------------------- total property -------------------------*/
+
+/* General Container Styling */
+.property-container {
+    width: 90%;
+    margin: 20px auto;
+    padding: 20px;
+    
+}
+
+/* Title */
+.property-title {
+    
+    font-size: 28px;
+    color: #333;
+=======
 tbody tr {
     border-bottom: 1px solid #ddd;
 }
@@ -810,9 +1265,448 @@ td {
 .title {
     text-align: center;
     font-size: 24px;
+
     font-weight: bold;
     margin-bottom: 20px;
 }
+
+
+/* Stats Container */
+.property-stats-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+/* Stats Container */
+.property-stats-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 20px;
+    flex-wrap: wrap; /* Makes it responsive */
+}
+
+/* Individual Stat Box */
+.property-stat-box {
+    flex: 1;
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 250px;
+}
+
+    .property-stat-box:hover {
+        transform: translateY(-5px);
+        box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Icon Styling */
+    .property-stat-box i {
+        color: #007bff;
+        margin-bottom: 12px;
+        font-size: 30px;
+        transition: 0.3s ease-in-out;
+    }
+
+    .property-stat-box:hover i {
+        color: #0056b3;
+        transform: scale(1.1);
+    }
+
+    /* Title Text */
+    .property-stat-box p {
+        font-size: 16px;
+        color: #444;
+        margin: 5px 0;
+        font-weight: 500;
+    }
+
+    /* Stat Number */
+    .property-stat-box h2 {
+        font-size: 24px;
+        color: #222;
+        font-weight: bold;
+        margin-top: 5px;
+    }
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .property-stats-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .property-stat-box {
+        width: 80%;
+        min-width: 200px;
+    }
+}
+
+/* Search Bar */
+.property-search-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    align-items: center;
+}
+
+.property-search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 48%;
+}
+
+    .property-search-box i {
+        position: absolute;
+        left: 12px;
+        color: #888;
+        font-size: 16px;
+    }
+
+.property-search-input {
+    width: 100%;
+    padding: 12px 12px 12px 40px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: border 0.3s ease-in-out;
+}
+
+    .property-search-input:focus {
+        border-color: #007bff;
+        outline: none;
+    }
+
+.property-search-select {
+    width: 48%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: border 0.3s ease-in-out;
+}
+
+    .property-search-select:focus {
+        border-color: #007bff;
+        outline: none;
+    }
+
+/* Table Styling */
+/*.property-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+    .property-table th {
+        background-color: #b2d7ff;
+        color: #323232;
+        padding: 12px;
+        font-size: 16px;
+        text-align: left;
+    }
+
+    .property-table td {
+        padding: 12px;
+        border-bottom: 1px solid #ddd;
+        font-size: 14px;
+    }
+
+.property-image {
+    width: 50px;
+    height: 50px;
+    border-radius: 5px;
+}
+
+.property-status-available {
+    color: green;
+    font-weight: bold;
+}
+
+.property-status-unavailable {
+    color: red;
+    font-weight: bold;
+}*/
+
+/* Pagination */
+/*.total-users-pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    padding: 10px;
+}
+
+#pagination-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+    #pagination-buttons button {
+        padding: 8px 14px;
+        font-size: 14px;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+        background: #007bff;
+        color: white;
+        transition: 0.3s;
+    }
+
+        #pagination-buttons button:hover {
+            background: #0056b3;
+        }
+
+.property-action-btn {
+    padding: 5px 10px;
+    border: none;
+    cursor: pointer;
+    background: #007bff;
+    color: white;
+    border-radius: 5px;
+}*/
+
+/* Table Container for Responsiveness */
+.property-table-container {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Table Styling */
+.property-table {
+    width: 100%;
+    min-width: 600px; /* Prevents content from squishing */
+    border-collapse: collapse;
+    background: white;
+    border-radius: 10px;
+}
+
+    .property-table th {
+        background-color: #b2d7ff;
+        color: #323232;
+        padding: 12px;
+        font-size: 16px;
+        text-align: left;
+    }
+
+    .property-table td {
+        padding: 12px;
+        border-bottom: 1px solid #ddd;
+        font-size: 14px;
+    }
+
+/* Make table responsive */
+@media (max-width: 768px) {
+    .property-table-container {
+        overflow-x: auto;
+    }
+
+    .property-table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+}
+
+.property-status-available {
+    color: green;
+    font-weight: bold;
+}
+.property-status-unavailable {
+    color: red;
+    font-weight: bold;
+}
+
+.total-users-action-btn.view {
+    background-color: #007bff; /* Blue color */
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px; /* Space between text and icon */
+    box-shadow: 0px 4px 8px rgba(0, 123, 255, 0.3);
+}
+
+    .total-users-action-btn.view:hover {
+        background-color: #0056b3; /* Darker blue on hover */
+        transform: translateY(-2px); /* Slight lift effect */
+        box-shadow: 0px 6px 12px rgba(0, 123, 255, 0.5);
+    }
+
+/*    --------------------------------particular property ---------------------------*/
+
+.apartment-container {
+    width: 90%;
+    max-width: 1400px;
+    margin: auto;
+    background: #fff;
+    padding: 20px;
+/*    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);*/
+}
+
+.apartment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.apartment-title {
+    font-size: 35px;
+    font-weight: bold;
+    color: #333;
+}
+
+.apartment-status {
+    font-size: 18px;
+    font-weight: bold;
+    color: green;
+}
+ .detail-icon, .spec-icon {
+    margin-right: 8px;
+    color: #007bff;
+    font-size: 18px;
+}
+.action-icon {
+    margin-right: 8px;
+    font-size: 15px;
+}
+.rating-icon {
+    margin-right: 8px;
+    color:gold;
+    font-size: 22px;
+}
+.apartment-rating {
+    font-size:1.5em;
+    font-weight: bold;
+    margin-bottom:5px;
+}
+
+.apartment-actions button {
+    border: none;
+    padding: 8px 15px;
+    margin: 5px;
+    cursor: pointer;
+    border-radius: 5px;
+
+}
+
+.apartment-edit {
+    background: #4CAF50;
+    color: white;
+}
+
+.apartment-delete {
+    background: #f44336;
+    color: white;
+}
+.review-button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+.apartment-user {
+    display: flex;
+    align-items: center;
+    margin-top: 5px;
+   
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+    margin-bottom:10px;
+}
+
+.apartment-main-image img {
+    width: 100%;
+    border-radius: 10px;
+    object-fit:fill;
+    max-height:75vh;
+}
+
+.apartment-gallery {
+    display: flex;
+    gap: 15px;
+    margin: 10px 0;
+    object-fit: fill;
+    max-height:28vh;
+}
+
+.gallery-image {
+    width: 24%;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: transform 0.3s;
+}
+
+    .gallery-image:hover {
+        transform: scale(1.05);
+    }
+
+.apartment-about, .apartment-price, .apartment-details, .apartment-specs {
+    margin: 20px 0;
+    padding: 15px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.apartment-details, .apartment-specs {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+}
+
+.detail-item, .spec-item {
+    flex: 1;
+    margin: 10px;
+    padding: 15px;
+    background: #f0f0f0;
+    border-radius: 8px;
+    font-size:20px;
+}
+
+@media (max-width: 768px) {
+    .apartment-gallery {
+        flex-wrap: wrap;
+    }
+
+    .gallery-image {
+        width: 48%;
+    }
+
+    .apartment-details, .apartment-specs {
+        flex-direction: column;
+    }
+}
+
 
 .profile-image-section {
     text-align: center;
@@ -912,4 +1806,5 @@ textarea {
     .logout-button:hover {
         background: darkred;
     }
+
 
