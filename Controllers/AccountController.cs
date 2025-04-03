@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using WebApplication1.Models;
 
 namespace WebApplication1.Controllers
@@ -20,7 +21,7 @@ namespace WebApplication1.Controllers
 
             }
 
-            else if (model.Phone == "superadmin@gmail.com" && model.Password == "123")
+            else if (model.Phone == "8542163955" && model.Password == "123456")
             {
                 return RedirectToAction("Super_AdminDashboard", "Account");
             }

@@ -7,6 +7,7 @@ namespace WebApplication1.Controllers
     {
         public IActionResult Dashboard()
         {
+
             var model = new DashboardViewModel
             {
                 TotalProperties = 24,
@@ -65,6 +66,7 @@ namespace WebApplication1.Controllers
 
 
         public IActionResult Messages() {
+            ViewData["ActivePage"] = "Messages";
             return View();
         }
 
