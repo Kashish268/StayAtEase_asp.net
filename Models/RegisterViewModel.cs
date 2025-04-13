@@ -38,7 +38,7 @@
 
 
 using System.ComponentModel.DataAnnotations;
-
+using Microsoft.AspNetCore.Http;
 public class RegisterViewModel
 {
     [Required(ErrorMessage = "Full name is required.")]
@@ -64,5 +64,8 @@ public class RegisterViewModel
 
     [Required(ErrorMessage = "User type is required.")]
     public string userType { get; set; }
+
+    //// ✅ New Optional Field for Profile Picture Upload
+    //public IFormFile? profilePicture { get; set; }
 }
 

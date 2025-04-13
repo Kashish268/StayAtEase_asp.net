@@ -1,7 +1,7 @@
 ﻿@{ 
      Layout = null; 
  } 
-
+ @model RegisterViewModel
 <style> 
      .radio-group { 
          display: flex; 
@@ -23,10 +23,10 @@
      .is-invalid { 
          border-color: #dc3545; 
      } 
- </style> 
+ </style>
 
- <form id="registerForm" method="post" asp-controller="Home" asp-action="Register"> 
-     <div class="row"> 
+<form id="registerForm" method="post" asp-controller="Home" asp-action="Register" enctype="multipart/form-data">
+    <div class="row"> 
          <!-- Left Column --> 
          <div class="col-sm-12 col-md-6"> 
              <div class="mb-3"> 
@@ -80,6 +80,13 @@
                  </div> 
                  <span class="text-danger" id="userTypeError"></span> 
              </div> 
+
+    @*          <div class="mb-3"> *@
+    @* <label class="form-label">Choose Profile Picture (Optional)</label> *@
+    @*             <input type="file"  class="form-control" name="profilePicture" id="profilePicture" accept="image/*"> *@
+
+</div>
+
          </div> 
      </div> 
 

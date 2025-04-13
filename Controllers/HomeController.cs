@@ -71,7 +71,7 @@ namespace WebApplication1.Controllers
             return View();
         }
         [HttpPost]
-        public IActionResult Register(RegisterViewModel model)
+        public async Task<IActionResult> Register(RegisterViewModel model)
         {
             string errorHtml;
             if (!ModelState.IsValid)
@@ -86,7 +86,17 @@ namespace WebApplication1.Controllers
 
                 }
                 else {
+
                     errorHtml = "<div class='alert alert-danger'>Please enter all required fields correctly.</div>";
+                    foreach (var state in ModelState.Values)
+                    {
+                        foreach (var error in state.Errors)
+                        {
+                            errorHtml += $"<li>{error.ErrorMessage}</li>";
+                        }
+                    }
+
+                    errorHtml += "</ul></div>";
 
                 }
                 // You can loop through ModelState if you want detailed errors, but for simplicity:
@@ -154,19 +164,51 @@ namespace WebApplication1.Controllers
                 }
 
 
+
                 // Insert only after email is sent successfully
-                string insertQuery = @"INSERT INTO users (name, email, mobile, password, role, verification_token, token_expiration)
-                               VALUES (@Name, @Email, @Phone, @Password, @Role, @Token,DATEADD(DAY, 1, GETDATE())
-)";
+                // Insert only after email is sent successfully
+                string insertQuery = @"INSERT INTO users (name, email, mobile, password, role, verification_token, token_expiration, profile_pic)
+                               VALUES (@Name, @Email, @Phone, @Password, @Role, @Token, DATEADD(DAY, 1, GETDATE()), @ProfilePic)";
 
                 using (SqlCommand cmd = new SqlCommand(insertQuery, conn))
                 {
                     cmd.Parameters.AddWithValue("@Name", model.fullname);
                     cmd.Parameters.AddWithValue("@Email", model.email);
                     cmd.Parameters.AddWithValue("@Phone", model.phone);
-                    cmd.Parameters.AddWithValue("@Password", model.password); // Should hash in real apps
+                    cmd.Parameters.AddWithValue("@Password", model.password); // Hashing is recommended in production
                     cmd.Parameters.AddWithValue("@Role", model.userType);
                     cmd.Parameters.AddWithValue("@Token", token);
+
+                    // ✅ Always save the default profile picture
+                    string profilePicPath = "/assets/profile_default.png";
+
+                    // ❌ No need to check or upload anything
+                    cmd.Parameters.AddWithValue("@ProfilePic", profilePicPath);
+
+                    //string profilePicPath;
+
+                    //if (model.profilePicture != null && model.profilePicture.Length > 0)
+                    //{
+                    //    var ext = Path.GetExtension(model.profilePicture.FileName);
+                    //    string uniqueFileName = Guid.NewGuid().ToString() + ext;
+
+                    //    string savePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", uniqueFileName);
+                    //    Console.WriteLine("Saving file to: " + savePath);
+
+                    //    using (var stream = new FileStream(savePath, FileMode.Create))
+                    //    {
+                    //        await model.profilePicture.CopyToAsync(stream);
+                    //    }
+
+                    //    profilePicPath = "/uploads/" + uniqueFileName;
+                    //}
+                    //else
+                    //{
+                    //    profilePicPath = "/assets/profile_default.png"; // Use default image only if image not uploaded
+                    //}
+
+
+                    //cmd.Parameters.AddWithValue("@ProfilePic", profilePicPath);
 
                     cmd.ExecuteNonQuery();
                 }
@@ -243,6 +285,136 @@ namespace WebApplication1.Controllers
             }
 
             return View("EmailVerified");
+        }
+
+        [HttpGet]
+        public IActionResult Forgotpassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult ForgotPassword(string Email)
+        {
+            string connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+
+                string userName = "";
+                // Check if the email exists and fetch fullname
+                string getUserQuery = "SELECT name FROM users WHERE email = @Email";
+                using (SqlCommand cmd = new SqlCommand(getUserQuery, conn))
+                {
+                    cmd.Parameters.AddWithValue("@Email", Email);
+                    var result = cmd.ExecuteScalar();
+
+                    if (result == null)
+                    {
+                        ViewBag.Error = "Email is not valid.";
+                        return View();
+                    }
+
+                    userName = result.ToString();
+                }
+
+                // Generate token and send email
+                string token = Guid.NewGuid().ToString();
+                string resetLink = Url.Action("Resetpassword", "Home", new { token = token }, Request.Scheme);
+
+                string emailBody = $@"
+        <p>Hello <strong>{userName}</strong>,</p>
+        <p>We received a request to reset your password.</p>
+        <p>Click the link below to reset it:</p>
+        <p><a href='{resetLink}'>Reset Password</a></p>
+        <p><em>Note: This link will expire in 1 hour for your security.</em></p>
+        <br/>
+        <p>If you didn’t request this, please ignore this email.</p>
+        <p>Thanks,<br/>StayAtEase Team</p>";
+
+                bool mailSent = SendVerificationEmail(Email, "Reset Password", emailBody);
+
+                if (mailSent)
+                {
+                    // Save token in database (optional but recommended)
+                    string updateTokenQuery = "UPDATE users SET verification_token = @Token, token_expiration = DATEADD(MINUTE, 1, GETDATE()) WHERE email = @Email";
+                    using (SqlCommand updateCmd = new SqlCommand(updateTokenQuery, conn))
+                    {
+                        updateCmd.Parameters.AddWithValue("@Token", token);
+                        updateCmd.Parameters.AddWithValue("@Email", Email);
+                        updateCmd.ExecuteNonQuery();
+                    }
+
+                    ViewBag.Message = "Reset link has been sent to your email.";
+                }
+                else
+                {
+                    ViewBag.Error = "Failed to send email. Try again.";
+                }
+            }
+
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult Resetpassword() {
+            return View();
+        }
+
+        [HttpPost]
+        [HttpPost]
+        public IActionResult ResetPassword(string token, string Password, string ConfirmPassword)
+        {
+            if (Password != ConfirmPassword)
+            {
+                ViewBag.Error = "Passwords do not match.";
+                return View();
+            }
+
+            if (Password.Length < 6)
+            {
+                ViewBag.Error = "Password must be at least 6 characters long.";
+                return View();
+            }
+
+            string connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+
+                // Check token validity
+                string email = null;
+                string tokenQuery = "SELECT email FROM users WHERE verification_token = @Token AND token_expiration > GETDATE()";
+                using (SqlCommand cmd = new SqlCommand(tokenQuery, conn))
+                {
+                    cmd.Parameters.AddWithValue("@Token", token);
+                    var result = cmd.ExecuteScalar();
+                    if (result == null)
+                    {
+                        ViewBag.Error = "Your reset link has expired. Please request a new one.";
+                        return RedirectToAction("Forgotpassword", "Home"); // adjust action/controller if needed
+                    }
+
+                    
+
+                    email = result.ToString();
+                }
+
+                // Update password
+                string updateQuery = "UPDATE users SET password = @Password WHERE email = @Email";
+                using (SqlCommand cmd = new SqlCommand(updateQuery, conn))
+                {
+                    cmd.Parameters.AddWithValue("@Password", Password); // Optional: hash password here
+                    cmd.Parameters.AddWithValue("@Email", email);
+                    cmd.ExecuteNonQuery();
+                }
+
+                ViewBag.Message = "Your password has been successfully updated.";
+            }
+
+            return View();
         }
 
 

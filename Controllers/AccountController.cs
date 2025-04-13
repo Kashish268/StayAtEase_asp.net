@@ -67,7 +67,7 @@ namespace WebApplication1.Controllers
                             case "roomowner":
                                 return RedirectToAction("Dashboard", "Account");
 
-                            case "tenants":
+                            case "tenant":
                                 return RedirectToAction("Index", "Home");
 
                             default:
