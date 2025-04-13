@@ -4,46 +4,69 @@
 }
 
 <form method="post" asp-controller="Account" asp-action="Login" id="loginForm">
-    <div class="mb-3">
-        <label for="phone" class="form-label">Phone number</label>
-        <input type="tel" class="form-control" id="phone" name="phone" placeholder="Enter your phone number">
-        <span id="phoneError" class="text-danger"></span>
-    </div>
+   <div class="mb-3"> 
+                 <label class="form-label">Email Address *</label> 
+                <input type="email" class="form-control" name="email" id="email" placeholder="your@email.com"> 
+                 <span class="text-danger" id="emailError"></span> 
+             </div> 
     <div class="mb-3">
         <label for="password" class="form-label">Password</label>
         <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password"  minlength="6">
         <span id="passwordError" class="text-danger"></span>
     </div>
 
+    <div class="mb-3 text-end">
+        <a href="#" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal">Forgot Password?</a>
+    </div>
+
     <button type="submit" class="btn btn-primary" style="width:100%;">Login</button>
 </form>
 
+<div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-labelledby="forgotPasswordModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form method="post" asp-action="ForgotPassword" asp-controller="Account">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="forgotPasswordModalLabel">Forgot Password</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <label for="forgotEmail">Enter your email address:</label>
+          <input type="email" class="form-control" id="forgotEmail" name="forgotEmail" required />
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Send Reset Link</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
 <script>
-    $(document).ready(function() {
-        // Custom phone validation
-        function validatePhone(phone) {
-            return /^[\d\s\+\-\(\)]{10,15}$/.test(phone);
+    $(document).ready(function () {
+        // Email validation
+        function validateEmail(email) {
+            return /^[^\s@@]+@@[^\s@@]+\.[^\s@@]+$/.test(email);
         }
 
-        // Form submission handler
-        $('#loginForm').on('submit', function(e) {
+        $('#loginForm').on('submit', function (e) {
             let isValid = true;
-            const phone = $('#phone').val().trim();
+            const email = $('#email').val().trim();
             const password = $('#password').val().trim();
 
-            // Reset error messages
+            // Reset errors
             $('.text-danger').text('');
 
-            // Validate phone
-            if (!phone) {
-                $('#phoneError').text('Phone number is required');
+            // Email validation
+            if (!email) {
+                $('#emailError').text('Email address is required');
                 isValid = false;
-            } else if (!validatePhone(phone)) {
-                $('#phoneError').text('Please enter a valid phone number');
+            } else if (!validateEmail(email)) {
+                $('#emailError').text('Please enter a valid email address');
                 isValid = false;
             }
 
-            // Validate password
+            // Password validation
             if (!password) {
                 $('#passwordError').text('Password is required');
                 isValid = false;
@@ -57,19 +80,19 @@
             }
         });
 
-        // Real-time validation on blur
-        $('#phone').on('blur', function() {
-            const phone = $(this).val().trim();
-            if (!phone) {
-                $('#phoneError').text('Phone number is required');
-            } else if (!validatePhone(phone)) {
-                $('#phoneError').text('Please enter a valid phone number');
+        // Real-time validation
+        $('#email').on('blur', function () {
+            const email = $(this).val().trim();
+            if (!email) {
+                $('#emailError').text('Email address is required');
+            } else if (!validateEmail(email)) {
+                $('#emailError').text('Please enter a valid email address');
             } else {
-                $('#phoneError').text('');
+                $('#emailError').text('');
             }
         });
 
-        $('#password').on('blur', function() {
+        $('#password').on('blur', function () {
             const password = $(this).val().trim();
             if (!password) {
                 $('#passwordError').text('Password is required');
@@ -81,3 +104,10 @@
         });
     });
 </script>
+
+
+
+@* @if (ViewBag.ErrorMessage != null) *@
+@* { *@
+@*     <div class="alert alert-danger">@ViewBag.ErrorMessage</div> *@
+@* } *@
