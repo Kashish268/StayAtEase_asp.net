@@ -6,10 +6,15 @@ using WebApplication1.Models;
 
 namespace WebApplication1.Controllers
 {
-    public class Super_AdminController : Controller
+    public class Super_AdminController : BaseController
     {
         public IActionResult Super_AdminDashboard()
         {
+
+            var redirect = RedirectToLoginIfNotLoggedIn();
+            if (redirect != null) return redirect;
+
+            
             ViewData["ActivePage"] = "Super_AdminDashboard";
 
 
@@ -19,6 +24,11 @@ namespace WebApplication1.Controllers
         public IActionResult Total_User()
         {
             ViewData["ActivePage"] = "Total_User";
+
+            var redirect = RedirectToLoginIfNotLoggedIn();
+            if (redirect != null) return redirect;
+
+           
             return View();
         }
         public IActionResult Total_Admin()
@@ -28,6 +38,11 @@ namespace WebApplication1.Controllers
         }
         public IActionResult Property_Reviews()
         {
+
+            var redirect = RedirectToLoginIfNotLoggedIn();
+            if (redirect != null) return redirect;
+
+           
             ViewData["ActivePage"] = "Property_Reviews";
             return View();
         }
@@ -38,6 +53,12 @@ namespace WebApplication1.Controllers
         }
         public IActionResult Total_Properties()
         {
+
+
+            var redirect = RedirectToLoginIfNotLoggedIn();
+            if (redirect != null) return redirect;
+
+           
             ViewData["ActivePage"] = "Total_Properties";
             return View();
         }
@@ -48,6 +69,11 @@ namespace WebApplication1.Controllers
             return View();
         }
         public IActionResult AdminProfile() {
+
+            var redirect = RedirectToLoginIfNotLoggedIn();
+            if (redirect != null) return redirect;
+
+            
             var model = new ProfileDetailsViewModel
             {
                 ProfileImageUrl = "/profile.png",

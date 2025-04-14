@@ -35,8 +35,13 @@ namespace WebApplication1.Controllers
         public IActionResult WishList()
         {
             ViewData["ActivePage"] = "WishList";
+
+            var userId = HttpContext.Session.GetInt32("UserId");
+            ViewData["IsLoggedIn"] = userId != null;
+
             return View();
         }
+
 
         public IActionResult Property_details()
         {
@@ -338,7 +343,7 @@ namespace WebApplication1.Controllers
                 if (mailSent)
                 {
                     // Save token in database (optional but recommended)
-                    string updateTokenQuery = "UPDATE users SET verification_token = @Token, token_expiration = DATEADD(MINUTE, 1, GETDATE()) WHERE email = @Email";
+                    string updateTokenQuery = "UPDATE users SET verification_token = @Token, token_expiration = DATEADD(DAY, 1, GETDATE()) WHERE email = @Email";
                     using (SqlCommand updateCmd = new SqlCommand(updateTokenQuery, conn))
                     {
                         updateCmd.Parameters.AddWithValue("@Token", token);
@@ -362,7 +367,6 @@ namespace WebApplication1.Controllers
             return View();
         }
 
-        [HttpPost]
         [HttpPost]
         public IActionResult ResetPassword(string token, string Password, string ConfirmPassword)
         {

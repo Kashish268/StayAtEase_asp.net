@@ -4,6 +4,8 @@
 }
 
 <form method="post" asp-controller="Account" asp-action="Login" id="loginForm">
+    <div id="loginContainer">
+    <div id="loginError" class="alert alert-danger d-none"></div>
    <div class="mb-3"> 
                  <label class="form-label">Email Address *</label> 
                 <input type="email" class="form-control" name="email" id="email" placeholder="your@email.com"> 
@@ -21,6 +23,7 @@
 
 
     <button type="submit" class="btn btn-primary" style="width:100%;">Login</button>
+    </div>
 </form>
 
 @* <div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-labelledby="forgotPasswordModalLabel" aria-hidden="true"> *@
@@ -44,73 +47,54 @@
 @* </div> *@
 
 <script>
-    $(document).ready(function () {
-        // Email validation
-        function validateEmail(email) {
-            return /^[^\s@@]+@@[^\s@@]+\.[^\s@@]+$/.test(email);
+ $('#loginForm').on('submit', function (e) {
+    e.preventDefault(); // prevent default form submit
+
+    let isValid = true;
+    const email = $('#email').val().trim();
+    const password = $('#password').val().trim();
+
+    $('.text-danger').text('');
+    $('#loginError').addClass('d-none').html('');
+
+    if (!email) {
+        $('#emailError').text('Email address is required');
+        isValid = false;
+    } else if (!/^[^\s@@]+@@[^\s@@]+\.[^\s@@]+$/.test(email)) {
+        $('#emailError').text('Please enter a valid email address');
+        isValid = false;
+    }
+
+    if (!password) {
+        $('#passwordError').text('Password is required');
+        isValid = false;
+    } else if (password.length < 6) {
+        $('#passwordError').text('Password must be at least 6 characters');
+        isValid = false;
+    }
+
+    if (!isValid) return;
+
+    $.ajax({
+        url: '/Account/Login',
+        type: 'POST',
+        data: {
+            email: email,
+            password: password
+        },
+        success: function (response) {
+            if (response.success) {
+                window.location.href = response.redirectUrl;
+            } else {
+                $('#loginError').removeClass('d-none').html(`<div class='alert alert-danger'>${response.message}</div>`);
+            }
+        },
+        error: function () {
+            $('#loginError').removeClass('d-none').html('<div class="alert alert-danger">An error occurred. Please try again.</div>');
         }
-
-        $('#loginForm').on('submit', function (e) {
-            let isValid = true;
-            const email = $('#email').val().trim();
-            const password = $('#password').val().trim();
-
-            // Reset errors
-            $('.text-danger').text('');
-
-            // Email validation
-            if (!email) {
-                $('#emailError').text('Email address is required');
-                isValid = false;
-            } else if (!validateEmail(email)) {
-                $('#emailError').text('Please enter a valid email address');
-                isValid = false;
-            }
-
-            // Password validation
-            if (!password) {
-                $('#passwordError').text('Password is required');
-                isValid = false;
-            } else if (password.length < 6) {
-                $('#passwordError').text('Password must be at least 6 characters');
-                isValid = false;
-            }
-
-            if (!isValid) {
-                e.preventDefault();
-            }
-        });
-
-        // Real-time validation
-        $('#email').on('blur', function () {
-            const email = $(this).val().trim();
-            if (!email) {
-                $('#emailError').text('Email address is required');
-            } else if (!validateEmail(email)) {
-                $('#emailError').text('Please enter a valid email address');
-            } else {
-                $('#emailError').text('');
-            }
-        });
-
-        $('#password').on('blur', function () {
-            const password = $(this).val().trim();
-            if (!password) {
-                $('#passwordError').text('Password is required');
-            } else if (password.length < 6) {
-                $('#passwordError').text('Password must be at least 6 characters');
-            } else {
-                $('#passwordError').text('');
-            }
-        });
     });
+});
+
 </script>
 
 
-
-
-
-@* @if (ViewBag.ErrorMessage != null) *@
-@* { *@
-@*     <div class="alert alert-danger">@ViewBag.ErrorMessage</div> *@
-@* } *@

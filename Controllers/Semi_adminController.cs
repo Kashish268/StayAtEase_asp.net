@@ -3,10 +3,12 @@ using WebApplication1.Models;
 
 namespace WebApplication1.Controllers
 {
-    public class Semi_adminController : Controller
+    public class Semi_adminController : BaseController
     {
         public IActionResult Dashboard()
         {
+            var redirect = RedirectToLoginIfNotLoggedIn();
+            if (redirect != null) return redirect;
 
             var model = new DashboardViewModel
             {
@@ -30,23 +32,33 @@ namespace WebApplication1.Controllers
             return View("Dashboard", model);
         }
 
-        public IActionResult Add_Properties() { 
+        public IActionResult Add_Properties()
+        {
+            var redirect = RedirectToLoginIfNotLoggedIn();
+            if (redirect != null) return redirect;
+
             return View();
         }
+
         public IActionResult Reviews()
-        { 
-        
-                 return View();
+        {
+            var redirect = RedirectToLoginIfNotLoggedIn();
+            if (redirect != null) return redirect;
+
+            return View();
         }
+
         public IActionResult Property_List(int currentPage = 1, int pageSize = 8)
         {
-            var properties = new List<PropertyViewModel>
-    {
-        new PropertyViewModel { Id = 1, Title = "Luxury Apartment", Price = "25000", Area = 1200, Address = "Downtown, City", IsAvailable = true, ImageUrl = "/assets/Property1.jpg" },
-        new PropertyViewModel { Id = 2, Title = "Modern Villa", Price = "50000", Area = 2000, Address = "Uptown, City", IsAvailable = false, ImageUrl = "/assets/Property2.jpg" },
-    new PropertyViewModel { Id = 3, Title = "Luxury Apartment", Price = "25000", Area = 1200, Address = "Downtown, City", IsAvailable = true, ImageUrl = "/assets/Property1.jpg" },
-        new PropertyViewModel { Id = 4, Title = "Modern Villa", Price = "50000", Area = 2000, Address = "Uptown, City", IsAvailable = false, ImageUrl = "/assets/Property2.jpg" },
+            var redirect = RedirectToLoginIfNotLoggedIn();
+            if (redirect != null) return redirect;
 
+            var properties = new List<PropertyViewModel>
+            {
+                new PropertyViewModel { Id = 1, Title = "Luxury Apartment", Price = "25000", Area = 1200, Address = "Downtown, City", IsAvailable = true, ImageUrl = "/assets/Property1.jpg" },
+                new PropertyViewModel { Id = 2, Title = "Modern Villa", Price = "50000", Area = 2000, Address = "Uptown, City", IsAvailable = false, ImageUrl = "/assets/Property2.jpg" },
+                new PropertyViewModel { Id = 3, Title = "Luxury Apartment", Price = "25000", Area = 1200, Address = "Downtown, City", IsAvailable = true, ImageUrl = "/assets/Property1.jpg" },
+                new PropertyViewModel { Id = 4, Title = "Modern Villa", Price = "50000", Area = 2000, Address = "Uptown, City", IsAvailable = false, ImageUrl = "/assets/Property2.jpg" },
             };
 
             var totalProperties = properties.Count;
@@ -64,14 +76,20 @@ namespace WebApplication1.Controllers
             return View(model);
         }
 
+        public IActionResult Messages()
+        {
+            var redirect = RedirectToLoginIfNotLoggedIn();
+            if (redirect != null) return redirect;
 
-        public IActionResult Messages() {
             ViewData["ActivePage"] = "Messages";
             return View();
         }
 
         public IActionResult MyProfile()
         {
+            var redirect = RedirectToLoginIfNotLoggedIn();
+            if (redirect != null) return redirect;
+
             var model = new ProfileDetailsViewModel
             {
                 ProfileImageUrl = "/profile.png",
@@ -88,11 +106,17 @@ namespace WebApplication1.Controllers
 
         public IActionResult Property_Details()
         {
+            var redirect = RedirectToLoginIfNotLoggedIn();
+            if (redirect != null) return redirect;
 
-        return View(); 
+            return View();
         }
-      public IActionResult Edit_Property()
+
+        public IActionResult Edit_Property()
         {
+            var redirect = RedirectToLoginIfNotLoggedIn();
+            if (redirect != null) return redirect;
+
             return View();
         }
     }
