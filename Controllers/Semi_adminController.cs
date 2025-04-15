@@ -230,7 +230,11 @@ namespace WebApplication1.Controllers
                 SearchTerm = searchTerm ?? ""
             };
 
+<<<<<<< HEAD
             return View("Reviews", viewModel); 
+=======
+            return View("Reviews", viewModel); // <-- Ensure the view name matches your .cshtml file (case-sensitive on Linux)
+>>>>>>> ef7b32b2840d9e0db7a201e1360e94cef2caa37c
         }
 
 
