@@ -5,16 +5,7 @@
     ViewData["Title"] = "Property Details";
 }
 
-@functions {
-    List<Views_Semi_admin_Messages.PropertyMessage> messages = new List<Views_Semi_admin_Messages.PropertyMessage>
-    {
-        new Views_Semi_admin_Messages.PropertyMessage { Name = "Sarah Johnson", PropertyId = "P-101", Email = "sarah@example.com", Contact = "1234567890", Message = "Is this property still available?" },
-        new Views_Semi_admin_Messages.PropertyMessage  { Name = "Michael Brown", PropertyId = "P-102", Email = "michael@example.com", Contact = "9876543210", Message = "Can I schedule a visit?" },
-        new Views_Semi_admin_Messages.PropertyMessage  { Name = "Victoria Gibson", PropertyId = "P-103", Email = "victoria@example.com", Contact = "9182736450", Message = "What are the lease terms?" },
-        new Views_Semi_admin_Messages.PropertyMessage  { Name = "Ethan Wilson", PropertyId = "P-104", Email = "ethan@example.com", Contact = "5647382910", Message = "Are there any nearby schools?" },
-        new Views_Semi_admin_Messages.PropertyMessage  { Name = "Robert Johnson", PropertyId = "P-105", Email = "robert@example.com", Contact = "1122334455", Message = "What is the security deposit?" }
-    };
-}
+
 <div class="container mt-4">
     <!-- Header Section -->
     <div class="d-flex justify-content-between align-items-start mb-4">
@@ -248,16 +239,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var msg in messages.Select((m, index) => new { m, index }))
-                    {
-                        <tr class="@(msg.index % 2 == 0 ? "bg-white" : "bg-light")">
-                            <td class="py-3 fw-medium">@msg.m.Name</td>
-                            <td class="py-3">@msg.m.PropertyId</td>
-                            <td class="py-3">@msg.m.Email</td>
-                            <td class="py-3">@msg.m.Contact</td>
-                            <td class="py-3">@msg.m.Message</td>
-                        </tr>
-                    }
+                  
                 </tbody>
             </table>
 
@@ -265,3 +247,4 @@
     </div>
 </div>
 </div>
+

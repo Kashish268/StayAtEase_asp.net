@@ -7,10 +7,9 @@
         public string Date { get; set; }
         public int Rating { get; set; }
         public string ReviewText { get; set; }
-        public string Property {  get; set; }
-        public string Text { get; set; }
+        public string Property { get; set; }
+        public string PropertyTitle { get; set; }  // Corrected to Property, matching the SQL query.
         public string ImageUrl { get; set; }
-
     }
 
     public class PropertyReviewViewModel
@@ -21,5 +20,6 @@
         public int TotalPages { get; set; }
         public string Property { get; set; }
         public int TotalReviews { get; set; }
+        public int ReviewsPerPage { get; set; }
     }
 }

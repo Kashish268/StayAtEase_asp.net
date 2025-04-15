@@ -27,4 +27,5 @@
 
         public string ConfirmPassword { get; set; }
     }
+
 }

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
 namespace WebApplication1.Controllers
 {
@@ -25,26 +26,8 @@ namespace WebApplication1.Controllers
             var redirect = RedirectToLoginIfNotLoggedIn();
             if (redirect != null) return redirect;
 
-            var model = new DashboardViewModel
-            {
-                TotalProperties = 24,
-                ActiveListings = 18,
-                TotalInquiries = 156,
-                ReviewRating = 4.8,
-                Messages = new List<PropertyMessageViewModel>
-                {
-                    new PropertyMessageViewModel { Name = "Sarah Johnson", PropertyId = "P_101", Email = "sarahjohnson@gmail.com", Contact = "1236547890", Message = "Are there any restrictions on lease agreements?" },
-                    new PropertyMessageViewModel { Name = "Michael Brown", PropertyId = "P_102", Email = "michaelbrown@gmail.com", Contact = "9874563210", Message = "Are there any restrictions on lease agreements?" },
-                    new PropertyMessageViewModel { Name = "Emma Davis", PropertyId = "P_103", Email = "emmadavis@gmail.com", Contact = "7410258963", Message = "What documents are required for booking?" }
-                },
-                Reviews = new List<PropertyReview>
-                {
-                    new PropertyReview { Name = "John Smith", Date = "Feb 10, 2024", Rating = 5, Text = "Amazing property with stunning views. Highly recommended!", Property = "Lakefront Cottage", ImageUrl = "/images/user1.jpg" },
-                    new PropertyReview { Name = "Lisa Anderson", Date = "Feb 8, 2024", Rating = 4, Text = "Great location and comfortable stay. Would visit again.", Property = "Downtown Loft", ImageUrl = "/images/user2.jpg" },
-                    new PropertyReview { Name = "David Wilson", Date = "Feb 7, 2024", Rating = 5, Text = "Perfect getaway spot. Everything was exactly as described.", Property = "Mountain View Cabin", ImageUrl = "/images/user3.jpg" }
-                }
-            };
-            return View("Dashboard", model);
+            
+            return View();
         }
 
         // Add Property (GET) Action
@@ -152,114 +135,359 @@ namespace WebApplication1.Controllers
             }
         }
 
-
-        // Reviews Action
-        public IActionResult Reviews()
-        {
-            var redirect = RedirectToLoginIfNotLoggedIn();
-            if (redirect != null) return redirect;
-
-            return View();
-        }
-
-        // Property List Action
-        public IActionResult Property_List(int currentPage = 1, int pageSize = 8)
-        {
-            var redirect = RedirectToLoginIfNotLoggedIn();
-            if (redirect != null) return redirect;
-
-            var properties = new List<PropertyViewModel>
-            {
-                new PropertyViewModel { Id = 1, Title = "Luxury Apartment", Price = "25000", Area = 1200, Address = "Downtown, City", IsAvailable = true, ImageUrl = "/assets/Property1.jpg" },
-                new PropertyViewModel { Id = 2, Title = "Modern Villa", Price = "50000", Area = 2000, Address = "Uptown, City", IsAvailable = false, ImageUrl = "/assets/Property2.jpg" },
-                new PropertyViewModel { Id = 3, Title = "Luxury Apartment", Price = "25000", Area = 1200, Address = "Downtown, City", IsAvailable = true, ImageUrl = "/assets/Property1.jpg" },
-                new PropertyViewModel { Id = 4, Title = "Modern Villa", Price = "50000", Area = 2000, Address = "Uptown, City", IsAvailable = false, ImageUrl = "/assets/Property2.jpg" }
-            };
-
-            var totalProperties = properties.Count;
-
-            var model = new MyListingsViewModel
-            {
-                TotalProperties = totalProperties,
-                ActiveListings = properties.Count(p => p.IsAvailable),
-                TotalInquiries = 25,
-                CurrentPage = currentPage,
-                PageSize = pageSize,
-                Properties = properties.Skip((currentPage - 1) * pageSize).Take(pageSize).ToList()
-            };
-
-            return View(model);
-        }
-
-        // Messages Action
-        public IActionResult Messages()
-        {
-            var redirect = RedirectToLoginIfNotLoggedIn();
-            if (redirect != null) return redirect;
-
-            ViewData["ActivePage"] = "Messages";
-            return View();
-        }
-
-        // Profile Action
-        // GET: MyProfile
         [HttpGet]
-        public IActionResult MyProfile()
+        // Reviews Action
+        public async Task<IActionResult> Reviews(string? searchTerm, int page = 1)
         {
             var redirect = RedirectToLoginIfNotLoggedIn();
             if (redirect != null) return redirect;
 
             int? userId = HttpContext.Session.GetInt32("UserId");
             if (userId == null)
+            {
+                TempData["Error"] = "User not logged in.";
                 return RedirectToAction("Login", "Account");
+            }
 
-            var repo = new UserRepository(_configuration);
-            var model = repo.GetUserProfile(userId.Value);
+            var reviews = new List<PropertyReview>();
+            string connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+            int pageSize = 10;
+            int offset = (page - 1) * pageSize;
+            int totalReviewsCount = 0;
+
+            using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                await con.OpenAsync();
+
+                string query = @"
+            SELECT r.ReviewID, u.Name, r.ReviewDate, r.Rating, r.Comment, p.PropertyID, u.profile_pic
+            FROM Reviews r
+            INNER JOIN Properties p ON p.PropertyID = r.PropertyID
+            INNER JOIN Users u ON u.user_id = r.UserID
+            WHERE p.UserId = @UserId";
+
+                if (!string.IsNullOrEmpty(searchTerm))
+                {
+                    query += " AND r.Comment LIKE @SearchTerm";
+                }
+
+                query += " ORDER BY r.ReviewDate DESC OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;";
+
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    cmd.Parameters.AddWithValue("@UserId", userId);
+                    cmd.Parameters.AddWithValue("@Offset", offset);
+                    cmd.Parameters.AddWithValue("@PageSize", pageSize);
+                    if (!string.IsNullOrEmpty(searchTerm))
+                        cmd.Parameters.AddWithValue("@SearchTerm", $"%{searchTerm}%");
+
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            reviews.Add(new PropertyReview
+                            {
+                                Id = Convert.ToInt32(reader["ReviewID"]),
+                                Name = reader["Name"].ToString(),
+                                Property = reader["PropertyID"].ToString(),
+                                Rating = Convert.ToInt32(reader["Rating"]),
+                                ReviewText = reader["Comment"].ToString(),
+                                ImageUrl = reader["profile_pic"] != DBNull.Value ? reader["profile_pic"].ToString() : string.Empty,
+                                Date = reader["ReviewDate"] != DBNull.Value ? Convert.ToDateTime(reader["ReviewDate"]).ToString("yyyy-MM-dd") : string.Empty,
+                            });
+                        }
+                    }
+                }
+
+                // Get total count
+                string countQuery = @"
+            SELECT COUNT(*) FROM Reviews r
+            INNER JOIN Properties p ON p.PropertyID = r.PropertyID
+            WHERE p.UserId = @UserId";
+
+                if (!string.IsNullOrEmpty(searchTerm))
+                {
+                    countQuery += " AND r.Comment LIKE @SearchTerm";
+                }
+
+                using (SqlCommand countCmd = new SqlCommand(countQuery, con))
+                {
+                    countCmd.Parameters.AddWithValue("@UserId", userId);
+                    if (!string.IsNullOrEmpty(searchTerm))
+                        countCmd.Parameters.AddWithValue("@SearchTerm", $"%{searchTerm}%");
+
+                    totalReviewsCount = Convert.ToInt32(await countCmd.ExecuteScalarAsync());
+                }
+            }
+
+            var viewModel = new PropertyReviewViewModel
+            {
+                Reviews = reviews,
+                TotalReviews = totalReviewsCount,
+                CurrentPage = page,
+                ReviewsPerPage = pageSize,
+                SearchTerm = searchTerm ?? ""
+            };
+
+            return View("Reviews", viewModel); // <-- Ensure the view name matches your .cshtml file (case-sensitive on Linux)
+        }
+
+
+
+
+        // Property List Action
+
+
+
+        [HttpGet]
+        public async Task<IActionResult> Messages(string? searchTerm, int page = 1, string filter = "all")
+        {
+            var redirect = RedirectToLoginIfNotLoggedIn();
+            if (redirect != null) return redirect;
+
+            int? userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                TempData["Error"] = "User not logged in.";
+                return RedirectToAction("Login", "Account");
+            }
+
+            ViewBag.UserId = userId;
+
+            // Pagination settings
+            int pageSize = 5; // Number of messages per page
+            int skip = (page - 1) * pageSize;
+
+            var messages = new List<PropertyMessageViewModel>();
+            string connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+            using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                await con.OpenAsync();
+
+                // Base query for fetching messages
+                string query = @"
+            SELECT 
+                m.Message,
+                m.PropertyID,
+                p.Title,
+                p.ImagePaths,
+                u.name,
+                u.Email,
+                u.mobile
+            FROM Inquiries m
+            INNER JOIN Properties p ON p.PropertyId = m.PropertyID
+            INNER JOIN users u ON u.user_id = m.UserID
+            WHERE p.UserID = @UserId";
+
+                // Search filter
+                if (!string.IsNullOrEmpty(searchTerm))
+                {
+                    query += " AND m.Message LIKE @SearchTerm";
+                }
+
+                // Status filter (Read/Unread)
+                if (filter == "unread")
+                {
+                    query += " AND m.Status = 'Unread'";
+                }
+                else if (filter == "read")
+                {
+                    query += " AND m.Status = 'Read'";
+                }
+
+                // Pagination logic
+                query += " ORDER BY m.InquiryDate DESC OFFSET @Skip ROWS FETCH NEXT @PageSize ROWS ONLY";
+
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    cmd.Parameters.AddWithValue("@UserId", userId);
+                    cmd.Parameters.AddWithValue("@Skip", skip);
+                    cmd.Parameters.AddWithValue("@PageSize", pageSize);
+
+                    if (!string.IsNullOrEmpty(searchTerm))
+                    {
+                        cmd.Parameters.AddWithValue("@SearchTerm", $"%{searchTerm}%");
+                    }
+
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            messages.Add(new PropertyMessageViewModel
+                            {
+                                Name = reader["name"].ToString(),                      // from users table
+                                PropertyId = reader["PropertyID"].ToString(),          // from inquiries
+                                Email = reader["email"].ToString(),                    // from users table
+                                Contact = reader["mobile"].ToString(),                 // from users table
+                                Message = reader["Message"].ToString(),                // from inquiries
+                                PropertyTitle = reader["Title"].ToString(),            // from properties
+                                ImageUrl = reader["ImagePaths"].ToString()
+                                    ?.Split(',').FirstOrDefault()                    // first image from comma-separated list
+                            });
+                        }
+                    }
+                }
+
+                // Get the total count of messages (for pagination purposes)
+                string countQuery = @"
+            SELECT COUNT(*) 
+            FROM Inquiries m
+            INNER JOIN Properties p ON p.PropertyId = m.PropertyID
+            WHERE p.UserID = @UserId";
+
+                if (!string.IsNullOrEmpty(searchTerm))
+                {
+                    countQuery += " AND m.Message LIKE @SearchTerm";
+                }
+
+                if (filter == "unread")
+                {
+                    countQuery += " AND m.Status = 'Unread'";
+                }
+                else if (filter == "read")
+                {
+                    countQuery += " AND m.Status = 'Read'";
+                }
+
+                int totalMessages = 0;
+                using (SqlCommand cmdCount = new SqlCommand(countQuery, con))
+                {
+                    cmdCount.Parameters.AddWithValue("@UserId", userId);
+                    if (!string.IsNullOrEmpty(searchTerm))
+                    {
+                        cmdCount.Parameters.AddWithValue("@SearchTerm", $"%{searchTerm}%");
+                    }
+
+                    totalMessages = (int)await cmdCount.ExecuteScalarAsync();
+                }
+
+                // Set pagination details on the ViewModel
+                var messageListViewModel = new PropertyMessageViewModel
+                {
+                    PagedMessages = messages,
+                    CurrentPage = page,
+                    TotalMessages = totalMessages,
+                    MessagesPerPage = pageSize,
+                    TotalPages = (int)Math.Ceiling((double)totalMessages / pageSize),
+                    SearchTerm = searchTerm,
+                    Filter = filter
+                };
+
+                return View(messageListViewModel);
+            }
+        }
+
+
+
+        // Messages Action
+
+
+
+        // Profile Action
+        [HttpGet]
+        public async Task<IActionResult> Property_List(string? searchTerm, int page = 1, string filter = "all")
+        {
+           
+
+            var redirect = RedirectToLoginIfNotLoggedIn();
+            if (redirect != null) return redirect;
+            int? userId = HttpContext.Session.GetInt32("UserId");
+
+            // Ensure the user_id exists in the session before proceeding
+            if (userId == null)
+            {
+                TempData["Error"] = "User not logged in.";
+                return RedirectToAction("Login", "Account");
+            }
+            ViewBag.UserId = userId;
+
+            var properties = new List<PropertyViewModel>();
+            string connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+            using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                await con.OpenAsync();
+
+                string query = @"SELECT * FROM Properties WHERE UserId = @UserId";
+
+                if (!string.IsNullOrEmpty(searchTerm))
+                {
+                    query += " AND Title LIKE @SearchTerm";
+                }
+
+                if (filter == "available")
+                {
+                    query += " AND IsAvailable = 1";
+                }
+                else if (filter == "unavailable")
+                {
+                    query += " AND IsAvailable = 0";
+                }
+
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    cmd.Parameters.AddWithValue("@UserId", userId);
+                    if (!string.IsNullOrEmpty(searchTerm))
+                        cmd.Parameters.AddWithValue("@SearchTerm", $"%{searchTerm}%");
+
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            properties.Add(new PropertyViewModel
+                            {
+                                Id = Convert.ToInt32(reader["PropertyId"]),
+                                Title = reader["Title"].ToString(),
+                                Price = Convert.ToDecimal(reader["Price"]),
+                                Area = Convert.ToInt32(reader["SquareFootage"]),
+                                Address = reader["Address"].ToString(),
+                                IsAvailable = reader["IsAvailable"] != DBNull.Value && Convert.ToBoolean(reader["IsAvailable"]),
+                                ImageUrl = reader["ImagePaths"].ToString()?.Split(',').FirstOrDefault()
+                            });
+                        }
+                    }
+                }
+            }
+
+            int currentPage = page;
+            int pageSize = 8;
+            var pagedProperties = properties.Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+
+            var viewModel = new MyListingsViewModel
+            {
+                Properties = pagedProperties,
+                CurrentPage = currentPage,
+                TotalInquiries = 0, // Optional: Add inquiry logic here
+                SearchTerm = searchTerm ?? "",
+                Filter = filter
+            };
+
+            return View(viewModel);
+        }
+
+
+
+
+        public IActionResult MyProfile()
+        {
+            var model = new ProfileDetailsViewModel
+            {
+                ProfileImageUrl = "/profile.png",
+                FirstName = "John",
+                LastName = "Doe",
+                Email = "john.doe@example.com",
+                Phone = "+1 (555) 000-0000",
+                Location = "San Francisco, CA",
+                Timezone = "(GMT-08:00) Pacific Time",
+                Bio = "Property dealer"
+            };
             return View(model);
         }
 
         // POST: MyProfile
-        [HttpPost]
-        public async Task<IActionResult> MyProfile(ProfileDetailsViewModel model)
-        {
-            var redirect = RedirectToLoginIfNotLoggedIn();
-            if (redirect != null) return redirect;
-
-            int? userId = HttpContext.Session.GetInt32("UserId");
-            if (userId == null)
-                return RedirectToAction("Login", "Account");
-
-            if (!ModelState.IsValid)
-                return View(model);
-
-            // Handle profile image upload if a file was posted
-            var file = Request.Form.Files["ProfileImage"];
-            if (file != null && file.Length > 0)
-            {
-                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-                var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "profiles", fileName);
-
-                Directory.CreateDirectory(Path.GetDirectoryName(path));
-
-                using (var stream = new FileStream(path, FileMode.Create))
-                {
-                    await file.CopyToAsync(stream);
-                }
-
-                model.ProfileImageUrl = "/images/profiles/" + fileName;
-            }
-
-            model.UserId = userId.Value;
-            var repo = new UserRepository(_configuration);
-            bool updated = repo.UpdateUserProfile(model);
-
-            if (updated)
-                TempData["Success"] = "Profile updated successfully!";
-            else
-                TempData["Error"] = "Failed to update profile.";
-
-            return View(model);
-        }
+       
 
 
         // Property Details Action
