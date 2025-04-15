@@ -1,84 +1,117 @@
-﻿@{
-    Layout = null;
+﻿@{ 
+     Layout = null; 
+ } 
+ @model RegisterViewModel
+<style> 
+     .radio-group { 
+         display: flex; 
+         gap: 20px; 
+         margin-top: 10px; 
+     } 
 
-}
-@model RegisterViewModel
+        .radio-group input[type="radio"] { 
+             margin-right: 5px; 
+         } 
 
-<form id="registerForm">
-    <div class="row">
-        <!-- Left Column -->
-        <div class="col-sm-12 col-md-6">
+    .text-danger { 
+        display: block; 
+         margin-top: 5px; 
+         font-size: 0.875em; 
+        color: #dc3545; 
+     } 
+
+     .is-invalid { 
+         border-color: #dc3545; 
+     } 
+ </style>
+
+<form id="registerForm" method="post" asp-controller="Home" asp-action="Register" enctype="multipart/form-data">
+    <div class="row"> 
+         <!-- Left Column --> 
+         <div class="col-sm-12 col-md-6"> 
+             <div class="mb-3"> 
+                 <label class="form-label">Email Address *</label> 
+                <input type="email" class="form-control" name="email" id="email" placeholder="your@email.com" required> 
+                 <span class="text-danger" id="emailError"></span> 
+             </div> 
+
+             <div class="mb-3"> 
+                 <label class="form-label">Phone Number *</label> 
+                 <input type="tel" class="form-control" name="phone" id="phone" placeholder="Enter 10-digit phone number" maxlength="10" pattern="[0-9]{10}" required> 
+                 <span class="text-danger" id="phoneError"></span> 
+             </div> 
+
+            <div class="mb-3"> 
+                <label class="form-label">Full Name *</label>  
+                <input type="text" class="form-control" name="fullname" id="fullname" placeholder="Enter your full name" required> 
+                <span class="text-danger" id="fullnameError"></span> 
+            </div> 
+       </div> 
+
+        <!-- Right Column --> 
+         <div class="col-sm-12 col-md-6"> 
+            <div class="mb-3"> 
+               <label class="form-label">Password *</label> 
+                 <div class="input-group"> 
+                     <input type="password" class="form-control" name="password" id="password" placeholder="Minimum 6 characters" minlength="6" required> 
+                 </div> 
+                 <span class="text-danger" id="passwordError"></span> 
+             </div> 
+
             <div class="mb-3">
-                <label class="form-label">Phone Number *</label>
-                <input type="text" class="form-control" name="phone" id="phone" placeholder="Enter your phone number" asp-for="Phone">
-                <span class="text-danger">@Html.ValidationMessageFor(m => m.Phone)</span>
-            </div>
+                 <label class="form-label">Confirm Password *</label> 
+                 <div class="input-group"> 
+                     <input type="password" class="form-control" name="confirmPassword" id="confirmPassword" placeholder="Confirm your password" minlength="6" required> 
+                 </div> 
+                <span class="text-danger" id="confirmPasswordError"></span> 
+             </div> 
 
-            <div class="mb-3">
-                <label class="form-label">Enter Verification Code</label>
-                <div class="verification-code d-flex">
-                    <input type="text" class="form-control code-input" maxlength="1" asp-for="VerificationCode">
-                    <input type="text" class="form-control code-input" maxlength="1" asp-for="VerificationCode">
-                    <input type="text" class="form-control code-input" maxlength="1" asp-for="VerificationCode">
-                    <input type="text" class="form-control code-input" maxlength="1" asp-for="VerificationCode">
-                    <input type="text" class="form-control code-input" maxlength="1" asp-for="VerificationCode">
-                    <input type="text" class="form-control code-input" maxlength="1" asp-for="VerificationCode">
-                </div>
-                <span class="text-danger">@Html.ValidationMessageFor(m => m.VerificationCode)</span>
-                <small>We've sent a code to your phone <a href="#">Resend Code</a></small>
-            </div>
+             <div class="mb-3"> 
+                 <label class="form-label d-block">I am a... *</label> 
+                 <div class="radio-group"> 
+                     <div> 
+                         <input type="radio" name="userType" value="Tenant" id="tenant" required> 
+                         <label for="tenant">🏠 Tenant</label> 
+                     </div> 
+                     <div> 
+                         <input type="radio" name="userType" value="RoomOwner" id="roomOwner"> 
+                         <label for="roomOwner">🔑 Room Owner</label> 
+                     </div> 
+                 </div> 
+                 <span class="text-danger" id="userTypeError"></span> 
+             </div> 
 
-            <div class="mb-3">
-                <label class="form-label">Full Name *</label>
-                <input type="text" class="form-control" name="fullname" id="fullname" placeholder="Enter your full name" asp-for="FullName">
-                <span class="text-danger">@Html.ValidationMessageFor(m => m.FullName)</span>
-            </div>
-        </div>
+    @*          <div class="mb-3"> *@
+    @* <label class="form-label">Choose Profile Picture (Optional)</label> *@
+    @*             <input type="file"  class="form-control" name="profilePicture" id="profilePicture" accept="image/*"> *@
 
-        <!-- Right Column -->
-        <div class="col-sm-12 col-md-6">
-            <div class="mb-3">
-                <label class="form-label">Email Address *</label>
-                <input type="email" class="form-control" name="email" id="email" placeholder="your@email.com" asp-for="Email">
-                <span class="text-danger">@Html.ValidationMessageFor(m => m.Email)</span>
-            </div>
+</div>
 
-            <div class="mb-3">
-                <label class="form-label">Password *</label>
-                <div class="input-group">
-                    <input type="password" class="form-control" name="password" id="password" placeholder="Create a password" asp-for="Password">
-                </div>
-                <span class="text-danger">@Html.ValidationMessageFor(m => m.Password)</span>
-            </div>
+         </div> 
+     </div> 
 
-            <div class="mb-3">
-                <label class="form-label">Confirm Password *</label>
-                <div class="input-group">
-                    <input type="password" class="form-control" name="confirmPassword" id="confirmPassword" placeholder="Confirm your password" asp-for="ConfirmPassword">
-                </div>
-                <span class="text-danger">@Html.ValidationMessageFor(m => m.ConfirmPassword)</span>
-            </div>
+<div class="mb-3 text-center"> 
+@* <input type="checkbox" id="terms" name="terms" required>  *@
+@* <label for="terms">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></label>  *@
+@* <span class="text-danger" id="termsError"></span>  *@
+ </div> 
 
-            <div class="mb-3">
-                <label class="form-label d-block">I am a... *</label>
-                <div class="radio-group">
-                    <input type="radio" name="userType" value="Tenant" id="tenant" asp-for="UserType">
-                    <label for="tenant">🏠 Tenant</label>
-                    <input type="radio" name="userType" value="RoomOwner" id="roomOwner" asp-for="UserType">
-                    <label for="roomOwner">🔑 Room Owner</label>
-                </div>
-                <span class="text-danger">@Html.ValidationMessageFor(m => m.UserType)</span>
-            </div>
-        </div>
+
+     <div class="text-center"> 
+         <button type="submit" class="btn btn-primary">Create Account</button> 
+     </div>
+     
+
+ </form> 
+ @if (TempData["SuccessMessage"] != null) 
+ { 
+     <script>alert('@TempData["SuccessMessage"]');</script> 
+ } 
+ @if (ViewBag.ValidationErrors != null) 
+ { 
+     //<script>alert('@ViewBag.ValidationErrors');</script>
+
+    <div class="alert alert-danger">
+        @ViewBag.ValidationErrors
     </div>
-
-    <div class="mb-3 text-center">
-        <input type="checkbox" id="terms" asp-for="TermsAccepted">
-        <label for="terms">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></label>
-        <small class="text-danger d-none" id="termsError">You must agree to the terms.</small>
-    </div>
-
-    <div class="text-center">
-        <button type="submit" class="btn btn-primary">Create Account</button>
-    </div>
-</form>
+ }

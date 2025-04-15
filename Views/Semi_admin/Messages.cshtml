@@ -1,88 +1,52 @@
-﻿@{
+﻿@model WebApplication1.Models.PropertyMessageViewModel
+
+@{
     Layout = "_AdminLayout";
     ViewData["Title"] = "Admin Dashboard";
     ViewData["ActivePage"] = "Messages";
-}
 
-@{
-    var messagesList = messages; // Renaming to avoid confusion
-    int pageSize = 8;
-    int currentPage = 1;
-
-    if (Context.Request.Query.ContainsKey("page"))
-    {
-        int.TryParse(Context.Request.Query["page"], out currentPage);
-        currentPage = Math.Max(currentPage, 1);
-    }
-
-    int totalMessages = messagesList.Count;
-    int totalPages = (int)Math.Ceiling((double)totalMessages / pageSize);
-
-    // Get only the records for the current page
-    var paginatedMessages = messagesList.Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
-}
-
-@functions {
-    public class PropertyMessage
-    {
-        public string Name { get; set; }
-        public string PropertyId { get; set; }
-        public string Email { get; set; }
-        public string Contact { get; set; }
-        public string Message { get; set; }
-    }
-
-    List<PropertyMessage> messages = new List<PropertyMessage>
-    {
-        new PropertyMessage { Name = "Sarah Johnson", PropertyId = "P-101", Email = "sarah@example.com", Contact = "1234567890", Message = "Is this property still available?" },
-        new PropertyMessage { Name = "Michael Brown", PropertyId = "P-102", Email = "michael@example.com", Contact = "9876543210", Message = "Can I schedule a visit?" },
-        new PropertyMessage { Name = "Victoria Gibson", PropertyId = "P-103", Email = "victoria@example.com", Contact = "9182736450", Message = "What are the lease terms?" },
-        new PropertyMessage { Name = "Ethan Wilson", PropertyId = "P-104", Email = "ethan@example.com", Contact = "5647382910", Message = "Are there any nearby schools?" },
-        new PropertyMessage { Name = "Robert Johnson", PropertyId = "P-105", Email = "robert@example.com", Contact = "1122334455", Message = "What is the security deposit?" },
-             new PropertyMessage { Name = "Sarah Johnson", PropertyId = "P-101", Email = "sarah@example.com", Contact = "1234567890", Message = "Is this property still available?" },
-        new PropertyMessage { Name = "Michael Brown", PropertyId = "P-102", Email = "michael@example.com", Contact = "9876543210", Message = "Can I schedule a visit?" },
-        new PropertyMessage { Name = "Victoria Gibson", PropertyId = "P-103", Email = "victoria@example.com", Contact = "9182736450", Message = "What are the lease terms?" },
-        new PropertyMessage { Name = "Ethan Wilson", PropertyId = "P-104", Email = "ethan@example.com", Contact = "5647382910", Message = "Are there any nearby schools?" },
-        new PropertyMessage { Name = "Robert Johnson", PropertyId = "P-105", Email = "robert@example.com", Contact = "1122334455", Message = "What is the security deposit?" },
-    };
+    var paginatedMessages = Model.PagedMessages;
+    int totalMessages = Model.TotalMessages;
+    int currentPage = Model.CurrentPage;
+    int totalPages = (int)Math.Ceiling((double)totalMessages / Model.MessagesPerPage);
+    string searchTerm = Model.SearchTerm;
+  
 }
 
 <div class="container mt-5">
     <h3 class="fw-bold mb-4">All Property Messages</h3>
 
-    <!-- Search Bar -->
-    <div class="mb-3 position-relative">
-        <i class="fas fa-search position-absolute top-50 start-0 ps-3 translate-middle-y text-secondary"></i>
-        <input type="text"
-               id="searchInput"
-               class="form-control ps-5"
-               placeholder="Search messages..."
-               onkeyup="filterMessages()">
-    </div>
+    <!-- Search & Filter -->
+    <form method="get" class="row mb-4">
+        <div class="col-12 mb-3">
+            <input type="text" id="searchInput" class="form-control w-100  border rounded" placeholder="Search messages..." value="@searchTerm" />
+        </div>
+      
+    </form>
 
-    <!-- Table -->
+    <!-- Messages Table -->
     <div class="table-responsive">
         <table class="table">
             <thead class="bg-light">
                 <tr>
-                    <th class="py-3">Guest Name</th>
-                    <th class="py-3">Property Id</th>
-                    <th class="py-3">Email Address</th>
-                    <th class="py-3">Contact No</th>
-                    <th class="py-3">Message</th>
+                    <th>Guest Name</th>
+                    <th>Property Title</th>
+                    <th>Email</th>
+                    <th>Contact</th>
+                    <th>Message</th>
                 </tr>
             </thead>
-            <tbody id="messagesTable">
-                @if (paginatedMessages.Any())
+            <tbody id="messageList">
+                @if (Model.PagedMessages.Any())
                 {
-                    @foreach (var msg in paginatedMessages.Select((m, index) => new { m, index }))
+                    @foreach (var msg in Model.PagedMessages)
                     {
-                        <tr class="@(msg.index % 2 == 0 ? "bg-white" : "bg-light") align-middle">
-                            <td class="py-3 fw-medium">@msg.m.Name</td>
-                            <td class="py-3">@msg.m.PropertyId</td>
-                            <td class="py-3">@msg.m.Email</td>
-                            <td class="py-3">@msg.m.Contact</td>
-                            <td class="py-3">@msg.m.Message</td>
+                        <tr class="message-row">
+                            <td>@msg.Name</td>
+                            <td>@msg.PropertyTitle</td>
+                            <td>@msg.Email</td>
+                            <td>@msg.Contact</td>
+                            <td>@msg.Message</td>
                         </tr>
                     }
                 }
@@ -93,59 +57,53 @@
                     </tr>
                 }
             </tbody>
+
         </table>
     </div>
 
     <!-- Pagination -->
     <div class="d-flex justify-content-between align-items-center mt-4 pb-4">
         <p class="text-muted small">
-            Showing @(Math.Min(((currentPage - 1) * pageSize) + 1, totalMessages))
-            to @(Math.Min(currentPage * pageSize, totalMessages))
-            of @totalMessages messages
+            Showing @Model.FirstItemIndex to @Model.LastItemIndex of @totalMessages messages
         </p>
         <nav>
             <ul class="pagination mb-0">
                 <li class="page-item @(currentPage == 1 ? "disabled" : "")">
-                    <a class="page-link" href="?page=@(currentPage - 1)">Previous</a>
+                    <a class="page-link" href="?page=@(currentPage - 1)&searchTerm=@searchTerm">Previous</a>
                 </li>
                 @for (int i = 1; i <= totalPages; i++)
                 {
                     <li class="page-item @(currentPage == i ? "active" : "")">
-                        <a class="page-link" href="?page=@i">@i</a>
+                        <a class="page-link" href="?page=@i&searchTerm=@searchTerm">@i</a>
                     </li>
                 }
                 <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
-                    <a class="page-link" href="?page=@(currentPage + 1)">Next</a>
+                    <a class="page-link" href="?page=@(currentPage + 1)&searchTerm=@searchTerm">Next</a>
                 </li>
             </ul>
         </nav>
+
     </div>
 </div>
-
 <script>
-    function filterMessages() {
-        let input = document.getElementById("searchInput").value.toLowerCase();
-        let rows = document.getElementById("messagesTable").getElementsByTagName("tr");
+    document.getElementById("searchInput").addEventListener("input", function () {
+        const term = this.value.toLowerCase().trim();
+        const rows = document.querySelectorAll("#messageList .message-row");
+        const noMessagesRow = document.getElementById("noMessagesRow");
 
-        for (let i = 0; i < rows.length; i++) {
-            let nameCell = rows[i].getElementsByTagName("td")[0];
-            if (nameCell) {
-                let nameText = nameCell.textContent || nameCell.innerText;
-                rows[i].style.display = nameText.toLowerCase().indexOf(input) > -1 ? "" : "none";
-            }
-        }
-    }
+        let visibleCount = 0;
+
+        rows.forEach(row => {
+            const content = row.textContent.toLowerCase();
+            const match = content.includes(term);
+            row.style.display = match ? "" : "none";
+            if (match) visibleCount++;
+        });
+
+        // Toggle "No messages found" row based on visibility count
+        noMessagesRow.style.display = visibleCount === 0 ? "" : "none";
+    });
 </script>
 
-<style>
-    .custom-striped tbody tr:nth-child(odd) {
-        background-color: white !important;
-    }
 
-    .custom-striped tbody tr:nth-child(even) {
-        background-color: #f8f9fa !important;
-    }
-</style>
 
-<!-- Bootstrap & FontAwesome -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

@@ -4,80 +4,98 @@
 }
 
 <form method="post" asp-controller="Account" asp-action="Login" id="loginForm">
+    <div id="loginContainer">
+    <div id="loginError" class="alert alert-danger d-none"></div>
+   <div class="mb-3"> 
+                 <label class="form-label">Email Address *</label> 
+                <input type="email" class="form-control" name="email" id="email" placeholder="your@email.com"> 
+                 <span class="text-danger" id="emailError"></span> 
+             </div> 
     <div class="mb-3">
-        <label for="phone" class="form-label">Phone number</label>
-        <input type="tel" class="form-control" id="phone" name="phone" placeholder="Enter your phone number">
-        <span id="phoneError" class="text-danger"></span>
-    </div>
-    <div class="mb-3">
+
         <label for="password" class="form-label">Password</label>
         <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password"  minlength="6">
         <span id="passwordError" class="text-danger"></span>
     </div>
 
+    <div class="mb-3 text-end">
+        <a asp-controller="Home" asp-action="ForgotPassword" class="text-decoration-none">Forgot Password?</a>
+    </div>
+
+
     <button type="submit" class="btn btn-primary" style="width:100%;">Login</button>
+    </div>
 </form>
 
+@* <div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-labelledby="forgotPasswordModalLabel" aria-hidden="true"> *@
+@*   <div class="modal-dialog"> *@
+@*     <form method="post" asp-action="ForgotPassword" asp-controller="Account"> *@
+@*       <div class="modal-content"> *@
+@*         <div class="modal-header"> *@
+@*           <h5 class="modal-title" id="forgotPasswordModalLabel">Forgot Password</h5> *@
+@*           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> *@
+@*         </div> *@
+@*         <div class="modal-body"> *@
+@*           <label for="forgotEmail">Enter your email address:</label> *@
+@*           <input type="email" class="form-control" id="forgotEmail" name="forgotEmail" required /> *@
+@*         </div> *@
+@*         <div class="modal-footer"> *@
+@*           <button type="submit" class="btn btn-primary">Send Reset Link</button> *@
+@*         </div> *@
+@*       </div> *@
+@*     </form> *@
+@*   </div> *@
+@* </div> *@
+
 <script>
-    $(document).ready(function() {
-        // Custom phone validation
-        function validatePhone(phone) {
-            return /^[\d\s\+\-\(\)]{10,15}$/.test(phone);
+ $('#loginForm').on('submit', function (e) {
+    e.preventDefault(); // prevent default form submit
+
+    let isValid = true;
+    const email = $('#email').val().trim();
+    const password = $('#password').val().trim();
+
+    $('.text-danger').text('');
+    $('#loginError').addClass('d-none').html('');
+
+    if (!email) {
+        $('#emailError').text('Email address is required');
+        isValid = false;
+    } else if (!/^[^\s@@]+@@[^\s@@]+\.[^\s@@]+$/.test(email)) {
+        $('#emailError').text('Please enter a valid email address');
+        isValid = false;
+    }
+
+    if (!password) {
+        $('#passwordError').text('Password is required');
+        isValid = false;
+    } else if (password.length < 6) {
+        $('#passwordError').text('Password must be at least 6 characters');
+        isValid = false;
+    }
+
+    if (!isValid) return;
+
+    $.ajax({
+        url: '/Account/Login',
+        type: 'POST',
+        data: {
+            email: email,
+            password: password
+        },
+        success: function (response) {
+            if (response.success) {
+                window.location.href = response.redirectUrl;
+            } else {
+                $('#loginError').removeClass('d-none').html(`<div class='alert alert-danger'>${response.message}</div>`);
+            }
+        },
+        error: function () {
+            $('#loginError').removeClass('d-none').html('<div class="alert alert-danger">An error occurred. Please try again.</div>');
         }
-
-        // Form submission handler
-        $('#loginForm').on('submit', function(e) {
-            let isValid = true;
-            const phone = $('#phone').val().trim();
-            const password = $('#password').val().trim();
-
-            // Reset error messages
-            $('.text-danger').text('');
-
-            // Validate phone
-            if (!phone) {
-                $('#phoneError').text('Phone number is required');
-                isValid = false;
-            } else if (!validatePhone(phone)) {
-                $('#phoneError').text('Please enter a valid phone number');
-                isValid = false;
-            }
-
-            // Validate password
-            if (!password) {
-                $('#passwordError').text('Password is required');
-                isValid = false;
-            } else if (password.length < 6) {
-                $('#passwordError').text('Password must be at least 6 characters');
-                isValid = false;
-            }
-
-            if (!isValid) {
-                e.preventDefault();
-            }
-        });
-
-        // Real-time validation on blur
-        $('#phone').on('blur', function() {
-            const phone = $(this).val().trim();
-            if (!phone) {
-                $('#phoneError').text('Phone number is required');
-            } else if (!validatePhone(phone)) {
-                $('#phoneError').text('Please enter a valid phone number');
-            } else {
-                $('#phoneError').text('');
-            }
-        });
-
-        $('#password').on('blur', function() {
-            const password = $(this).val().trim();
-            if (!password) {
-                $('#passwordError').text('Password is required');
-            } else if (password.length < 6) {
-                $('#passwordError').text('Password must be at least 6 characters');
-            } else {
-                $('#passwordError').text('');
-            }
-        });
     });
+});
+
 </script>
+
+
