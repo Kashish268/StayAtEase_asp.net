@@ -33,6 +33,34 @@ namespace WebApplication1.Models
 
         public List<string> Amenities { get; set; } = new List<string>();
 
+        // List to hold uploaded images
+        [Required(ErrorMessage = "At least one image is required.")]
+        [MaxLength(8, ErrorMessage = "You can only upload up to 8 images.")]
         public List<IFormFile> Images { get; set; } = new List<IFormFile>();
+
+        // Foreign Key to associate property with a user
+        [Required]
+        public int UserId { get; set; }
+
+        // Validation for file size (for each image)
+        [DataType(DataType.Upload)]
+        public List<IFormFile> ImageFiles { get; set; } = new List<IFormFile>();
+
+        // Add any custom validation for files (example: image size)
+        public string ValidateImageFiles(IList<IFormFile> files)
+        {
+            foreach (var file in files)
+            {
+                if (file.Length > 5 * 1024 * 1024) // Limit to 5MB
+                {
+                    return "Each image must be less than 5MB.";
+                }
+                if (!file.ContentType.StartsWith("image/"))
+                {
+                    return "Only image files are allowed.";
+                }
+            }
+            return string.Empty;
+        }
     }
 }
