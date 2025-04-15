@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@{
+    var isLoggedIn = Context.Session.GetString("UserId") != null;
+}
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -24,53 +27,58 @@
                     <img src="\assets\StayAtEase.png" alt="Logo" class="nav-logo"> <!-- Add your logo image -->
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-end">
                     <ul class="navbar-nav">
                         <li class="nav-item">
                             <a class="nav-link @(ViewData["ActivePage"] == "Dashboard" ? "active" : "")"
-                               asp-controller="Account" asp-action="Dashboard">
+                            asp-controller="Account" asp-action="Dashboard">
                                 Home
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link @(ViewData["ActivePage"] == "Add_Properties" ? "active" : "")"
-                               asp-controller="Semi_admin" asp-action="Add_Properties">
+                            asp-controller="Semi_admin" asp-action="Add_Properties">
                                 Add Properties
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link @(ViewData["ActivePage"] == "Property_List" ? "active" : "")"
-                               asp-controller="Semi_admin" asp-action="Property_List">
+                            asp-controller="Semi_admin" asp-action="Property_List">
                                 My List
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link @(ViewData["ActivePage"] == "Reviews" ? "active" : "")"
-                               asp-controller="Semi_admin" asp-action="Reviews">
+                            asp-controller="Semi_admin" asp-action="Reviews">
                                 Reviews
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link @(ViewData["ActivePage"] == "Massages" ? "active" : "")"
-                               asp-controller="Semi_admin" asp-action="Messages">
-                               Messages
+                            asp-controller="Semi_admin" asp-action="Messages">
+                                Messages
                             </a>
                         </li>
-                        <li class="profile-container">
-                            <a class="nav-link @(ViewData["ActivePage"] == "MyProfile" ? "active" : "")"
-                               asp-controller="Semi_admin" asp-action="MyProfile">
-                                <img src=" /assets/profile.png" class="profile-image" alt="User"  />
-                            </a>
-                            <li />
-                            <li >
-                            <a class="nav-link @(ViewData["ActivePage"] == "Home" ? "active" : "")" asp-area="" asp-controller="Home" asp-action="Index">
-                                <i class="fas fa-sign-out-alt"></i> <!-- Font Awesome Logout Icon -->
-                            </a>
-                        </li>
+                        @if (isLoggedIn)
 
+                        {
+
+                            <li class="nav-item profile-container">
+                                <a class="nav-link @(ViewData["ActivePage"] == "Profile_details" ? "active" : "")"
+                                asp-controller="Semi_admin" asp-action="MyProfile">
+                                    <img src="@ViewBag.ProfileImage" class="profile-image" alt="User" />
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Account" asp-action="Logout">
+                                    <i class="fas fa-sign-out-alt"></i> <!-- Logout Icon -->
+                                </a>
+                            </li>
+
+                        }
 
                         @* <li class="nav-item"> *@
                         @*     <a class="nav-link @(ViewData["ActivePage"] == "WishList" ? "active" : "")" asp-area="" asp-controller="Home" asp-action="WishList">My Listing</a> *@
@@ -106,6 +114,17 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    @* @section Scripts { *@
+    @*     <script type="text/javascript"> *@
+    @*         // Check if session is valid on page load *@
+    @*         window.onload = function() { *@
+    @*             var userId = '@ViewBag.UserId'; *@
+    @*             if (!userId) { *@
+    @*                 window.location.href = '/Home/Index'; // Redirect to home if no session *@
+    @*             } *@
+    @*         } *@
+    @*     </script> *@
+    @* } *@
 
 
 </body>

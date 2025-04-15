@@ -1,27 +1,31 @@
 ﻿@{
     ViewData["Title"] = "Property_details";
+    var isLoggedIn = Context.Session.GetString("UserId") != null;
+
 }
+
+
 
 <div class="property-info custom-property">
     <!-- Image & Details Row -->
     <div class="row align-items-start">
-        
+
         <!-- Main Image Column -->
         <div class="col-md-8">
             <div class="main-image-container">
                 <img src="~/assets/Property1.jpg" class="img-fluid w-100 mb-3" 
-                     alt="Main Property Image" style="max-height: 500px; object-fit: cover;">
+                alt="Main Property Image" style="max-height: 500px; object-fit: cover;">
             </div>
         </div>
 
         <!-- Small Images Column -->
         <div class="col-md-4 d-flex flex-column">
             <img src="~/assets/Property4.jpg" class="img-fluid mb-3" 
-                 alt="Image 1" style="max-height: 240px; object-fit: cover;">
+            alt="Image 1" style="max-height: 240px; object-fit: cover;">
             <span class="custom-image-container">
                 <img src="~/assets/Property2.jpg" class="img-fluid mb-3 open-slider"
-                     alt="Image 2" style="max-height: 240px; object-fit: cover; "
-                     data-bs-target="#imageModal" data-bs-slide-to="0">
+                alt="Image 2" style="max-height: 240px; object-fit: cover; "
+                data-bs-target="#imageModal" data-bs-slide-to="0">
                 <span class="custom-overlay">+ 7 more</span>
             </span>
             @* <img src="~/assets/Property3.jpg" class="img-fluid mb-3"  *@
@@ -33,7 +37,7 @@
 
     <!-- Property Details & Agent Section -->
     <div class="row mt-4">
-        
+
         <!-- Property Details Column -->
         <div class="col-md-8">
             <h2 style="font-weight:600; letter-spacing:0.1px;">Luxury Apartment with City View</h2>
@@ -234,7 +238,7 @@
         </div>
     </div>
 
-    </div>
+</div>
 
 
 
@@ -248,9 +252,11 @@
                 <button type="button" class="btn-close position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-               
-                <form>
-                    @* <div class="mb-3"> *@
+                @if (isLoggedIn)
+                {
+
+                    <form>
+                        @* <div class="mb-3"> *@
                     @*     <label for="fullName" class="form-label fw-semibold">Full Name</label> *@
                     @*     <input type="text" class="form-control" id="fullName" placeholder="Enter your full name"> *@
                     @* </div> *@
@@ -267,7 +273,13 @@
                         <textarea class="form-control" id="message" rows="4" placeholder="Enter your message"></textarea>
                     </div>
                     <button type="submit" class="btn btn-primary w-100" style="border-radius: 8px;">Send Inquiry</button>
-                </form>
+                </form>}
+                else
+                {
+                    <div class="alert alert-warning text-center mb-0" role="alert" style="border-radius: 8px;">
+                        Please log in to send an inquiry.
+                    </div>
+                }
             </div>
         </div>
     </div>
@@ -283,24 +295,33 @@
                 <button type="button" class="btn-close position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <!-- Rating Section -->
-                <label class="fw-semibold">Rating</label>
-                <div class="mb-3">
-                    <span class="star" onclick="setRating(1)" data-value="1">★</span>
-                    <span class="star" onclick="setRating(2)" data-value="2">★</span>
-                    <span class="star" onclick="setRating(3)" data-value="3">★</span>
-                    <span class="star" onclick="setRating(4)" data-value="4">★</span>
-                    <span class="star" onclick="setRating(5)" data-value="5">★</span>
-                </div>
 
-                <!-- Review Textarea -->
-                <div class="mb-3">
-                    <label for="reviewText" class="form-label fw-semibold">Your Review</label>
-                    <textarea class="form-control" id="reviewText" rows="4" placeholder="Share your experience..."></textarea>
-                </div>
+                @if (isLoggedIn)
+                {
+                    <!-- ✅ User is logged in – show review form -->
+                    <label class="fw-semibold">Rating</label>
+                    <div class="mb-3">
+                        <span class="star" onclick="setRating(1)" data-value="1">★</span>
+                        <span class="star" onclick="setRating(2)" data-value="2">★</span>
+                        <span class="star" onclick="setRating(3)" data-value="3">★</span>
+                        <span class="star" onclick="setRating(4)" data-value="4">★</span>
+                        <span class="star" onclick="setRating(5)" data-value="5">★</span>
+                    </div>
 
-                <!-- Submit Button -->
-                <button type="submit" class="btn btn-primary w-100" style="border-radius: 8px;">Submit Review</button>
+                    <div class="mb-3">
+                        <label for="reviewText" class="form-label fw-semibold">Your Review</label>
+                        <textarea class="form-control" id="reviewText" rows="4" placeholder="Share your experience..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100" style="border-radius: 8px;">Submit Review</button>
+                }
+                else
+                {
+                    <!-- ❌ Not logged in – show message -->
+                    <div class="alert alert-warning text-center mb-0" role="alert" style="border-radius: 8px;">
+                        Please log in to write a review.
+                    </div>
+                }
             </div>
         </div>
     </div>
@@ -351,8 +372,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-
-        window.onload = function () {
+         window.onload = function () {
         console.log("✅ JavaScript Loaded!");
 
         const thumbnails = document.querySelectorAll(".open-slider");
@@ -388,8 +408,6 @@
         });
     };
 
-
-       
 
 
 

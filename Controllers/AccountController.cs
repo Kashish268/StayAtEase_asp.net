@@ -23,6 +23,7 @@ namespace WebApplication1.Controllers
 
         [HttpPost]
         public IActionResult Login(LoginModel model)
+        
         {
             // Check if model is valid
             if (string.IsNullOrWhiteSpace(model.email) || string.IsNullOrWhiteSpace(model.password))
@@ -146,6 +147,20 @@ namespace WebApplication1.Controllers
             ViewBag.UserId = userId;
 
             return View();
+        }
+
+        public IActionResult Logout()
+        {
+            // Clear the session
+            HttpContext.Session.Remove("UserId");
+
+            // You can clear all session data if needed
+             HttpContext.Session.Clear();
+            Console.WriteLine("Logout successfully!");
+            
+            TempData["LogoutMessage"] = "You have been logged out successfully!";
+            // Redirect to home or login page
+            return RedirectToAction("Index", "Home");
         }
     }
 }

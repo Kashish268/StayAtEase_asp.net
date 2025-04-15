@@ -4,12 +4,14 @@ using System.Diagnostics;
 using System.Net.Mail;
 using System.Net;
 using WebApplication1.Models;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 
 namespace WebApplication1.Controllers
 {
     public class HomeController : Controller
     {
+
 
         private readonly IConfiguration _configuration;
         private readonly ILogger<HomeController> _logger;
@@ -20,11 +22,97 @@ namespace WebApplication1.Controllers
             _configuration = configuration;
         }
 
+        public override void OnActionExecuting(ActionExecutingContext context)
+        {
+            int? userId = HttpContext.Session.GetInt32("UserId");
+
+            if (userId.HasValue)
+            {
+                ViewBag.ProfileImage = GetProfileImagePath(userId.Value);
+            }
+
+            base.OnActionExecuting(context);
+        }
+
+        protected string GetProfileImagePath(int userId)
+        {
+            string profilePath = null;
+
+            // Shared connection string (update with your actual connection string)
+            string connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                string query = "SELECT profile_pic FROM users WHERE user_id = @UserId";
+                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@UserId", userId);
+
+                conn.Open();
+                var result = cmd.ExecuteScalar();
+                if (result != null && result != DBNull.Value)
+                {
+                    profilePath = result.ToString();
+                }
+            }
+
+            return profilePath;
+        }
+
         public IActionResult Index()
         {
             ViewData["ActivePage"] = "Home";
+            //int? userId = HttpContext.Session.GetInt32("UserId");
+
+            //if (userId.HasValue)
+            //{
+            //    string profilePath = GetProfileImagePath(userId.Value); // Use .Value to unwrap the nullable int
+            //    ViewBag.ProfileImage = string.IsNullOrEmpty(profilePath) ? "/assets/default-user.png" : profilePath;
+            //}
+            //var userId = HttpContext.Session.GetInt32("UserId");
+            //var role = HttpContext.Session.GetString("UserRole");
+
+            //if (userId != null)
+            //{
+            //    switch (role)
+            //    {
+            //        case "admin":
+            //            return RedirectToAction("Super_AdminDashboard", "Account");
+            //        case "roomowner":
+            //            return RedirectToAction("Dashboard", "Account");
+            //        case "tenant":
+            //            return RedirectToAction("Index", "Tenant"); // or wherever tenant goes
+            //    }
+            //}
             return View();
         }
+
+
+        //private string GetProfileImagePath(int? userId)
+        //{
+        //    if (userId == null) return null;
+
+        //    string profilePath = null;
+        //    string connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+        //    using (SqlConnection conn = new SqlConnection(connectionString))
+        //    {
+        //        string query = "SELECT profile_pic FROM users WHERE user_id = @UserId";
+
+        //        SqlCommand cmd = new SqlCommand(query, conn);
+        //        cmd.Parameters.AddWithValue("@UserId", userId.Value);
+
+        //        conn.Open();
+        //        object result = cmd.ExecuteScalar();
+        //        if (result != null && result != DBNull.Value)
+        //        {
+        //            profilePath = result.ToString();
+        //        }
+        //    }
+
+        //    return profilePath;
+        //}
+
 
         public IActionResult Privacy()
         {
@@ -48,6 +136,38 @@ namespace WebApplication1.Controllers
             ViewData["ActivePage"] = "Privacy";
             return View();
         }
+
+        public IActionResult Profile_details()
+        {
+            ViewData["Title"] = "Profile_details";
+            //var userId = HttpContext.Session.GetInt32("UserId");
+            ////if (!int.TryParse(userIdString, out int userId))
+            ////    return RedirectToAction("Index");
+
+            //string connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+            //string profileImagePath = ""; // Default image
+
+            //using (SqlConnection connection = new SqlConnection(connectionString))
+            //{
+            //    string query = "SELECT profile_pic FROM users WHERE user_id  = @UserId";
+
+            //    SqlCommand command = new SqlCommand(query, connection);
+            //    command.Parameters.AddWithValue("@UserId", userId);
+
+            //    connection.Open();
+            //    var result = command.ExecuteScalar();
+            //    if (result != null && result != DBNull.Value)
+            //    {
+            //        profileImagePath = result.ToString();
+            //    }
+            //}
+
+            //ViewBag.ProfileImage = profileImagePath;
+            //Console.WriteLine(profileImagePath);
+            return View();
+        }
+
 
         //public IActionResult Dashboard() { 
         //    return View();
@@ -185,7 +305,7 @@ namespace WebApplication1.Controllers
                     cmd.Parameters.AddWithValue("@Token", token);
 
                     // ✅ Always save the default profile picture
-                    string profilePicPath = "/assets/profile_default.png";
+                    string profilePicPath = "/assets/profile_default.jpg";
 
                     // ❌ No need to check or upload anything
                     cmd.Parameters.AddWithValue("@ProfilePic", profilePicPath);
