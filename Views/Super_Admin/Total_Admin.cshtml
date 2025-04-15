@@ -1,22 +1,19 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿
+
 @{
     ViewBag.Title = "Super Admin Dashboard";
     Layout = "~/Views/Shared/_SuperAdminLayout.cshtml";
 }
 
-
 <link rel="stylesheet" href="~/Content/site.css" />
 
-
 <div class="total-users-container">
-    <h2 class="total-users-title"> Property Owners</h2>
+    <h2 class="total-users-title">Property Owners</h2>
 
     <div class="total-users-wrapper">
 
         <div class="search-container">
-            <i class="fas fa-search search-icon"></i>  <!-- Font Awesome icon -->
+            <i class="fas fa-search search-icon"></i>
             <input type="text" class="total-users-search" placeholder="Search users...">
         </div>
 
@@ -33,7 +30,20 @@
                     </tr>
                 </thead>
                 <tbody id="adminTableBody">
-                    <!-- Rows will be inserted dynamically -->
+                    @foreach (var user in Model)
+                    {
+                        <tr>
+                            <td>@user.UserId</td>
+                            <td>@user.Name</td>
+                            <td>@user.Mobile</td>
+                            <td>@user.CreatedAt.ToString("yyyy-MM-dd")</td>
+                            <td>@user.Status</td>
+                            <td>
+                                <!-- Example action: View or Edit -->
+                                <a href="/SuperAdmin/Details/@user.UserId">View</a>
+                            </td>
+                        </tr>
+                    }
                 </tbody>
             </table>
         </div>
@@ -45,7 +55,4 @@
     </div>
 </div>
 
-<!-- Include External JavaScript -->
 <script src="~/js/site.js"></script>
-
-
