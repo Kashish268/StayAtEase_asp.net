@@ -5,6 +5,7 @@ using System.Net.Mail;
 using System.Net;
 using WebApplication1.Models;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
 
 namespace WebApplication1.Controllers
@@ -116,8 +117,55 @@ namespace WebApplication1.Controllers
 
         public IActionResult Privacy()
         {
+            List<UserProperty> properties = new List<UserProperty>();
+
+            string connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                string query = @"
+SELECT 
+    p.PropertyId, 
+    p.Title, 
+    p.Address AS Location, 
+    p.Bedrooms AS Beds, 
+    p.Bathrooms AS Baths, 
+    CAST(p.SquareFootage AS NVARCHAR) + ' sqft' AS Size, 
+    N'₹' + CAST(p.Price AS NVARCHAR) + '/month' AS Price, 
+    p.ImagePaths AS ImagePath, 
+    CAST(ROUND(ISNULL(AVG(r.Rating), 0), 1) AS DECIMAL(2,1)) AS Rating, 
+    COUNT(r.ReviewID) AS Reviews
+FROM Properties p
+LEFT JOIN Reviews r ON p.PropertyId = r.PropertyID
+GROUP BY 
+    p.PropertyId, p.Title, p.Address, p.Bedrooms, p.Bathrooms, 
+    p.SquareFootage, p.Price, p.ImagePaths";
+
+
+                SqlCommand cmd = new SqlCommand(query, conn);
+                conn.Open();
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    properties.Add(new UserProperty
+                    {
+                        PropertyID = Convert.ToInt32(reader["PropertyID"]),
+                        Title = reader["Title"].ToString(),
+                        Location = reader["Location"].ToString(),
+                        Beds = Convert.ToInt32(reader["Beds"]),
+                        Baths = Convert.ToInt32(reader["Baths"]),
+                        Size = reader["Size"].ToString(),
+                        Price = reader["Price"].ToString(),
+                        ImagePath = reader["ImagePath"].ToString(),
+                        Rating = Convert.ToDecimal(reader["Rating"]),
+                        Reviews = Convert.ToInt32(reader["Reviews"])
+                    });
+                }
+            }
+
             ViewData["ActivePage"] = "Privacy";
-            return View();
+            return View(properties);
         }
 
         public IActionResult WishList()
@@ -131,10 +179,149 @@ namespace WebApplication1.Controllers
         }
 
 
-        public IActionResult Property_details()
+        //public IActionResult Property_details()
+        //{
+        //    ViewData["ActivePage"] = "Privacy";
+        //    return View();
+        //}
+
+        public IActionResult Property_details(int id)
         {
-            ViewData["ActivePage"] = "Privacy";
-            return View();
+            UserProperty property = null;
+
+            string connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                string query = @"
+        SELECT 
+            p.PropertyId, 
+            p.Title, 
+            p.Address AS Location, 
+            p.Bedrooms AS Beds, 
+            p.Bathrooms AS Baths, 
+            CAST(p.SquareFootage AS NVARCHAR) + ' sqft' AS Size, 
+            N'₹' + CAST(p.Price AS NVARCHAR) + '/month' AS Price, 
+            p.ImagePaths AS ImagePath, 
+            CAST(ROUND(ISNULL(AVG(r.Rating), 0), 1) AS DECIMAL(2,1)) AS Rating, 
+            COUNT(r.ReviewID) AS Reviews
+        FROM Properties p
+        LEFT JOIN Reviews r ON p.PropertyId = r.PropertyID
+        WHERE p.PropertyId = @PropertyId
+        GROUP BY 
+            p.PropertyId, p.Title, p.Address, p.Bedrooms, p.Bathrooms, 
+            p.SquareFootage, p.Price, p.ImagePaths";
+
+                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@PropertyId", id);  // Passing the PropertyId to the query
+
+                conn.Open();
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                if (reader.Read())
+                {
+                    property = new UserProperty
+                    {
+                        PropertyID = Convert.ToInt32(reader["PropertyID"]),
+                        Title = reader["Title"].ToString(),
+                        Location = reader["Location"].ToString(),
+                        Beds = Convert.ToInt32(reader["Beds"]),
+                        Baths = Convert.ToInt32(reader["Baths"]),
+                        Size = reader["Size"].ToString(),
+                        Price = reader["Price"].ToString(),
+                        ImagePath = reader["ImagePath"].ToString(),
+                        Rating = Convert.ToDecimal(reader["Rating"]),
+                        Reviews = Convert.ToInt32(reader["Reviews"])
+                    };
+                }
+            }
+
+            if (property == null)
+            {
+                return NotFound();  // If the property was not found, return a 404 error.
+            }
+
+            return View(property);  // Passing the property details to the view.
+        }
+
+        
+        [HttpPost]
+        public IActionResult SubmitReview(int propertyId, int userId, int rating, string comment)
+        {
+            if (rating == 0 || string.IsNullOrWhiteSpace(comment))
+            {
+                TempData["ErrorMessage"] = "Rating and comment are required.";
+                return RedirectToAction("Property_details", new { id = propertyId });
+            }
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+                {
+                    string query = @"INSERT INTO Reviews (PropertyID, UserID, Rating, Comment, ReviewDate)
+                             VALUES (@PropertyID, @UserID, @Rating, @Comment, @CreatedAt)";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@PropertyID", propertyId);
+                        cmd.Parameters.AddWithValue("@UserID", userId);
+                        cmd.Parameters.AddWithValue("@Rating", rating);
+                        cmd.Parameters.AddWithValue("@Comment", comment);
+                        cmd.Parameters.AddWithValue("@CreatedAt", DateTime.Now);
+
+                        conn.Open();
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+
+                TempData["SuccessMessage"] = "Review submitted successfully.";
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                TempData["ErrorMessage"] = "Error submitting review: " + ex.Message;
+            }
+
+            return RedirectToAction("Property_details", new { id = propertyId });
+        }
+
+       
+        [HttpPost]
+        public IActionResult SubmitInquiry(int userId, int propertyId, string message)
+        {
+            if (string.IsNullOrWhiteSpace(message))
+            {
+                TempData["InquiryError"] = "Please enter a message.";
+                return RedirectToAction("Property_details", new { id = propertyId });
+            }
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+                {
+                    string query = @"INSERT INTO Inquiries (UserID, PropertyID, Message, InquiryDate)
+                             VALUES (@UserID, @PropertyID, @Message, @InquiryDate)";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@UserID", userId);
+                        cmd.Parameters.AddWithValue("@PropertyID", propertyId);
+                        cmd.Parameters.AddWithValue("@Message", message);
+                        cmd.Parameters.AddWithValue("@InquiryDate", DateTime.Now);
+
+                        conn.Open();
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+
+                TempData["InquirySuccess"] = "Inquiry sent successfully!";
+            }
+            catch (Exception ex)
+            {
+                TempData["InquiryError"] = "Error: " + ex.Message;
+            }
+
+            return RedirectToAction("Property_details", new { id = propertyId });
         }
 
         public IActionResult Profile_details()
