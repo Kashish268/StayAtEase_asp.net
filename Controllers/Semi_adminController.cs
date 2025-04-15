@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Data.SqlClient;
 using WebApplication1.Models;
 
@@ -6,6 +7,50 @@ namespace WebApplication1.Controllers
 {
     public class Semi_adminController : BaseController
     {
+        private readonly IConfiguration _configuration;
+
+        public Semi_adminController(IConfiguration configuration) : base(configuration)
+        {
+            _configuration = configuration;
+
+        }
+
+        public override void OnActionExecuting(ActionExecutingContext context)
+        {
+            int? userId = HttpContext.Session.GetInt32("UserId");
+
+            if (userId.HasValue)
+            {
+                ViewBag.ProfileImage = GetProfileImagePath(userId.Value);
+            }
+
+            base.OnActionExecuting(context);
+        }
+
+        protected string GetProfileImagePath(int userId)
+        {
+            string profilePath = null;
+
+            // Shared connection string (update with your actual connection string)
+            string connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                string query = "SELECT profile_pic FROM users WHERE user_id = @UserId";
+                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@UserId", userId);
+
+                conn.Open();
+                var result = cmd.ExecuteScalar();
+                if (result != null && result != DBNull.Value)
+                {
+                    profilePath = result.ToString();
+                }
+            }
+
+            return profilePath;
+        }
         public IActionResult Dashboard()
         {
             var redirect = RedirectToLoginIfNotLoggedIn();
@@ -211,7 +256,7 @@ namespace WebApplication1.Controllers
                 Reviews = reviews,
                 TotalReviews = totalReviewsCount,
                 CurrentPage = page,
-                ReviewsPerPage = pageSize,
+                //ReviewsPerPage = pageSize,
                 SearchTerm = searchTerm ?? ""
             };
 
@@ -372,9 +417,10 @@ namespace WebApplication1.Controllers
 
         // Profile Action
         [HttpGet]
+        [HttpGet]
         public async Task<IActionResult> Property_List(string? searchTerm, int page = 1, string filter = "all")
         {
-           
+
 
             var redirect = RedirectToLoginIfNotLoggedIn();
             if (redirect != null) return redirect;
@@ -451,6 +497,7 @@ namespace WebApplication1.Controllers
 
             return View(viewModel);
         }
+
 
 
 
