@@ -1,19 +1,26 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Data.SqlClient;
 using WebApplication1.Models;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Http;
 
 namespace WebApplication1.Controllers
 {
     public class Semi_adminController : BaseController
     {
         private readonly IConfiguration _configuration;
-
-        public Semi_adminController(IConfiguration configuration) : base(configuration)
+        private readonly IWebHostEnvironment _webHostEnvironment;
+        public Semi_adminController(IWebHostEnvironment webHostEnvironment, IConfiguration configuration)
+    : base(configuration) // ✅ This is the missing piece
         {
+            _webHostEnvironment = webHostEnvironment;
             _configuration = configuration;
-
         }
+
+
 
         public override void OnActionExecuting(ActionExecutingContext context)
         {
@@ -70,100 +77,84 @@ namespace WebApplication1.Controllers
             return View();
         }
 
-        // Create Property (POST) Action
+    
         [HttpPost]
         public async Task<IActionResult> Create(AddPropertyModel model)
         {
-            var redirect = RedirectToLoginIfNotLoggedIn();
-            if (redirect != null) return redirect;
-            int? userId = HttpContext.Session.GetInt32("UserId");
+            if (!ModelState.IsValid)
+            {
+                TempData["Error"] = "Please fill in all required fields.";
+                return View(model);
+            }
 
-            // Ensure the user_id exists in the session before proceeding
-            if (userId==null)
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
             {
                 TempData["Error"] = "User not logged in.";
                 return RedirectToAction("Login", "Account");
             }
-            ViewBag.UserId = userId;
-            if (!ModelState.IsValid)
-                return View(model);
-
-            var amenities = Request.Form["Amenities"];
-            string amenitiesString = string.Join(", ", amenities);
 
             var imagePaths = new List<string>();
-            if (model.Images != null && model.Images.Any())
+            string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads");
+
+            if (!Directory.Exists(uploadsFolder))
             {
-                foreach (var image in model.Images)
+                Directory.CreateDirectory(uploadsFolder);
+            }
+
+            foreach (var image in model.Images)
+            {
+                if (image != null && image.Length > 0)
                 {
-                    if (image.Length > 0)
+                    string fileName = Guid.NewGuid() + Path.GetExtension(image.FileName);
+                    string filePath = Path.Combine(uploadsFolder, fileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
                     {
-                        var fileName = Guid.NewGuid().ToString() + Path.GetExtension(image.FileName);
-                        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "properties", fileName);
-
-                        var directory = Path.GetDirectoryName(filePath);
-                        if (!Directory.Exists(directory))
-                        {
-                            Directory.CreateDirectory(directory);
-                        }
-
-                        using (var stream = new FileStream(filePath, FileMode.Create))
-                        {
-                            await image.CopyToAsync(stream);
-                        }
-
-                        imagePaths.Add("/images/properties/" + fileName);
+                        await image.CopyToAsync(stream);
                     }
+
+                    imagePaths.Add("/uploads/" + fileName);
                 }
             }
 
-            string imagePathString = string.Join(", ", imagePaths);
+            string imagePathString = string.Join(",", imagePaths);
 
             string connectionString = _configuration.GetConnectionString("DefaultConnection");
 
-            try
+            using (SqlConnection con = new SqlConnection(connectionString))
             {
-                using (SqlConnection con = new SqlConnection(connectionString))
+                await con.OpenAsync();
+
+                string query = @"INSERT INTO Properties 
+                      (Title, Price, SquareFootage, Address, Bedrooms, Bathrooms, PropertyType, Amenities, ImagePaths, UserId)
+                      VALUES 
+                      (@Title, @Price, @SquareFootage, @Address, @Bedrooms, @Bathrooms, @PropertyType, @Amenities, @ImagePaths, @UserId)";
+
+                using (SqlCommand cmd = new SqlCommand(query, con))
                 {
-                    string query = @"
-                INSERT INTO Properties 
-                (Title, Price, SquareFootage, Address, Bedrooms, Bathrooms, PropertyType, Amenities, ImagePaths, UserId)
-                VALUES
-                (@Title, @Price, @SquareFootage, @Address, @Bedrooms, @Bathrooms, @PropertyType, @Amenities, @ImagePaths, @UserId)";
+                    cmd.Parameters.AddWithValue("@Title", model.Title);
+                    cmd.Parameters.AddWithValue("@Price", model.Price);
+                    cmd.Parameters.AddWithValue("@SquareFootage", model.SquareFootage);
+                    cmd.Parameters.AddWithValue("@Address", model.Address);
+                    cmd.Parameters.AddWithValue("@Bedrooms", model.Bedrooms);
+                    cmd.Parameters.AddWithValue("@Bathrooms", model.Bathrooms);
+                    cmd.Parameters.AddWithValue("@PropertyType", model.PropertyType ?? "");
+                    cmd.Parameters.AddWithValue("@Amenities", model.Amenities != null ? string.Join(",", model.Amenities) : "");
+                    cmd.Parameters.AddWithValue("@ImagePaths", imagePathString);
+                    cmd.Parameters.AddWithValue("@UserId", userId);
 
-                    using (SqlCommand cmd = new SqlCommand(query, con))
-                    {
-                        cmd.Parameters.AddWithValue("@Title", model.Title);
-                        cmd.Parameters.AddWithValue("@Price", model.Price);
-                        cmd.Parameters.AddWithValue("@SquareFootage", model.SquareFootage);
-                        cmd.Parameters.AddWithValue("@Address", model.Address);
-                        cmd.Parameters.AddWithValue("@Bedrooms", model.Bedrooms);
-                        cmd.Parameters.AddWithValue("@Bathrooms", model.Bathrooms);
-                        cmd.Parameters.AddWithValue("@PropertyType", model.PropertyType);
-                        cmd.Parameters.AddWithValue("@Amenities", amenitiesString);
-                        cmd.Parameters.AddWithValue("@ImagePaths", imagePathString);
-                        cmd.Parameters.AddWithValue("@UserId", userId);
-
-                        con.Open();
-                        int rowsAffected = await cmd.ExecuteNonQueryAsync();
-                        if (rowsAffected == 0)
-                        {
-                            ModelState.AddModelError("", "Failed to add the property.");
-                            return View(model);
-                        }
-                    }
+                    await cmd.ExecuteNonQueryAsync();
                 }
+            }
 
-                TempData["Success"] = "Property added successfully!";
-                return RedirectToAction("Property_List", "Semi_admin");
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error adding property: {ex.Message}");
-                ModelState.AddModelError("", "An error occurred while adding the property. Please try again.");
-                return View(model);
-            }
+            TempData["UploadedImages"] = imagePaths;
+            TempData["Success"] = "Property added successfully!";
+
+            // Redirect to the PropertyList action (change "PropertyList" to the actual name of the action that displays the property list)
+            return RedirectToAction("Property_List", "Semi_adminController"); // Assuming your controller is named PropertyController
         }
+
 
         [HttpGet]
         // Reviews Action
@@ -265,7 +256,6 @@ namespace WebApplication1.Controllers
             return View("Reviews", viewModel); // <-- Ensure the view name matches your .cshtml file (case-sensitive on Linux)
 
         }
-
 
 
 
@@ -418,23 +408,21 @@ namespace WebApplication1.Controllers
 
 
 
-        // Profile Action
-        [HttpGet]
+      
         [HttpGet]
         public async Task<IActionResult> Property_List(string? searchTerm, int page = 1, string filter = "all")
         {
-
-
             var redirect = RedirectToLoginIfNotLoggedIn();
             if (redirect != null) return redirect;
+
             int? userId = HttpContext.Session.GetInt32("UserId");
 
-            // Ensure the user_id exists in the session before proceeding
             if (userId == null)
             {
                 TempData["Error"] = "User not logged in.";
                 return RedirectToAction("Login", "Account");
             }
+
             ViewBag.UserId = userId;
 
             var properties = new List<PropertyViewModel>();
@@ -444,25 +432,21 @@ namespace WebApplication1.Controllers
             {
                 await con.OpenAsync();
 
-                string query = @"SELECT * FROM Properties WHERE UserId = @UserId";
+                // Adjust query to only use existing columns
+                string query = @"
+            SELECT PropertyId, Title, Price, SquareFootage, Address, ImagePaths 
+            FROM Properties 
+            WHERE UserId = @UserId";
 
                 if (!string.IsNullOrEmpty(searchTerm))
                 {
                     query += " AND Title LIKE @SearchTerm";
                 }
 
-                if (filter == "available")
-                {
-                    query += " AND IsAvailable = 1";
-                }
-                else if (filter == "unavailable")
-                {
-                    query += " AND IsAvailable = 0";
-                }
-
                 using (SqlCommand cmd = new SqlCommand(query, con))
                 {
                     cmd.Parameters.AddWithValue("@UserId", userId);
+
                     if (!string.IsNullOrEmpty(searchTerm))
                         cmd.Parameters.AddWithValue("@SearchTerm", $"%{searchTerm}%");
 
@@ -477,8 +461,9 @@ namespace WebApplication1.Controllers
                                 Price = Convert.ToDecimal(reader["Price"]),
                                 Area = Convert.ToInt32(reader["SquareFootage"]),
                                 Address = reader["Address"].ToString(),
-                                IsAvailable = reader["IsAvailable"] != DBNull.Value && Convert.ToBoolean(reader["IsAvailable"]),
                                 ImageUrl = reader["ImagePaths"].ToString()?.Split(',').FirstOrDefault()
+
+                                // IsAvailable removed because column doesn't exist
                             });
                         }
                     }
@@ -493,13 +478,15 @@ namespace WebApplication1.Controllers
             {
                 Properties = pagedProperties,
                 CurrentPage = currentPage,
-                TotalInquiries = 0, // Optional: Add inquiry logic here
+                TotalInquiries = 0,
                 SearchTerm = searchTerm ?? "",
                 Filter = filter
             };
 
             return View(viewModel);
         }
+
+
 
 
 
