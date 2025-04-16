@@ -121,28 +121,65 @@ namespace WebApplication1.Controllers
 
             string connectionString = _configuration.GetConnectionString("DefaultConnection");
 
+            int? userId = HttpContext.Session.GetInt32("UserId"); // Login check
+
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
-                string query = @"
-SELECT 
-    p.PropertyId, 
-    p.Title, 
-    p.Address AS Location, 
-    p.Bedrooms AS Beds, 
-    p.Bathrooms AS Baths, 
-    CAST(p.SquareFootage AS NVARCHAR) + ' sqft' AS Size, 
-    N'₹' + CAST(p.Price AS NVARCHAR) + '/month' AS Price, 
-    p.ImagePaths AS ImagePath, 
-    CAST(ROUND(ISNULL(AVG(r.Rating), 0), 1) AS DECIMAL(2,1)) AS Rating, 
-    COUNT(r.ReviewID) AS Reviews
-FROM Properties p
-LEFT JOIN Reviews r ON p.PropertyId = r.PropertyID
-GROUP BY 
-    p.PropertyId, p.Title, p.Address, p.Bedrooms, p.Bathrooms, 
-    p.SquareFootage, p.Price, p.ImagePaths";
+                string query;
 
+                if (userId != null)
+                {
+                    // If user is logged in, join Wishlist and get IsWishlisted
+                    query = @"
+            SELECT 
+                p.PropertyId, 
+                p.Title, 
+                p.Address AS Location, 
+                p.Bedrooms AS Beds, 
+                p.Bathrooms AS Baths, 
+                CAST(p.SquareFootage AS NVARCHAR) + ' sqft' AS Size, 
+                N'₹' + CAST(p.Price AS NVARCHAR) + '/month' AS Price, 
+                p.ImagePaths AS ImagePath, 
+                CAST(ROUND(ISNULL(AVG(r.Rating), 0), 1) AS DECIMAL(2,1)) AS Rating, 
+                COUNT(r.ReviewID) AS Reviews,
+                CASE WHEN w.UserID IS NOT NULL THEN 1 ELSE 0 END AS IsWishlisted
+            FROM Properties p
+            LEFT JOIN Reviews r ON p.PropertyId = r.PropertyID
+            LEFT JOIN Wishlist w ON p.PropertyId = w.PropertyID AND w.UserId = @UserId
+            GROUP BY 
+                p.PropertyId, p.Title, p.Address, p.Bedrooms, p.Bathrooms, 
+                p.SquareFootage, p.Price, p.ImagePaths, w.UserId";
+                }
+                else
+                {
+                    // If user is NOT logged in, IsWishlisted will always be false
+                    query = @"
+            SELECT 
+                p.PropertyId, 
+                p.Title, 
+                p.Address AS Location, 
+                p.Bedrooms AS Beds, 
+                p.Bathrooms AS Baths, 
+                CAST(p.SquareFootage AS NVARCHAR) + ' sqft' AS Size, 
+                N'₹' + CAST(p.Price AS NVARCHAR) + '/month' AS Price, 
+                p.ImagePaths AS ImagePath, 
+                CAST(ROUND(ISNULL(AVG(r.Rating), 0), 1) AS DECIMAL(2,1)) AS Rating, 
+                COUNT(r.ReviewID) AS Reviews,
+                0 AS IsWishlisted
+            FROM Properties p
+            LEFT JOIN Reviews r ON p.PropertyId = r.PropertyID
+            GROUP BY 
+                p.PropertyId, p.Title, p.Address, p.Bedrooms, p.Bathrooms, 
+                p.SquareFootage, p.Price, p.ImagePaths";
+                }
 
                 SqlCommand cmd = new SqlCommand(query, conn);
+
+                if (userId != null)
+                {
+                    cmd.Parameters.AddWithValue("@UserId", userId);
+                }
+
                 conn.Open();
                 SqlDataReader reader = cmd.ExecuteReader();
 
@@ -159,7 +196,8 @@ GROUP BY
                         Price = reader["Price"].ToString(),
                         ImagePath = reader["ImagePath"].ToString(),
                         Rating = Convert.ToDecimal(reader["Rating"]),
-                        Reviews = Convert.ToInt32(reader["Reviews"])
+                        Reviews = Convert.ToInt32(reader["Reviews"]),
+                        IsWishlisted = Convert.ToInt32(reader["IsWishlisted"]) == 1
                     });
                 }
             }
@@ -173,10 +211,68 @@ GROUP BY
             ViewData["ActivePage"] = "WishList";
 
             var userId = HttpContext.Session.GetInt32("UserId");
-            ViewData["IsLoggedIn"] = userId != null;
+            bool isLoggedIn = userId.HasValue;
+            ViewData["IsLoggedIn"] = isLoggedIn;
 
-            return View();
+            // if user is not logged in, skip DB call and return empty list
+            if (!isLoggedIn)
+            {
+                return View(new List<UserProperty>());
+            }
+
+            List<UserProperty> wishlistedProperties = new List<UserProperty>();
+
+            string connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                string query = @"
+SELECT 
+    p.PropertyId, 
+    p.Title, 
+    p.Address AS Location, 
+    p.Bedrooms AS Beds, 
+    p.Bathrooms AS Baths, 
+    CAST(p.SquareFootage AS NVARCHAR) + ' sqft' AS Size, 
+    N'₹' + CAST(p.Price AS NVARCHAR) + '/month' AS Price, 
+    p.ImagePaths AS ImagePath, 
+    CAST(ROUND(ISNULL(AVG(r.Rating), 0), 1) AS DECIMAL(2,1)) AS Rating, 
+    COUNT(r.ReviewID) AS Reviews
+FROM Properties p
+INNER JOIN Wishlist w ON p.PropertyId = w.PropertyID
+LEFT JOIN Reviews r ON p.PropertyId = r.PropertyID
+WHERE w.UserId = @UserId
+GROUP BY 
+    p.PropertyId, p.Title, p.Address, p.Bedrooms, p.Bathrooms, 
+    p.SquareFootage, p.Price, p.ImagePaths";
+
+                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@UserId", userId.Value); // .Value is safe here
+
+                conn.Open();
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    wishlistedProperties.Add(new UserProperty
+                    {
+                        PropertyID = Convert.ToInt32(reader["PropertyID"]),
+                        Title = reader["Title"].ToString(),
+                        Location = reader["Location"].ToString(),
+                        Beds = Convert.ToInt32(reader["Beds"]),
+                        Baths = Convert.ToInt32(reader["Baths"]),
+                        Size = reader["Size"].ToString(),
+                        Price = reader["Price"].ToString(),
+                        ImagePath = reader["ImagePath"].ToString(),
+                        Rating = Convert.ToDecimal(reader["Rating"]),
+                        Reviews = Convert.ToInt32(reader["Reviews"])
+                    });
+                }
+            }
+
+            return View(wishlistedProperties);
         }
+
 
 
         //public IActionResult Property_details()

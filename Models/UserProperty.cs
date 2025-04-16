@@ -12,5 +12,8 @@
         public string ImagePath { get; set; }
         public decimal Rating { get; set; }
         public int Reviews { get; set; }
+
+        public bool IsWishlisted { get; set; }
+
     }
 }

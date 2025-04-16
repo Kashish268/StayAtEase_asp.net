@@ -10,40 +10,52 @@
     <div class="row g-4">
         @if (isLoggedIn)
         {
-            foreach (var property in new[]
-            {
-        new {Image="/assets/Property5.jpg", Title="Luxury Beachfront Villa", Location="Miami Beach, Florida", Beds="4", Baths="3", Size="2800 sqft", Price="₹1,950/month", Rating="4.3", Reviews="124"},
-        new {Image="/assets/Property4.jpg", Title="Modern Luxury Apartment", Location="Downtown, New York", Beds="3", Baths="2", Size="2200 sqft", Price="₹2,500/month", Rating="4.8", Reviews="98"},
-        new {Image="/assets/Property3.jpg", Title="Cozy Studio Apartment", Location="Brooklyn, New York", Beds="1", Baths="1", Size="900 sqft", Price="₹1,800/month", Rating="4.5", Reviews="67"},
-        new {Image="/assets/Property1.jpg", Title="Spacious Family Home", Location="Los Angeles, California", Beds="5", Baths="4", Size="3500 sqft", Price="₹3,200/month", Rating="4.7", Reviews="142"},
-        new {Image="/assets/Property2.jpg", Title="Penthouse Suite", Location="San Francisco, California", Beds="3", Baths="3", Size="2800 sqft", Price="₹4,500/month", Rating="4.9", Reviews="189"},
-        new {Image="/assets/Property6.jpg", Title="Lakeview Cabin", Location="Austin, Texas", Beds="2", Baths="1", Size="1500 sqft", Price="₹2,100/month", Rating="4.6", Reviews="75"},
-        })
-            {
-                <div class="col-md-4">
-                    <div class="card shadow-sm">
-                        <img src="@property.Image" class="card-img-top" alt="Property Image">
-                        <button class="like-btn position-absolute top-0 end-0 m-2">
-                            <i class="fa fa-heart" style="color:red;"></i>
-                        </button>
-                        <div class="card-body">
-                            <h5 class="card-title">@property.Title</h5>
-                            <p class="text-muted">📍 @property.Location</p>
-                            <div class="d-flex align-items-center mb-2">
-                                <span class="me-3"><i class="fa fa-bed"></i> @property.Beds beds</span>
-                                <span class="me-3"><i class="fa fa-bath"></i> @property.Baths baths</span>
-                                <span><i class="fa fa-expand"></i> @property.Size</span>
-                            </div>
-                            <div class="d-flex align-items-center mb-2">
-                                <span class="text-warning me-2">⭐ @property.Rating</span>
-                                <small class="text-muted">(@property.Reviews)</small>
-                            </div>
-                            <h6 class="text-primary fw-bold">@property.Price</h6>
-                            <a href="#" class="btn btn-primary w-100 mt-2">View Details</a>
+          @model List<WebApplication1.Models.UserProperty>
+
+<div class="container py-4">
+    <div class="row g-4">
+        @foreach (var property in Model)
+        {
+            <div class="col-md-4">
+                <div class="card shadow-sm position-relative">
+                    <img src="@property.ImagePath" class="card-img-top" alt="Image of @property.Title">
+
+                    <!-- Red heart, because these are wishlisted -->
+                    <button class="like-btn position-absolute top-0 end-0 m-2">
+                        <i class="fa fa-heart text-danger"></i>
+                    </button>
+
+                    <div class="card-body">
+                        <h5 class="card-title">@property.Title</h5>
+                        <p class="text-muted">📍 @property.Location</p>
+
+                        <div class="d-flex justify-content-between text-muted mb-2">
+                            <span><i class="fa fa-bed"></i> @property.Beds beds</span>
+                            <span><i class="fa fa-bath"></i> @property.Baths baths</span>
+                            <span><i class="fa fa-expand"></i> @property.Size</span>
                         </div>
+
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="text-warning fw-semibold me-2">⭐ @property.Rating</span>
+                            <small class="text-muted">(@property.Reviews reviews)</small>
+                        </div>
+
+                        <h6 class="text-primary fw-bold">@property.Price</h6>
+
+                        <a class="btn btn-primary w-100 mt-2" asp-controller="Home" asp-action="Property_details" asp-route-id="@property.PropertyID">View Details</a>
                     </div>
                 </div>
-            }
+            </div>
+        }
+    </div>
+</div>
+
+
+
+
+
+
+
         }
         else
         {
