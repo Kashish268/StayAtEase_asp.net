@@ -39,8 +39,12 @@
                             <td>@user.CreatedAt.ToString("yyyy-MM-dd")</td>
                             <td>@user.Status</td>
                             <td>
-                                <!-- Example action: View or Edit -->
-                                <a href="/SuperAdmin/Details/@user.UserId">View</a>
+                                <form asp-action="Total_Admin" method="post" onsubmit="return confirm('Are you sure you want to delete this user?');" style="display:inline;">
+                                    <input type="hidden" name="id" value="@user.UserId" />
+                                    <button type="submit" style="background:none;border:none;color:red;" title="Delete">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                     }
