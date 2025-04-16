@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using System.Configuration;
 using WebApplication1.Models;
 
 namespace WebApplication1.Controllers
@@ -113,6 +114,125 @@ namespace WebApplication1.Controllers
         //    return View();
         //}
 
+        //public IActionResult Dashboard()
+        //{
+        //    int? userId = HttpContext.Session.GetInt32("UserId");
+
+        //    if (userId == null)
+        //    {
+        //        return RedirectToAction("Index", "Home");
+        //    }
+
+        //    Console.WriteLine("Logged in User ID: " + userId);
+        //    ViewBag.UserId = userId;
+
+        //    // Initialize ViewModel
+        //    var model = new SuperAdminDashboardViewModel
+        //    {
+        //        Tenants = new List<User>(),
+        //        PropertyOwners = new List<User>(),
+        //        LatestMessages = new List<PropertyMessageViewModel>()
+        //    };
+
+        //    string connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+        //    using (SqlConnection conn = new SqlConnection(connectionString))
+        //    {
+        //        conn.Open();
+
+        //        // Total Properties
+        //        using (SqlCommand cmd = new SqlCommand("SELECT COUNT(*) FROM Properties", conn))
+        //        {
+        //            model.TotalProperties = (int)cmd.ExecuteScalar();
+        //        }
+
+        //        // Active Listings
+        //        using (SqlCommand cmd = new SqlCommand("SELECT COUNT(*) FROM Properties WHERE IsAvailable = 1", conn))
+        //        {
+        //            model.ActiveListings = (int)cmd.ExecuteScalar();
+        //        }
+
+        //        // Total Inquiries
+        //        using (SqlCommand cmd = new SqlCommand("SELECT COUNT(*) FROM Inquiries", conn))
+        //        {
+        //            model.TotalInquiries = (int)cmd.ExecuteScalar();
+        //        }
+
+        //        // Average Review Rating
+        //        using (SqlCommand cmd = new SqlCommand("SELECT AVG(CAST(Rating AS FLOAT)) FROM Reviews", conn))
+        //        {
+        //            var result = cmd.ExecuteScalar();
+        //            model.AverageReviewRating = result != DBNull.Value ? Convert.ToDouble(result) : 0;
+        //        }
+
+        //        // Tenants (top 5)
+        //        using (SqlCommand cmd = new SqlCommand("SELECT TOP 5 user_id, name, mobile, email, role, status, created_at, profile_pic FROM users WHERE role = 'tenant'", conn))
+        //        using (SqlDataReader reader = cmd.ExecuteReader())
+        //        {
+        //            while (reader.Read())
+        //            {
+        //                model.Tenants.Add(new User
+        //                {
+        //                    UserId = reader.GetInt32(0),
+        //                    Name = reader.GetString(1),
+        //                    Mobile = reader.GetString(2),
+        //                    Email = reader.GetString(3),
+        //                    Role = reader.GetString(4),
+        //                    Status = reader.GetString(5),
+        //                    CreatedAt = reader.GetDateTime(6),
+        //                    ProfilePic = reader.IsDBNull(7) ? null : reader.GetString(7)
+        //                });
+        //            }
+        //        }
+
+        //        // Property Owners (top 5)
+        //        using (SqlCommand cmd = new SqlCommand("SELECT TOP 5 user_id, name, mobile, email, role, status, created_at, profile_pic FROM users WHERE role = 'roomowner'", conn))
+        //        using (SqlDataReader reader = cmd.ExecuteReader())
+        //        {
+        //            while (reader.Read())
+        //            {
+        //                model.PropertyOwners.Add(new User
+        //                {
+        //                    UserId = reader.GetInt32(0),
+        //                    Name = reader.GetString(1),
+        //                    Mobile = reader.GetString(2),
+        //                    Email = reader.GetString(3),
+        //                    Role = reader.GetString(4),
+        //                    Status = reader.GetString(5),
+        //                    CreatedAt = reader.GetDateTime(6),
+        //                    ProfilePic = reader.IsDBNull(7) ? null : reader.GetString(7)
+        //                });
+        //            }
+        //        }
+
+        //        // Latest Messages (top 3)
+        //        string messageQuery = @"
+        //SELECT TOP 3 u.name, u.email, u.mobile, p.PropertyId, i.Message
+        //FROM Inquiries i
+        //JOIN users u ON i.UserID = u.user_id
+        //JOIN Properties p ON i.PropertyID = p.PropertyId
+        //ORDER BY i.InquiryDate DESC";
+
+        //        using (SqlCommand cmd = new SqlCommand(messageQuery, conn))
+        //        using (SqlDataReader reader = cmd.ExecuteReader())
+        //        {
+        //            while (reader.Read())
+        //            {
+        //                model.LatestMessages.Add(new PropertyMessageViewModel
+        //                {
+        //                    Name = reader.GetString(0),
+        //                    Email = reader.GetString(1),
+        //                    Contact = reader.GetString(2),
+        //                    PropertyId = "P-" + reader.GetInt32(3),
+        //                    Message = reader.GetString(4)
+        //                });
+        //            }
+        //        }
+        //    }
+
+        //    return View(model);
+        //}
+
         public IActionResult Dashboard()
         {
             int? userId = HttpContext.Session.GetInt32("UserId");
@@ -130,8 +250,6 @@ namespace WebApplication1.Controllers
 
             return View();
         }
-
-
         public IActionResult Super_AdminDashboard()
         {
             int? userId = HttpContext.Session.GetInt32("UserId");
@@ -141,14 +259,116 @@ namespace WebApplication1.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            // ✅ Session value print karne ke liye (console pe ya debug)
             Console.WriteLine("Logged in User ID: " + userId);
-
-            // OR pass karo view me dekhne ke liye
             ViewBag.UserId = userId;
 
-            return View();
+            // Sample Data – Replace with actual DB fetching logic
+            var model = new SuperAdminDashboardViewModel
+            {
+                Tenants = new List<User>(),
+                PropertyOwners = new List<User>(),
+                LatestMessages = new List<PropertyMessageViewModel>()
+            };
+
+            string connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+
+                // Example logic for filling the model data
+                using (SqlCommand cmd = new SqlCommand("SELECT COUNT(*) FROM Properties", conn))
+                {
+                    model.TotalProperties = (int)cmd.ExecuteScalar();
+                }
+                // Active Listings
+                using (SqlCommand cmd = new SqlCommand("SELECT COUNT(*) FROM Properties WHERE IsAvailable = 1", conn))
+                {
+                    model.ActiveListings = (int)cmd.ExecuteScalar();
+                }
+
+                // Total Inquiries
+                using (SqlCommand cmd = new SqlCommand("SELECT COUNT(*) FROM Inquiries", conn))
+                {
+                    model.TotalInquiries = (int)cmd.ExecuteScalar();
+                }
+
+                // Average Review Rating
+                using (SqlCommand cmd = new SqlCommand("SELECT AVG(CAST(Rating AS FLOAT)) FROM Reviews", conn))
+                {
+                    var result = cmd.ExecuteScalar();
+                    model.AverageReviewRating = result != DBNull.Value ? Convert.ToDouble(result) : 0;
+                }
+
+                // Tenants
+                using (SqlCommand cmd = new SqlCommand("SELECT TOP 5 user_id, name, mobile, email, role, status, created_at, profile_pic FROM users WHERE role = 'tenant'", conn))
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        model.Tenants.Add(new User
+                        {
+                            UserId = reader.GetInt32(0),
+                            Name = reader.GetString(1),
+                            Mobile = reader.GetString(2),
+                            Email = reader.GetString(3),
+                            Role = reader.GetString(4),
+                            Status = reader.GetString(5),
+                            CreatedAt = reader.GetDateTime(6),
+                            ProfilePic = reader.IsDBNull(7) ? null : reader.GetString(7)
+                        });
+                    }
+                }
+
+                // Property Owners
+                using (SqlCommand cmd = new SqlCommand("SELECT TOP 5 user_id, name, mobile, email, role, status, created_at, profile_pic FROM users WHERE role = 'roomowner'", conn))
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        model.PropertyOwners.Add(new User
+                        {
+                            UserId = reader.GetInt32(0),
+                            Name = reader.GetString(1),
+                            Mobile = reader.GetString(2),
+                            Email = reader.GetString(3),
+                            Role = reader.GetString(4),
+                            Status = reader.GetString(5),
+                            CreatedAt = reader.GetDateTime(6),
+                            ProfilePic = reader.IsDBNull(7) ? null : reader.GetString(7)
+                        });
+                    }
+                }
+
+                // Latest Messages
+                string messageQuery = @"
+                SELECT TOP 3 u.name, u.email, u.mobile, p.PropertyId, i.Message
+                FROM Inquiries i
+                JOIN users u ON i.UserID = u.user_id
+                JOIN Properties p ON i.PropertyID = p.PropertyId
+                ORDER BY i.InquiryDate DESC";
+
+                using (SqlCommand cmd = new SqlCommand(messageQuery, conn))
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        model.LatestMessages.Add(new PropertyMessageViewModel
+                        {
+                            Name = reader.GetString(0),
+                            Email = reader.GetString(1),
+                            Contact = reader.GetString(2),
+                            PropertyId = "P-" + reader.GetInt32(3),
+                            Message = reader.GetString(4)
+                        });
+
+                    }
+                }
+            }
+
+            return View(model); // ✅ Pass the model to the view
         }
+
 
         public override void OnActionExecuting(ActionExecutingContext context)
         {
