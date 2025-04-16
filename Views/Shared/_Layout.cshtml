@@ -1,4 +1,6 @@
-﻿
+﻿@{
+    var isLoggedIn = Context.Session.GetString("UserId") != null;
+}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -36,9 +38,26 @@
                         <li class="nav-item">
                             <a class="nav-link @(ViewData["ActivePage"] == "WishList" ? "active" : "")" asp-area="" asp-controller="Home" asp-action="WishList">Wishlist</a>
                         </li>
-                        <li class="nav-item">
-                            <button class="btn btn-primary" id="openLoginModal">Login</button>
-                        </li>
+                        @if (isLoggedIn)
+                        {
+                            <li class="nav-item profile-container">
+                                <a class="nav-link @(ViewData["ActivePage"] == "Profile_details" ? "active" : "")"
+                                   asp-controller="Home" asp-action="Profile_details">
+                                    <img src="@ViewBag.ProfileImage" class="profile-image" alt="User" />
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Account" asp-action="Logout">
+                                    <i class="fas fa-sign-out-alt"></i> <!-- Logout Icon -->
+                                </a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <button class="btn btn-primary" id="openLoginModal">Login</button>
+                            </li>
+                        }
                     </ul>
 
 
@@ -57,7 +76,7 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
-
+    
     <!-- Login Modal (always present in the layout) -->
     <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -174,7 +193,16 @@
     });
     });
     </script>
-
+    @section Scripts {
+        <script>
+            @if (TempData["LogoutMessage"] != null)
+            {
+                <text>
+                            alert('@TempData["LogoutMessage"]');
+                </text>
+            }
+        </script>
+    }
 
    </body>
 </html>

@@ -1,8 +1,12 @@
 ﻿
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.Data.SqlClient;
+<<<<<<< HEAD
 using Microsoft.EntityFrameworkCore;
+=======
+>>>>>>> c9bf34604bad84b9271264bc02109fa89c966e0a
 using System.Collections.Generic;
 using WebApplication1.Models;
 
@@ -10,6 +14,7 @@ namespace WebApplication1.Controllers
 {
     public class Super_AdminController : BaseController
     {
+<<<<<<< HEAD
         private readonly IConfiguration _config;
         private readonly ILogger<Super_AdminController> _logger;
 
@@ -17,6 +22,51 @@ namespace WebApplication1.Controllers
         {
             _config = config;
             _logger = logger;
+=======
+        private readonly IConfiguration _configuration;
+
+        public Super_AdminController(IConfiguration configuration) : base(configuration)
+        {
+            _configuration = configuration;
+
+        }
+
+        public override void OnActionExecuting(ActionExecutingContext context)
+        {
+            int? userId = HttpContext.Session.GetInt32("UserId");
+
+            if (userId.HasValue)
+            {
+                ViewBag.ProfileImage = GetProfileImagePath(userId.Value);
+            }
+
+            base.OnActionExecuting(context);
+        }
+
+        protected string GetProfileImagePath(int userId)
+        {
+            string profilePath = null;
+
+            // Shared connection string (update with your actual connection string)
+            string connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                string query = "SELECT profile_pic FROM users WHERE user_id = @UserId";
+                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@UserId", userId);
+
+                conn.Open();
+                var result = cmd.ExecuteScalar();
+                if (result != null && result != DBNull.Value)
+                {
+                    profilePath = result.ToString();
+                }
+            }
+
+            return profilePath;
+>>>>>>> c9bf34604bad84b9271264bc02109fa89c966e0a
         }
         public IActionResult Super_AdminDashboard()
         {
