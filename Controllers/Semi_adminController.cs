@@ -775,7 +775,6 @@ WHERE
                 string uploadsFolder = Path.Combine(_env.WebRootPath, "/images/properties/");
                 List<string> uploadedImagePaths = new List<string>();
 
-                // Handle new image uploads
                 foreach (var file in Images)
                 {
                     if (file.Length > 0)
