@@ -1,12 +1,8 @@
 ﻿
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.Data.SqlClient;
-<<<<<<< HEAD
 using Microsoft.EntityFrameworkCore;
-=======
->>>>>>> c9bf34604bad84b9271264bc02109fa89c966e0a
 using System.Collections.Generic;
 using WebApplication1.Models;
 
@@ -14,72 +10,132 @@ namespace WebApplication1.Controllers
 {
     public class Super_AdminController : BaseController
     {
-<<<<<<< HEAD
         private readonly IConfiguration _config;
         private readonly ILogger<Super_AdminController> _logger;
 
-        public Super_AdminController(IConfiguration config, ILogger<Super_AdminController> logger)
+        public Super_AdminController(IConfiguration configuration, ILogger<Super_AdminController> logger)
+            : base(configuration)
         {
-            _config = config;
+            _config = configuration;
             _logger = logger;
-=======
-        private readonly IConfiguration _configuration;
-
-        public Super_AdminController(IConfiguration configuration) : base(configuration)
-        {
-            _configuration = configuration;
-
         }
+//        [HttpGet]
+//        public IActionResult Super_AdminDashboard()
+//        {
+//            ViewData["ActivePage"] = "Super_AdminDashboard";
+//            int? userId = HttpContext.Session.GetInt32("UserId");
 
-        public override void OnActionExecuting(ActionExecutingContext context)
-        {
-            int? userId = HttpContext.Session.GetInt32("UserId");
+//            if (userId == null)
+//            {
+//                return RedirectToAction("Index", "Home");
+//            }
 
-            if (userId.HasValue)
-            {
-                ViewBag.ProfileImage = GetProfileImagePath(userId.Value);
-            }
+//            var model = new SuperAdminDashboardViewModel
+//            {
+//                Tenants = new List<User>(),
+//                PropertyOwners = new List<User>(),
+//                LatestMessages = new List<PropertyMessageViewModel>()
+//            };
 
-            base.OnActionExecuting(context);
-        }
+//            string connectionString = _config.GetConnectionString("DefaultConnection");
 
-        protected string GetProfileImagePath(int userId)
-        {
-            string profilePath = null;
+//            using (SqlConnection conn = new SqlConnection(connectionString))
+//            {
+//                conn.Open();
 
-            // Shared connection string (update with your actual connection string)
-            string connectionString = _configuration.GetConnectionString("DefaultConnection");
+//                // Example logic for filling the model data
+//                using (SqlCommand cmd = new SqlCommand("SELECT COUNT(*) FROM Properties", conn))
+//                {
+//                    model.TotalProperties = (int)cmd.ExecuteScalar();
+//                }
+//                // Active Listings
+//                using (SqlCommand cmd = new SqlCommand("SELECT COUNT(*) FROM Properties WHERE IsAvailable = 1", conn))
+//                {
+//                    model.ActiveListings = (int)cmd.ExecuteScalar();
+//                }
 
+//                // Total Inquiries
+//                using (SqlCommand cmd = new SqlCommand("SELECT COUNT(*) FROM Inquiries", conn))
+//                {
+//                    model.TotalInquiries = (int)cmd.ExecuteScalar();
+//                }
 
-            using (SqlConnection conn = new SqlConnection(connectionString))
-            {
-                string query = "SELECT profile_pic FROM users WHERE user_id = @UserId";
-                SqlCommand cmd = new SqlCommand(query, conn);
-                cmd.Parameters.AddWithValue("@UserId", userId);
+//                // Average Review Rating
+//                using (SqlCommand cmd = new SqlCommand("SELECT AVG(CAST(Rating AS FLOAT)) FROM Reviews", conn))
+//                {
+//                    var result = cmd.ExecuteScalar();
+//                    model.AverageReviewRating = result != DBNull.Value ? Convert.ToDouble(result) : 0;
+//                }
 
-                conn.Open();
-                var result = cmd.ExecuteScalar();
-                if (result != null && result != DBNull.Value)
-                {
-                    profilePath = result.ToString();
-                }
-            }
+//                // Tenants
+//                using (SqlCommand cmd = new SqlCommand("SELECT TOP 5 user_id, name, mobile, email, role, status, created_at, profile_pic FROM users WHERE role = 'tenant'", conn))
+//                using (SqlDataReader reader = cmd.ExecuteReader())
+//                {
+//                    while (reader.Read())
+//                    {
+//                        model.Tenants.Add(new User
+//                        {
+//                            UserId = reader.GetInt32(0),
+//                            Name = reader.GetString(1),
+//                            Mobile = reader.GetString(2),
+//                            Email = reader.GetString(3),
+//                            Role = reader.GetString(4),
+//                            Status = reader.GetString(5),
+//                            CreatedAt = reader.GetDateTime(6),
+//                            ProfilePic = reader.IsDBNull(7) ? null : reader.GetString(7)
+//                        });
+//                    }
+//                }
 
-            return profilePath;
->>>>>>> c9bf34604bad84b9271264bc02109fa89c966e0a
-        }
-        public IActionResult Super_AdminDashboard()
-        {
+//                // Property Owners
+//                using (SqlCommand cmd = new SqlCommand("SELECT TOP 5 user_id, name, mobile, email, role, status, created_at, profile_pic FROM users WHERE role = 'roomowner'", conn))
+//                using (SqlDataReader reader = cmd.ExecuteReader())
+//                {
+//                    while (reader.Read())
+//                    {
+//                        model.PropertyOwners.Add(new User
+//                        {
+//                            UserId = reader.GetInt32(0),
+//                            Name = reader.GetString(1),
+//                            Mobile = reader.GetString(2),
+//                            Email = reader.GetString(3),
+//                            Role = reader.GetString(4),
+//                            Status = reader.GetString(5),
+//                            CreatedAt = reader.GetDateTime(6),
+//                            ProfilePic = reader.IsDBNull(7) ? null : reader.GetString(7)
+//                        });
+//                    }
+//                }
 
-            var redirect = RedirectToLoginIfNotLoggedIn();
-            if (redirect != null) return redirect;
+//                // Latest Messages
+//                string messageQuery = @"
+//                SELECT TOP 3 u.name, u.email, u.mobile, p.PropertyId, i.Message
+//                FROM Inquiries i
+//                JOIN users u ON i.UserID = u.user_id
+//                JOIN Properties p ON i.PropertyID = p.PropertyId
+//                ORDER BY i.InquiryDate DESC";
 
-            
-            ViewData["ActivePage"] = "Super_AdminDashboard";
+//                using (SqlCommand cmd = new SqlCommand(messageQuery, conn))
+//                using (SqlDataReader reader = cmd.ExecuteReader())
+//                {
+//                    while (reader.Read())
+//                    {
+//                      model.LatestMessages.Add(new PropertyMessageViewModel
+//{
+//    Name = reader.GetString(0),
+//    Email = reader.GetString(1),
+//    Contact = reader.GetString(2),
+//    PropertyId = "P-" + reader.GetInt32(3),
+//    Message = reader.GetString(4)
+//});
 
+//                    }
+//                }
+//            }
 
-            return View();
-        }
+//           return View();
+
+//        }
 
         public IActionResult Total_User()
         {
@@ -89,7 +145,7 @@ namespace WebApplication1.Controllers
             if (redirect != null) return redirect;
 
 
-            List< User> tenants = new List<User>();
+            List<User> tenants = new List<User>();
             string connectionString = _config.GetConnectionString("DefaultConnection");
 
             using (SqlConnection conn = new SqlConnection(connectionString))
@@ -456,47 +512,48 @@ namespace WebApplication1.Controllers
             return View(properties);
         }
         [HttpPost]
-public IActionResult Total_Properties(int id)
-{
-    string connectionString = _config.GetConnectionString("DefaultConnection");
-
-    using (SqlConnection conn = new SqlConnection(connectionString))
-    {
-        string query = "DELETE FROM Properties WHERE PropertyId = @Id";
-
-        using (SqlCommand cmd = new SqlCommand(query, conn))
+        public IActionResult Total_Properties(int id)
         {
-            cmd.Parameters.AddWithValue("@Id", id);
+            string connectionString = _config.GetConnectionString("DefaultConnection");
 
-            conn.Open();
-            int rowsAffected = cmd.ExecuteNonQuery();
-            conn.Close();
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                string query = "DELETE FROM Properties WHERE PropertyId = @Id";
 
-            if (rowsAffected > 0)
-            {
-                TempData["Success"] = "Property deleted successfully.";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@Id", id);
+
+                    conn.Open();
+                    int rowsAffected = cmd.ExecuteNonQuery();
+                    conn.Close();
+
+                    if (rowsAffected > 0)
+                    {
+                        TempData["Success"] = "Property deleted successfully.";
+                    }
+                    else
+                    {
+                        TempData["Error"] = "Failed to delete property.";
+                    }
+                }
             }
-            else
-            {
-                TempData["Error"] = "Failed to delete property.";
-            }
+
+            return RedirectToAction("Total_Properties"); // Redirect back to property list view
         }
-    }
-
-    return RedirectToAction("TotalProperties"); // Redirect back to property list view
-}
 
         public IActionResult Particular_property()
         {
             ViewData["ActivePage"] = "Total_Properties";
             return View();
         }
-        public IActionResult AdminProfile() {
+        public IActionResult AdminProfile()
+        {
 
             var redirect = RedirectToLoginIfNotLoggedIn();
             if (redirect != null) return redirect;
 
-            
+
             var model = new ProfileDetailsViewModel
             {
                 ProfileImageUrl = "/profile.png",
