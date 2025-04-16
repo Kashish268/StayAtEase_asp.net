@@ -1,10 +1,20 @@
-﻿@{
+﻿@model List<WebApplication1.Models.UserProperty>
+@{
     ViewData["Title"] = "Privacy";
+
+    // Get search parameters from URL
+    var locationParam = Context.Request.Query["location"];
+    var propertyTypeParam = Context.Request.Query["propertyType"];
+    var priceRangeParam = Context.Request.Query["priceRange"];
 }
 
-<!-- Yeh line page ke kisi bhi jagah ho sakti hai -->
+<!-- Hidden field to hold logged-in user ID -->
 <input type="hidden" id="loggedInUserId" value="@Context.Session.GetInt32("UserId")" />
 
+<!-- Add this hidden fields to store initial filters -->
+<input type="hidden" id="initialLocation" value="@locationParam" />
+<input type="hidden" id="initialPropertyType" value="@propertyTypeParam" />
+<input type="hidden" id="initialPriceRange" value="@priceRangeParam" />
 <div class="p-5" style="background-color:#F9FAFB;">
     <h2 class="fw-bold" style="letter-spacing:0.1px; margin-left:12px;">Find Your Perfect Stay</h2>
     <p style="letter-spacing:0.1px; margin-left:12px;color:#64748B;">Browse through our curated collection of properties</p>
@@ -15,50 +25,62 @@
         <div class="d-flex flex-wrap align-items-center gap-3 flex-grow-1">
             <input type="text" class="form-control search-input" placeholder="Search..." style="max-width: 350px; min-width: 220px;">
 
-            <select class="form-select search-input" style="max-width: 200px; min-width: 150px;">
+            <select class="form-select search-input" style="max-width: 200px; min-width: 150px;" id="propertyType">
                 <option selected>🏠 Property Type</option>
                 <option>Apartment</option>
                 <option>House</option>
                 <option>Villa</option>
             </select>
 
+            @* <select class="form-select search-input" style="max-width: 200px; min-width: 150px;" id="priceRange"> *@
+            @*     <option selected value="">💰 All Prices</option> *@
+            @*     <option value="0-5000">Under ₹5,000</option> *@
+            @*     <option value="5001-10000">₹5,001 - ₹10,000</option> *@
+            @*     <option value="10001-15000">₹10,001 - ₹15,000</option> *@
+            @*     <option value="15001-20000">₹15,001 - ₹20,000</option> *@
+            @*     <option value="20001-30000">₹20,001 - ₹30,000</option> *@
+            @*     <option value="30001">Above ₹30,000</option> *@
+            @* </select> *@
+
             <div class="d-flex align-items-center">
                 <label class="me-2 fw-bold">Price:</label>
-                <input type="range" min="500" max="10000" step="500" class="form-range" style="width: 150px;">
-                <span id="priceValue" class="ms-2 fw-bold">₹500</span>
+                <input type="range" min="1000" max="30000" step="1000" class="form-range" style="width: 150px;" value="30000">
+                <span id="priceValue" class="ms-2 fw-bold">₹30000</span>
             </div>
+        </div>
         </div>
 
         <!-- Right Side: Buttons -->
-        <div class="d-flex flex-wrap gap-2">
-            <button class="btn btn-outline-primary filter-btn" onclick="toggleActive(this)">New</button>
-            <button class="btn btn-outline-primary filter-btn" onclick="toggleActive(this)">Price Ascending</button>
-            <button class="btn btn-outline-primary filter-btn" onclick="toggleActive(this)">Price Descending</button>
-        </div>
+        @* <div class="d-flex flex-wrap gap-2"> *@
+        @*     <button class="btn btn-outline-primary filter-btn" onclick="toggleActive(this)">New</button> *@
+        @*     <button class="btn btn-outline-primary filter-btn" onclick="toggleActive(this)">Price Ascending</button> *@
+        @*     <button class="btn btn-outline-primary filter-btn" onclick="toggleActive(this)">Price Descending</button> *@
+        @* </div> *@
     </div>
-    @model List<WebApplication1.Models.UserProperty>
-<input type="hidden" id="loggedInUserId" value="@Context.Session.GetInt32("UserId")" />
 
-<div class="container py-4">
-    <div class="row g-4">
-        @foreach (var property in Model)
-        {
-            <div class="col-md-4">
-                <div class="card shadow-sm h-100 position-relative">
-                    <img src="@property.ImagePath" class="card-img-top" alt="Image of @property.Title">
+    <!-- Property Cards -->
+    <div class="container py-4">
+        <div class="row g-4">
+            @foreach (var property in Model)
+            {
+                <div class="col-md-4 property-card"
+                     data-title="@property.Title.ToLower()"
+                     data-location="@property.Location.ToLower()"
+                     data-type="@property.PropertyType.ToLower()"
+                     data-price="@property.Price"
+                     data-date="@property.CreatedAt">
+                    <div class="card shadow-sm h-100 position-relative">
+                        <img src="@property.ImagePath" class="card-img-top" alt="Image of @property.Title" style="height: 200px; object-fit: cover;">
 
-                    <!-- Like Button -->
-                        <!-- Heart button with dynamic class -->
+                        <!-- Like Button -->
                         <button class="like-btn position-absolute top-0 end-0 m-2" data-id="@property.PropertyID">
                             <i class="fa fa-heart @(property.IsWishlisted ? "text-danger" : "text-secondary")"></i>
                         </button>
 
-                        
-
                         <div class="card-body d-flex flex-column">
                             <h5 class="card-title">@property.Title</h5>
                             <p class="text-muted mb-2">📍 @property.Location</p>
-
+                            <p class="text-muted mb-2">@property.PropertyType</p>
                             <div class="d-flex justify-content-between text-muted mb-2">
                                 <span><i class="fa fa-bed"></i> @property.Beds beds</span>
                                 <span><i class="fa fa-bath"></i> @property.Baths baths</span>
@@ -73,51 +95,241 @@
                             <h6 class="text-primary fw-bold">@property.Price</h6>
 
                             <a class="btn btn-primary w-100 mt-2" asp-controller="Home" asp-action="Property_details" asp-route-id="@property.PropertyID">View Details</a>
-
                         </div>
                     </div>
                 </div>
             }
         </div>
     </div>
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const likeButtons = document.querySelectorAll(".like-btn");
-            const userId = document.getElementById("loggedInUserId").value;
+</div>
 
-            likeButtons.forEach(btn => {
-                btn.addEventListener("click", function () {
-                    if (!userId) {
-                        alert("Please login to add in wishlist");
-                        return;
-                    }
 
-                    const propertyId = btn.getAttribute("data-id");
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const likeButtons = document.querySelectorAll(".like-btn");
+        const userId = document.getElementById("loggedInUserId").value;
 
-                    fetch("/Wishlist/Toggle", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({ propertyId: parseInt(propertyId) })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            const icon = btn.querySelector("i");
-                            if (data.isWishlisted) {
-                                icon.classList.remove("text-secondary");
-                                icon.classList.add("text-danger");
-                            } else {
-                                icon.classList.remove("text-danger");
-                                icon.classList.add("text-secondary");
-                            }
+        likeButtons.forEach(btn => {
+            btn.addEventListener("click", function () {
+                if (!userId) {
+                    alert("Please login to add in wishlist");
+                    return;
+                }
+
+                const propertyId = btn.getAttribute("data-id");
+
+                fetch("/Wishlist/Toggle", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ propertyId: parseInt(propertyId) })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const icon = btn.querySelector("i");
+                        if (data.isWishlisted) {
+                            icon.classList.remove("text-secondary");
+                            icon.classList.add("text-danger");
                         } else {
-                            alert(data.message); // If not logged in
+                            icon.classList.remove("text-danger");
+                            icon.classList.add("text-secondary");
                         }
-                    });
+                    } else {
+                        alert(data.message); // If not logged in
+                    }
                 });
             });
         });
-    </script>
+    });
+
+             document.addEventListener("DOMContentLoaded", function() {
+            // DOM elements
+            const searchInput = document.querySelector('input.search-input');
+            const propertyTypeSelect = document.getElementById('propertyType');
+            const priceRange = document.querySelector('input[type="range"]');
+            const priceValue = document.getElementById('priceValue');
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            const propertyCards = document.querySelectorAll('.property-card');
+
+                // Initialize price display with max value
+        priceRange.min = 1000;
+        priceRange.max = 30000;
+        priceRange.step = 1000;
+        priceRange.value = 30000;
+        priceValue.textContent = `₹${priceRange.value}`;
+
+                // Price range event listener remains the same
+        priceRange.addEventListener('input', function() {
+            priceValue.textContent = `₹${this.value}`;
+            filterProperties();
+        });
+
+            // Search input event
+            searchInput.addEventListener('input', filterProperties);
+
+            // Property type select event
+            propertyTypeSelect.addEventListener('change', filterProperties);
+
+            // Filter buttons click events
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    this.classList.toggle('active');
+                    filterProperties();
+                });
+            });
+
+            function filterProperties() {
+                const searchTerm = searchInput.value.toLowerCase();
+                const selectedType = propertyTypeSelect.value.toLowerCase();
+                const maxPrice = parseInt(priceRange.value);
+                const activeFilters = Array.from(document.querySelectorAll('.filter-btn.active'))
+                                       .map(btn => btn.textContent.trim());
+
+                propertyCards.forEach(card => {
+                    const title = card.dataset.title || '';
+                    const location = card.dataset.location || '';
+                    const type = card.dataset.type || '';
+                    const price = parseInt(card.dataset.price) || 0;
+                    const dateStr = card.dataset.date;
+                    const date = dateStr ? new Date(dateStr) : new Date();
+
+                    // Search term matching
+                    const matchesSearch = searchTerm === '' ||
+                                         title.includes(searchTerm) ||
+                                         location.includes(searchTerm);
+
+                    // Property type matching
+                    const matchesType = selectedType === '🏠 property type' ||
+                                       selectedType === type;
+
+                    // Price range matching
+                    const matchesPrice = price <= maxPrice;
+
+                    // Additional filters
+                    let matchesFilters = true;
+                    if (activeFilters.includes('New')) {
+                        const oneWeekAgo = new Date();
+                        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+                        matchesFilters = matchesFilters && (date >= oneWeekAgo);
+                    }
+
+                    // Show/hide card
+                    card.style.display = (matchesSearch && matchesType && matchesPrice && matchesFilters) ?
+                                        'block' : 'none';
+                });
+
+                // Apply sorting if needed
+                if (activeFilters.includes('Price Ascending') || activeFilters.includes('Price Descending')) {
+                    sortProperties(activeFilters.includes('Price Ascending') ? 'asc' : 'desc');
+                }
+            }
+
+                function sortProperties(order) {
+            const container = document.querySelector('.row');
+            const cards = Array.from(container.querySelectorAll('.property-card[style*="display: block"]'));
+
+            cards.sort((a, b) => {
+                const priceA = parseInt(a.dataset.price) || 0;
+                const priceB = parseInt(b.dataset.price) || 0;
+                return order === 'asc' ? priceA - priceB : priceB - priceA;
+            });
+
+            cards.forEach(card => container.appendChild(card));
+        }
+        });
+
+        document.addEventListener("DOMContentLoaded", function() {
+        // Get initial filter values from hidden fields
+        const initialLocation = document.getElementById('initialLocation').value;
+        const initialPropertyType = document.getElementById('initialPropertyType').value;
+        const initialPriceRange = document.getElementById('initialPriceRange').value;
+
+        // DOM elements
+        const searchInput = document.querySelector('input.search-input');
+        const propertyTypeSelect = document.getElementById('propertyType');
+        const priceRange = document.querySelector('input[type="range"]');
+        const priceValue = document.getElementById('priceValue');
+        const propertyCards = document.querySelectorAll('.property-card');
+
+        // Initialize filters from URL parameters if they exist
+        if (initialLocation) {
+            searchInput.value = initialLocation;
+        }
+        if (initialPropertyType) {
+            propertyTypeSelect.value = initialPropertyType;
+        }
+        if (initialPriceRange) {
+            let maxPrice = 30000;
+            if (initialPriceRange === "30001") {
+                maxPrice = 30001;
+            } else if (initialPriceRange.includes('-')) {
+                maxPrice = parseInt(initialPriceRange.split('-')[1]);
+            }
+            priceRange.value = maxPrice;
+            priceValue.textContent = `₹${maxPrice}`;
+        }
+
+        // Initialize price slider
+        priceRange.min = 1000;
+        priceRange.max = 30000;
+        priceRange.step = 1000;
+        if (!initialPriceRange) {
+            priceRange.value = 30000;
+            priceValue.textContent = '₹30000';
+        }
+
+        // Event listeners
+        searchInput.addEventListener('input', filterProperties);
+        propertyTypeSelect.addEventListener('change', filterProperties);
+        priceRange.addEventListener('input', function() {
+            priceValue.textContent = `₹${this.value}`;
+            filterProperties();
+        });
+
+        // Filter function
+        function filterProperties() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const selectedType = propertyTypeSelect.value.toLowerCase();
+            const maxPrice = parseInt(priceRange.value);
+
+            propertyCards.forEach(card => {
+                const title = card.dataset.title || '';
+                const location = card.dataset.location || '';
+                const type = card.dataset.type || '';
+                const price = parseInt(card.dataset.price) || 0;
+
+                const matchesSearch = searchTerm === '' ||
+                                     title.includes(searchTerm) ||
+                                     location.includes(searchTerm);
+                const matchesType = selectedType === '🏠 property type' ||
+                                   selectedType === type;
+                const matchesPrice = price <= maxPrice;
+
+                card.style.display = (matchesSearch && matchesType && matchesPrice)
+                                  ? 'block'
+                                  : 'none';
+            });
+        }
+
+        // Apply initial filter if URL parameters exist
+        if (initialLocation || initialPropertyType || initialPriceRange) {
+            filterProperties();
+        }
+
+        // Your existing like button code remains the same
+        const likeButtons = document.querySelectorAll(".like-btn");
+        const userId = document.getElementById("loggedInUserId").value;
+
+        likeButtons.forEach(btn => {
+            btn.addEventListener("click", function() {
+                // Your existing like button logic
+            });
+        });
+    });
+
+</script>
+
+
 

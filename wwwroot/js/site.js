@@ -569,3 +569,73 @@ document.addEventListener("DOMContentLoaded", function () {
 
     loadProperties(); 
 });
+
+
+
+//==============FILETER==================//
+
+ //document.addEventListener("DOMContentLoaded", function () {
+ //       const searchInput = document.querySelector(".search-input");
+ //       const propertyType = document.getElementById("propertyType");
+ //       const priceRange = document.querySelector("input[type='range']");
+ //       const priceValue = document.getElementById("priceValue");
+
+ //       function filterCards() {
+ //           const searchText = searchInput.value.toLowerCase();
+ //           const selectedType = propertyType.value.toLowerCase();
+ //           const maxPrice = parseInt(priceRange.value);
+
+ //           const cards = document.querySelectorAll(".property-card"); // Re-query every time
+ //           cards.forEach(card => {
+ //               const title = card.dataset.title.toLowerCase();
+ //               const location = card.dataset.location.toLowerCase();
+ //               const type = card.dataset.type.toLowerCase();
+ //               const price = parseInt(card.dataset.price);
+
+ //               const matchesSearch = title.includes(searchText) || location.includes(searchText);
+ //               const matchesType = selectedType === "🏠 property type" || type === selectedType;
+ //               const matchesPrice = price <= maxPrice;
+
+ //               if (matchesSearch && matchesType && matchesPrice) {
+ //                   card.style.display = "block";
+ //               } else {
+ //                   card.style.display = "none";
+ //               }
+ //           });
+ //       }
+
+ //       searchInput.addEventListener("input", filterCards);
+ //       propertyType.addEventListener("change", filterCards);
+ //       priceRange.addEventListener("input", function () {
+ //           priceValue.innerText = "₹" + priceRange.value;
+ //           filterCards();
+ //       });
+
+ //       // Sorting
+ //       document.querySelectorAll(".filter-btn").forEach(btn => {
+ //           btn.addEventListener("click", function () {
+ //               const action = btn.textContent.trim().toLowerCase();
+ //               const container = document.querySelector(".row.g-4");
+ //               const allCards = Array.from(document.querySelectorAll(".property-card"));
+
+ //               // Show visible cards only
+ //               const visibleCards = allCards.filter(card => card.style.display !== "none");
+
+ //               if (action === "price ascending") {
+ //                   visibleCards.sort((a, b) => parseInt(a.dataset.price) - parseInt(b.dataset.price));
+ //               } else if (action === "price descending") {
+ //                   visibleCards.sort((a, b) => parseInt(b.dataset.price) - parseInt(a.dataset.price));
+ //               } else if (action === "new") {
+ //                   visibleCards.sort((a, b) => new Date(b.dataset.date) - new Date(a.dataset.date));
+ //               }
+
+ //               // Re-append sorted visible cards
+ //               visibleCards.forEach(card => container.appendChild(card));
+ //           });
+ //       });
+
+ //       // Run initial filter on load
+ //       filterCards();
+ //   });
+
+

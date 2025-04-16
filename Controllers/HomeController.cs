@@ -6,6 +6,8 @@ using System.Net;
 using WebApplication1.Models;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System.Globalization;
 
 
 namespace WebApplication1.Controllers
@@ -63,31 +65,55 @@ namespace WebApplication1.Controllers
         public IActionResult Index()
         {
             ViewData["ActivePage"] = "Home";
-            //int? userId = HttpContext.Session.GetInt32("UserId");
 
-            //if (userId.HasValue)
-            //{
-            //    string profilePath = GetProfileImagePath(userId.Value); // Use .Value to unwrap the nullable int
-            //    ViewBag.ProfileImage = string.IsNullOrEmpty(profilePath) ? "/assets/default-user.png" : profilePath;
-            //}
-            //var userId = HttpContext.Session.GetInt32("UserId");
-            //var role = HttpContext.Session.GetString("UserRole");
+            List<UserProperty> featuredProperties = new List<UserProperty>();
+            string connectionString = _configuration.GetConnectionString("DefaultConnection");
 
-            //if (userId != null)
-            //{
-            //    switch (role)
-            //    {
-            //        case "admin":
-            //            return RedirectToAction("Super_AdminDashboard", "Account");
-            //        case "roomowner":
-            //            return RedirectToAction("Dashboard", "Account");
-            //        case "tenant":
-            //            return RedirectToAction("Index", "Tenant"); // or wherever tenant goes
-            //    }
-            //}
-            return View();
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                string query = @"
+            SELECT TOP 6 
+                p.PropertyId, 
+                p.Title, 
+                p.Address AS Location, 
+                p.Price,
+                p.ImagePaths AS Image,
+                CAST(ROUND(ISNULL(AVG(r.Rating), 0), 1) AS DECIMAL(2,1)) AS Rating,
+                p.PropertyType
+            FROM Properties p
+            LEFT JOIN Reviews r ON p.PropertyId = r.PropertyID
+            GROUP BY 
+                p.PropertyId, p.Title, p.Address, p.Price, p.ImagePaths, p.PropertyType
+            ORDER BY NEWID()";
+
+                SqlCommand cmd = new SqlCommand(query, conn);
+                conn.Open();
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    // Safe conversions with null checks
+                    decimal price = 0.0m;
+                    decimal.TryParse(reader["Price"]?.ToString(), out price);
+
+                    decimal rating = 0.0m;
+                    decimal.TryParse(reader["Rating"]?.ToString(), out rating);
+
+                    featuredProperties.Add(new UserProperty
+                    {
+                        PropertyID = reader["PropertyId"] != DBNull.Value ? Convert.ToInt32(reader["PropertyId"]) : 0,
+                        Title = reader["Title"]?.ToString() ?? "Untitled Property",
+                        Location = reader["Location"]?.ToString() ?? "Location not specified",
+                        Price = "₹" + price.ToString("N0") + "/month",  // Changed $ to ₹
+                        ImagePath = reader["Image"]?.ToString() ?? "/assets/default-property.jpg",
+                        Rating = rating,
+                        PropertyType = reader["PropertyType"]?.ToString() ?? "Unknown"
+                    });
+                }
+            }
+
+            return View(featuredProperties);
         }
-
 
         //private string GetProfileImagePath(int? userId)
         //{
@@ -160,6 +186,7 @@ namespace WebApplication1.Controllers
                 p.Address AS Location, 
                 p.Bedrooms AS Beds, 
                 p.Bathrooms AS Baths, 
+p.PropertyType ,
                 CAST(p.SquareFootage AS NVARCHAR) + ' sqft' AS Size, 
                 N'₹' + CAST(p.Price AS NVARCHAR) + '/month' AS Price, 
                 p.ImagePaths AS ImagePath, 
@@ -170,7 +197,7 @@ namespace WebApplication1.Controllers
             LEFT JOIN Reviews r ON p.PropertyId = r.PropertyID
             GROUP BY 
                 p.PropertyId, p.Title, p.Address, p.Bedrooms, p.Bathrooms, 
-                p.SquareFootage, p.Price, p.ImagePaths";
+                p.SquareFootage, p.Price, p.ImagePaths, p.PropertyType";
                 }
 
                 SqlCommand cmd = new SqlCommand(query, conn);
@@ -195,6 +222,7 @@ namespace WebApplication1.Controllers
                         Size = reader["Size"].ToString(),
                         Price = reader["Price"].ToString(),
                         ImagePath = reader["ImagePath"].ToString(),
+                        PropertyType = reader["PropertyType"].ToString(),
                         Rating = Convert.ToDecimal(reader["Rating"]),
                         Reviews = Convert.ToInt32(reader["Reviews"]),
                         IsWishlisted = Convert.ToInt32(reader["IsWishlisted"]) == 1
