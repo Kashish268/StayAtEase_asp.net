@@ -8,6 +8,7 @@
         public decimal Price { get; set; }                 // Price / Month
         public double Rating { get; set; }                 // Average rating (optional)
         public string ImageUrl { get; set; } = string.Empty; // First image URL
+        public List<string> ImageUrls { get; set; } = new();
         public int Area { get; set; }                      // SquareFootage
         public string Address { get; set; } = string.Empty;
         public bool IsAvailable { get; set; }              // If needed, else set always true

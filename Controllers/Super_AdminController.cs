@@ -3,10 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.Data.SqlClient;
-<<<<<<< HEAD
+
 using Microsoft.EntityFrameworkCore;
-=======
->>>>>>> c9bf34604bad84b9271264bc02109fa89c966e0a
+
 using System.Collections.Generic;
 using WebApplication1.Models;
 
@@ -14,15 +13,12 @@ namespace WebApplication1.Controllers
 {
     public class Super_AdminController : BaseController
     {
-<<<<<<< HEAD
+
         private readonly IConfiguration _config;
         private readonly ILogger<Super_AdminController> _logger;
 
-        public Super_AdminController(IConfiguration config, ILogger<Super_AdminController> logger)
-        {
-            _config = config;
-            _logger = logger;
-=======
+       
+
         private readonly IConfiguration _configuration;
 
         public Super_AdminController(IConfiguration configuration) : base(configuration)
@@ -66,7 +62,7 @@ namespace WebApplication1.Controllers
             }
 
             return profilePath;
->>>>>>> c9bf34604bad84b9271264bc02109fa89c966e0a
+
         }
         public IActionResult Super_AdminDashboard()
         {
@@ -90,7 +86,7 @@ namespace WebApplication1.Controllers
 
 
             List< User> tenants = new List<User>();
-            string connectionString = _config.GetConnectionString("DefaultConnection");
+            string connectionString = _configuration.GetConnectionString("DefaultConnection");
 
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
@@ -120,7 +116,7 @@ namespace WebApplication1.Controllers
         [HttpPost]
         public IActionResult Total_User(int id)
         {
-            string connectionString = _config.GetConnectionString("DefaultConnection");
+            string connectionString = _configuration.GetConnectionString("DefaultConnection");
 
             try
             {
@@ -153,7 +149,7 @@ namespace WebApplication1.Controllers
             if (redirect != null) return redirect;
 
             List<User> roomOwners = new List<User>();
-            string connectionString = _config.GetConnectionString("DefaultConnection");
+            string connectionString = _configuration.GetConnectionString("DefaultConnection");
 
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
@@ -183,7 +179,7 @@ namespace WebApplication1.Controllers
         [HttpPost]
         public IActionResult Total_Admin(int id)
         {
-            string connectionString = _config.GetConnectionString("DefaultConnection");
+            string connectionString = _configuration.GetConnectionString("DefaultConnection");
 
             try
             {
@@ -211,7 +207,7 @@ namespace WebApplication1.Controllers
         public async Task<IActionResult> Property_Reviews(string? searchTerm, int page = 1)
         {
             var reviews = new List<PropertyReview>();
-            string connectionString = _config.GetConnectionString("DefaultConnection");
+            string connectionString = _configuration.GetConnectionString("DefaultConnection");
 
             int pageSize = 10;
             int offset = (page - 1) * pageSize;
@@ -261,7 +257,7 @@ namespace WebApplication1.Controllers
         [HttpPost]
         public IActionResult Property_Reviews(int id)
         {
-            string connectionString = _config.GetConnectionString("DefaultConnection");
+            string connectionString = _configuration.GetConnectionString("DefaultConnection");
 
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
@@ -296,7 +292,7 @@ namespace WebApplication1.Controllers
             int skip = (page - 1) * pageSize;
 
             var messages = new List<PropertyMessageViewModel>();
-            string connectionString = _config.GetConnectionString("DefaultConnection");
+            string connectionString = _configuration.GetConnectionString("DefaultConnection");
 
             using (SqlConnection con = new SqlConnection(connectionString))
             {
@@ -419,7 +415,7 @@ namespace WebApplication1.Controllers
         public IActionResult Total_Properties()
         {
             List<PropertyViewModel> properties = new List<PropertyViewModel>();
-            string connectionString = _config.GetConnectionString("DefaultConnection");
+            string connectionString = _configuration.GetConnectionString("DefaultConnection");
 
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
@@ -458,7 +454,7 @@ namespace WebApplication1.Controllers
         [HttpPost]
 public IActionResult Total_Properties(int id)
 {
-    string connectionString = _config.GetConnectionString("DefaultConnection");
+    string connectionString = _configuration.GetConnectionString("DefaultConnection");
 
     using (SqlConnection conn = new SqlConnection(connectionString))
     {

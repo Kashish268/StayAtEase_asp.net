@@ -419,7 +419,7 @@ namespace WebApplication1.Controllers
 
 
         // Profile Action
-        [HttpGet]
+      
         [HttpGet]
         public async Task<IActionResult> Property_List(string? searchTerm, int page = 1, string filter = "all")
         {
@@ -470,6 +470,11 @@ namespace WebApplication1.Controllers
                     {
                         while (await reader.ReadAsync())
                         {
+                            var rawImagePaths = reader["ImagePaths"]?.ToString();
+                            var imagePaths = !string.IsNullOrEmpty(rawImagePaths)
+                                ? rawImagePaths.Split(',').Select(p => p.Trim()).ToList()
+                                : new List<string>();
+
                             properties.Add(new PropertyViewModel
                             {
                                 Id = Convert.ToInt32(reader["PropertyId"]),
@@ -478,9 +483,12 @@ namespace WebApplication1.Controllers
                                 Area = Convert.ToInt32(reader["SquareFootage"]),
                                 Address = reader["Address"].ToString(),
                                 IsAvailable = reader["IsAvailable"] != DBNull.Value && Convert.ToBoolean(reader["IsAvailable"]),
-                                ImageUrl = reader["ImagePaths"].ToString()?.Split(',').FirstOrDefault()
+                                ImageUrl = imagePaths.Count > 0 ? imagePaths[0] : "/images/placeholder.jpg",
+
+                                ImageUrls = imagePaths // optional, if your ViewModel supports list of images
                             });
                         }
+
                     }
                 }
             }

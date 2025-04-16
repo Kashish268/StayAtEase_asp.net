@@ -5,7 +5,7 @@
         public int Id { get; set; }
         public string Name { get; set; }
         public string Date { get; set; }
-        public int Rating { get; set; }
+        public decimal Rating { get; set; }
         public string ReviewText { get; set; }
         public string Property { get; set; }
         public string PropertyTitle { get; set; }  // Corrected to Property, matching the SQL query.

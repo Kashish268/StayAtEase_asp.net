@@ -44,6 +44,7 @@ namespace WebApplication1.Models
 
         // Validation for file size (for each image)
         [DataType(DataType.Upload)]
+        public string ImageUrl { get; set; } // First image
         public List<IFormFile> ImageFiles { get; set; } = new List<IFormFile>();
 
         // Add any custom validation for files (example: image size)

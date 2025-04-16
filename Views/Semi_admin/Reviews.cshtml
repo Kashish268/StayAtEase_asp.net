@@ -56,10 +56,11 @@
                                 {
                                     <i class="fas fa-star text-warning"></i>
                                 }
-                                @for (int i = review.Rating; i < 5; i++)
+                                @for (int i = (int)Math.Floor(review.Rating); i < 5; i++)
                                 {
                                     <i class="far fa-star text-muted"></i>
                                 }
+
                             </td>
                             <td>@review.ReviewText</td>
                            
