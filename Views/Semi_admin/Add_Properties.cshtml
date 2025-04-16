@@ -105,21 +105,31 @@
                 </div>
             </div>
 
-            <div class="mb-3 text-left">
-                <label class="form-label fw-bold">Property Images</label>
-                <div class="p-4 rounded text-center" style="cursor: pointer;" onclick="document.getElementById('imageUploadInput').click();">
-                    <i class="fas fa-cloud-upload-alt bg-light fs-3"></i>
-                    <p>Drag & drop images here or click to upload</p>
-                    <p class="text-muted">Maximum 8 images allowed</p>
-                    <input type="file" asp-for="Images" multiple class="form-control d-none" accept="image/*" id="imageUploadInput" onchange="previewImages();">
-                    <button type="button" class="btn btn-light mt-2" onclick="document.getElementById('imageUploadInput').click(); event.stopPropagation();">
-                        Select Files
-                    </button>
-                </div>
-                <div id="imagePreview" class="mt-3 row"></div>
+            <!-- Image Upload -->
+            <div class="mb-3">
+                <label class="form-label fw-bold">Upload Property Images</label>
+                <input type="file" name="Images" id="imageUploadInput" class="form-control" multiple onchange="previewImages()" />
             </div>
 
-            <div class="text-center">
+            <!-- Image Preview -->
+            <div id="imagePreview" class="mt-3 row"></div>
+
+            <!-- Uploaded Images After Save -->
+            @if (TempData["UploadedImages"] != null)
+            {
+                var uploadedImages = TempData["UploadedImages"].ToString().Split(",");
+                <h5>Uploaded Images:</h5>
+                <div class="row">
+                    @foreach (var img in uploadedImages)
+                    {
+                        <div class="col-md-3 mb-2">
+                            <img src="@img" class="img-thumbnail" style="width: 100%; height: 150px; object-fit: cover;" />
+                        </div>
+                    }
+                </div>
+            }
+
+            <div class="text-center mt-4">
                 <button type="submit" class="btn btn-primary">Submit Property</button>
             </div>
         </form>
@@ -154,6 +164,9 @@
             reader.onload = function (event) {
                 const imgElement = document.createElement('img');
                 imgElement.src = event.target.result;
+                imgElement.className = 'img-thumbnail m-2';
+                imgElement.style.width = '100px';
+                imgElement.style.height = '100px';
                 previewContainer.appendChild(imgElement);
             };
 
@@ -161,5 +174,3 @@
         }
     }
 </script>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
