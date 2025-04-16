@@ -2,6 +2,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddDistributedMemoryCache(); // Required for session
+builder.Services.AddSession();                // Enables session
 
 var app = builder.Build();
 
@@ -19,21 +21,22 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthorization();
+app.UseSession(); // Enables session handling
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 // Route for Admin controller
-app.MapControllerRoute(
-    name: "admin",
-    pattern: "Account/{action=Dashboard}/{id?}",
-    defaults: new { controller = "Account", action = "Dashboard" }
-);
-app.MapControllerRoute(
-    name: "super_admin",
-    pattern: "Account/{action=Super_AdminDashboard}/{id?}",
-    defaults: new { controller = "Account", action = "Super_AdminDashboard" }
-);
+//app.MapControllerRoute(
+//    name: "admin",
+//    pattern: "Account/{action=Dashboard}/{id?}",
+//    defaults: new { controller = "Account", action = "Dashboard" }
+//);
+//app.MapControllerRoute(
+//    name: "super_admin",
+//    pattern: "Account/{action=Super_AdminDashboard}/{id?}",
+//    defaults: new { controller = "Account", action = "Super_AdminDashboard" }
+//);
 
 app.Run();

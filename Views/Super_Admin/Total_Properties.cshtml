@@ -56,7 +56,39 @@
                 <th>Action</th>
             </tr>
         </thead>
-        <tbody id="propertyTableBody"></tbody>
+            <tbody id="propertyTableBody">
+                @foreach (var property in Model)
+                {
+                    <tr>
+                        <td>
+                            @if (!string.IsNullOrEmpty(property.ImageUrl))
+                            {
+                                <img src="@property.ImageUrl" alt="Property Image" width="60" />
+                            }
+                            else
+                            {
+                                <span>No Image</span>
+                            }
+                        </td>
+                        <td>@property.Title</td>
+                        <td>₹@property.Price.ToString("N0")</td>
+                        <td>@property.Address</td>
+                        <td>@property.AddedBy</td>
+                        <td>@property.Status</td>
+                        <td>@property.TotalReviews</td>
+                        <td>@property.TotalInquiries</td>
+                        <td>
+                            <form asp-action="DeleteProperty" method="post" onsubmit="return confirm('Delete this property?');">
+                                <input type="hidden" name="id" value="@property.Id" />
+                                <button type="submit" style="background:none;border:none;color:red;" title="Delete">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+
     </table>
 </div>
 <div class="total-users-pagination">

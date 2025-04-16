@@ -1,0 +1,118 @@
+﻿@{
+    ViewData["Title"] = "Email Verification";
+    bool isTokenValid = ViewBag.IsTokenValid != null && (bool)ViewBag.IsTokenValid;
+}
+
+<style>
+    body {
+        background-color: #f0f2f5;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    .welcome-card {
+        background: #fff;
+        border-radius: 20px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        padding: 40px;
+        max-width: 550px;
+        margin: 80px auto;
+        position: relative;
+        overflow: hidden;
+        text-align: center;
+    }
+
+        .welcome-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 8px;
+            width: 100%;
+            background: linear-gradient(to right, #1E3C72, #2A5298);
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+        }
+
+    .icon-circle {
+        background-color: #347AE2;
+        width: 90px;
+        height: 90px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0 auto 25px;
+        box-shadow: 0 0 15px rgba(42, 82, 152, 0.4);
+        animation: popIn 0.6s ease-out;
+    }
+
+        .icon-circle i {
+            color: white;
+            font-size: 40px;
+        }
+
+    h1 {
+        font-size: 2.8rem;
+        color: #347AE2;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    .subtitle {
+        font-size: 1.4rem;
+        color: #444;
+        margin-bottom: 10px;
+    }
+
+    .tagline {
+        font-size: 1.1rem;
+        font-weight: 500;
+        color: #2A2A2A;
+        margin-bottom: 20px;
+    }
+
+    .small-info {
+        font-size: 1rem;
+        color: #666;
+    }
+
+    
+</style>
+
+<div class="welcome-card">
+    <div class="icon-circle">
+        <i class="fa fa-@((isTokenValid) ? "check" : "exclamation")"></i>
+    </div>
+
+    @if (isTokenValid)
+    {
+        <h1>Welcome to StayAtEase</h1>
+        <p class="subtitle">🎉 @ViewBag.SuccessMessage</p>
+        <p class="tagline">Your comfort, our priority. Let’s get started!</p>
+        <p class="small-info">You will be redirected to the login shortly.</p>
+    }
+    else
+    {
+        <h1>Link Expired</h1>
+        <p class="subtitle">⚠️ @ViewBag.ErrorMessage</p>
+        <p class="tagline">Don't worry, you can sign up again in just a few steps.</p>
+        <p class="small-info">Redirecting you to registration form...</p>
+    }
+</div>
+
+<!-- Show login or register modal based on token validity -->
+<script type="text/javascript">
+    setTimeout(function () {
+        $.ajax({
+            url: "@(isTokenValid ? "/Account/Login" : "/Home/Register")",  // change to actual register/login partial URLs
+            type: "GET",
+            success: function (data) {
+                $("#loginContent").html(data);
+                $("#loginModal").modal("show");
+            },
+            error: function () {
+                alert("Error loading form.");
+            }
+        });
+    }, 2000); // 2-second delay
+</script>
