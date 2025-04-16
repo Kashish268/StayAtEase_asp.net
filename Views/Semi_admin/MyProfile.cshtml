@@ -1,55 +1,83 @@
 ﻿@model ProfileDetailsViewModel
 
 @{
+
     Layout = "_AdminLayout";
     ViewData["Title"] = "My Profile";
+
+    ViewData["ActivePage"] = "My_Profile";
 }
 
 <div class="container mt-5">
+    @if (ViewBag.Message != null)
+    {
+        <div class="alert alert-success mt-3">
+            @Html.Raw(ViewBag.Message)
+        </div>
+    }
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert alert-danger mt-3">
+            @Html.Raw(ViewBag.Error)
+        </div>
+    }
     <div class="bg-white shadow p-4">
         <h2 class="fw-bold text-left mb-4">Profile Details</h2>
-
-        <div class="text-center">
-            <img src="/assets/profile.png" alt="Profile" height="100" width="100" class="rounded-circle border profile-img">
-            <div class="mt-2">
-                <label class="btn btn-outline-primary btn-sm">
-                    Change Picture
-                    <input type="file" class="d-none" onchange="previewImage(event)">
-                </label>
+        <form asp-action="MyProfile" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="FormType" value="ProfileUpdate" />
+            <input type="hidden" name="UserId" value="@Model.UserId" />
+            <div class="text-center">
+                <img src="@Url.Content(Model.ProfileImage ?? "~/images/default-profile.png")" alt="Profile" height="100" width="100" class="rounded-circle border profile-img" id="profilePreview">
+                <div class="mt-2">
+                    <label class="btn btn-outline-primary btn-sm">
+                        Change Picture
+                        <input type="file" name="ProfilePicFile" class="d-none" onchange="previewImage(event)">
+                    </label>
+                </div>
             </div>
-            <div class="text-muted mt-2">
-                You joined StayAtaese on 
-            </div>
-        </div>
 
-        <form method="post" class="mt-4">
-            <!-- Personal Details -->
-            <div class="row g-3">
+            <div class="row g-3 mt-3">
+                <!-- First Name -->
                 <div class="col-md-6">
                     <label class="form-label">First Name</label>
                     <input type="text" class="form-control" name="FirstName" value="@Model.FirstName">
                 </div>
-                
+
+                <!-- Email -->
                 <div class="col-md-6">
                     <label class="form-label">Email Address</label>
-                    <input type="email" class="form-control" name="Email" value="@Model.Email">
+                    <input type="email" class="form-control" name="Email" value="@Model.Email" readonly>
+                    <small class="text-muted">Note: You cannot change your email.</small>
                 </div>
+
+                <!-- Phone -->
                 <div class="col-md-6">
                     <label class="form-label">Phone Number</label>
                     <input type="text" class="form-control" name="Phone" value="@Model.Phone">
                 </div>
             </div>
 
-            <!-- Save Button -->
             <div class="d-flex justify-content-end mt-3">
                 <button type="submit" class="btn btn-primary">Save Changes</button>
             </div>
         </form>
-
+        <!-- Image Preview Script -->
+        <script>
+            function previewImage(event) {
+                const reader = new FileReader();
+                reader.onload = function () {
+                    document.getElementById('profilePreview').src = reader.result;
+                };
+                reader.readAsDataURL(event.target.files[0]);
+            }
+        </script>
         <!-- Change Password Section -->
         <div class="mt-5">
             <h4 class="fw-bold">Change Password</h4>
-            <form method="post">
+            <form asp-action="MyProfile" method="post">
+                <input type="hidden" name="FormType" value="PasswordChange" />
+                <input type="hidden" name="UserId" value="@Model.UserId" />
                 <div class="mb-3">
                     <label class="form-label">Current Password</label>
                     <input type="password" class="form-control" name="CurrentPassword">
@@ -83,16 +111,6 @@
 </div>
 
 <!-- JavaScript for Profile Image Preview -->
-<script>
-    function previewImage(event) {
-        const reader = new FileReader();
-        reader.onload = function () {
-            document.querySelector(".profile-img").src = reader.result;
-        };
-        reader.readAsDataURL(event.target.files[0]);
-    }
-</script>
-
 <!-- Styling -->
 <style>
     .profile-img {
@@ -113,3 +131,4 @@
         box-shadow: none;
     }
 </style>
+

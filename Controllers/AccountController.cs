@@ -117,6 +117,7 @@ namespace WebApplication1.Controllers
         {
             int? userId = HttpContext.Session.GetInt32("UserId");
 
+            
             if (userId == null)
             {
                 return RedirectToAction("Index", "Home");

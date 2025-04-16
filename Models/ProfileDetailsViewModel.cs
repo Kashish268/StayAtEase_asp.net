@@ -1,31 +1,34 @@
-﻿namespace WebApplication1.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+public class ProfileDetailsViewModel
 {
-    public class ProfileDetailsViewModel
-    {
-        public int UserId { get; set; } // Needed to identify the user for updates
+    public int UserId { get; set; }
 
-        public string ProfileImageUrl { get; set; } = "/images/default-profile.png";
+    // Default image path if user doesn't upload one
+    public string ProfileImage { get; set; } = "/images/default-profile.png";
 
-        public string FirstName { get; set; } = string.Empty;
+    [Required(ErrorMessage = "First name is required")]
+    public string FirstName { get; set; }
 
-        public string LastName { get; set; } = string.Empty;
 
-        public string Email { get; set; } = string.Empty;
+    public string Email { get; set; }
 
-        public string Phone { get; set; } = string.Empty;
+    [Required(ErrorMessage = "Phone number is required")]
+    [RegularExpression(@"^\d{10}$", ErrorMessage = "Phone must be 10 digits")]
+    public string Phone { get; set; }
 
-        public string Location { get; set; } = string.Empty;
+    // These fields are now optional and will only be validated when filled
+    [DataType(DataType.Password)]
+    public string? CurrentPassword { get; set; }
+    [MinLength(6, ErrorMessage = "Password must be at least 6 characters")]
+    [DataType(DataType.Password)]
 
-        public string Timezone { get; set; } = string.Empty;
+    public string? NewPassword { get; set; }
 
-        public string Bio { get; set; } = string.Empty;
 
-        // For password update
-        public string CurrentPassword { get; set; }
+    [Compare("NewPassword", ErrorMessage = "Passwords do not match")]
+    [DataType(DataType.Password)]
+    public string? ConfirmPassword { get; set; }
 
-        public string NewPassword { get; set; }
-
-        public string ConfirmPassword { get; set; }
-    }
-
+    public DateTime CreateAt { get; set; }
 }
