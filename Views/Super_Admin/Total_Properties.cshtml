@@ -78,7 +78,7 @@
                         <td>@property.TotalReviews</td>
                         <td>@property.TotalInquiries</td>
                         <td>
-                            <form asp-action="DeleteProperty" method="post" onsubmit="return confirm('Delete this property?');">
+                            <form asp-action="Total_Properties" method="post" onsubmit="return confirm('Delete this property?');">
                                 <input type="hidden" name="id" value="@property.Id" />
                                 <button type="submit" style="background:none;border:none;color:red;" title="Delete">
                                     <i class="fas fa-trash-alt"></i>

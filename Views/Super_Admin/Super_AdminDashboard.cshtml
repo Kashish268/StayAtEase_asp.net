@@ -1,9 +1,4 @@
-﻿
-
-    @* For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860 *@
-
-@{
-}
+﻿@model SuperAdminDashboardViewModel
 @{
     ViewBag.Title = "Super Admin Dashboard";
     Layout = "~/Views/Shared/_SuperAdminLayout.cshtml";
@@ -15,27 +10,28 @@
     <!-- Overview Cards -->
     <div class="sad-dashboard-stats">
         <div class="sad-card">
-            <div class="sad-card-icon "><i class="fas fa-building"></i></div>
-            <h3>24</h3>
+            <div class="sad-card-icon"><i class="fas fa-building"></i></div>
+            <h3>@Model.TotalProperties</h3>
             <p>Total Properties</p>
         </div>
         <div class="sad-card">
-            <div class="sad-card-icon "><i class="fas fa-list"></i></div>
-            <h3>18</h3>
+            <div class="sad-card-icon"><i class="fas fa-list"></i></div>
+            <h3>@Model.ActiveListings</h3>
             <p>Active Listings</p>
         </div>
         <div class="sad-card">
             <div class="sad-card-icon"><i class="fas fa-envelope"></i></div>
-            <h3>156</h3>
+            <h3>@Model.TotalInquiries</h3>
             <p>Total Inquiries</p>
         </div>
         <div class="sad-card">
             <div class="sad-card-icon"><i class="fas fa-star"></i></div>
-            <h3>4.8</h3>
+            <h3>@Model.AverageReviewRating.ToString("0.0")</h3>
             <p>Review Rating</p>
         </div>
     </div>
-    <!-- Top Providers & Admins -->
+
+    <!-- Tenants -->
     <div class="sad-dashboard-tables">
         <div class="sad-table-container">
             <div class="sad-section-header">
@@ -49,13 +45,19 @@
                     <th>Email</th>
                     <th>Phone</th>
                 </tr>
-                <tr><td>1</td><td>Robert</td><td>robert@example.com</td><td>+1 347-679-8275</td></tr>
-                <tr><td>2</td><td>Sharonda</td><td>sharonda@example.com</td><td>+1 570-621-248</td></tr>
-                <tr><td>3</td><td>John Smith</td><td>johnsmith@example.com</td><td>+1 646-957-0004</td></tr>
-                <tr><td>4</td><td>Pricilla</td><td>pricilla@example.com</td><td>+1 614-915-8101</td></tr>
-                <tr><td>5</td><td>James</td><td>james@example.com</td><td>+1 918-543-3702</td></tr>
+                @foreach (var tenant in Model.Tenants)
+                {
+                    <tr>
+                        <td>@tenant.UserId</td>
+                        <td>@tenant.Name</td>
+                        <td>@tenant.Email</td>
+                        <td>@tenant.Mobile</td>
+                    </tr>
+                }
             </table>
         </div>
+
+        <!-- Property Owners -->
         <div class="sad-table-container">
             <div class="sad-section-header">
                 <h4>Property Owners</h4>
@@ -68,11 +70,15 @@
                     <th>Email</th>
                     <th>Phone</th>
                 </tr>
-                <tr><td>1</td><td>Robert</td><td>robert@example.com</td><td>+1 347-679-8275</td></tr>
-                <tr><td>2</td><td>Sharonda</td><td>sharonda@example.com</td><td>+1 570-621-248</td></tr>
-                <tr><td>3</td><td>John Smith</td><td>johnsmith@example.com</td><td>+1 646-957-0004</td></tr>
-                <tr><td>4</td><td>Pricilla</td><td>pricilla@example.com</td><td>+1 614-915-8101</td></tr>
-                <tr><td>5</td><td>James</td><td>james@example.com</td><td>+1 918-543-3702</td></tr>
+                @foreach (var owner in Model.PropertyOwners)
+                {
+                    <tr>
+                        <td>@owner.UserId</td>
+                        <td>@owner.Name</td>
+                        <td>@owner.Email</td>
+                        <td>@owner.Mobile</td>
+                    </tr>
+                }
             </table>
         </div>
     </div>
@@ -91,31 +97,20 @@
                 <th>Contact No</th>
                 <th>Message</th>
             </tr>
-            <tr>
-                <td>Sarah Johnson</td>
-                <td>P-101</td>
-                <td>sarahjohnson@gmail.com</td>
-                <td>1236547890</td>
-                <td>Are there any restrictions on lease agreements?</td>
-            </tr>
-            <tr>
-                <td>Michael Brown</td>
-                <td>P-102</td>
-                <td>michaelbrown@gmail.com</td>
-                <td>9874563210</td>
-                <td>Are there any restrictions on lease agreements?</td>
-            </tr>
-            <tr>
-                <td>Emma Davis</td>
-                <td>P-103</td>
-                <td>emmadavis@gmail.com</td>
-                <td>7410259863</td>
-                <td>What documents are required for booking?</td>
-            </tr>
+            @foreach (var msg in Model.LatestMessages)
+            {
+                <tr>
+                    <td>@msg.Name</td>
+                    <td>@msg.PropertyId</td>
+                    <td>@msg.Email</td>
+                    <td>@msg.Contact</td>
+                    <td>@msg.Message</td>
+                </tr>
+            }
         </table>
     </div>
 
-    <!-- Latest Reviews -->
+    <!-- Placeholder Review Section -->
     <div class="sad-latest-section">
         <div class="sad-section-header">
             <h4>Latest Reviews</h4>
@@ -128,28 +123,9 @@
                     <h5>John Doe</h5>
                     <span class="sad-review-date">March 20, 2025</span>
                     <p>Great platform! Found my rental easily.</p>
-                    <small><i class="fas fa-star"></i> <i class="fas fa-star"></i> <i class="fas fa-star"></i> <i class="fas fa-star"></i> <i class="fas fa-star"></i></small>
-                </div>
-            </div>
-            <div class="sad-review-card">
-                <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User Profile" class="sad-review-profile">
-                <div class="sad-review-content">
-                    <h5>Sarah Smith</h5>
-                    <span class="sad-review-date">March 18, 2025</span>
-                    <p>Very user-friendly and smooth experience.</p>
-                    <small><i class="fas fa-star"></i> <i class="fas fa-star"></i> <i class="fas fa-star"></i> <i class="fas fa-star"></i></small>
-                </div>
-            </div>
-            <div class="sad-review-card">
-                <img src="https://randomuser.me/api/portraits/men/47.jpg" alt="User Profile" class="sad-review-profile">
-                <div class="sad-review-content">
-                    <h5>Michael Lee</h5>
-                    <span class="sad-review-date">March 15, 2025</span>
-                    <p>Customer support was really helpful.</p>
-                    <small><i class="fas fa-star"></i> <i class="fas fa-star"></i> <i class="fas fa-star"></i> <i class="fas fa-star"></i> <i class="fas fa-star"></i></small>
+                    <small><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></small>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
