@@ -31,17 +31,26 @@
                 </tr>
             </thead>
             <tbody id="messageTableBody">
-                @foreach (var message in Model.PagedMessages)
+                @if (Model != null)
+                {
+                    @foreach (var message in Model.PagedMessages)
+                    {
+                        <tr>
+                            <td>@message.Name</td>
+                            <td>@message.PropertyId</td>
+                            <td>@message.Email</td>
+                            <td>@message.Contact</td>
+                            <td>@message.Message</td>
+                            <td>
+                                <a href="#">View</a>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
                 {
                     <tr>
-                        <td>@message.Name</td>
-                        <td>@message.PropertyId</td>
-                        <td>@message.Email</td>
-                        <td>@message.Contact</td>
-                        <td>@message.Message</td>
-                        <td>
-                            <a href="#">View</a>
-                        </td>
+                        <td colspan="6" style="text-align: center;">No messages found</td>
                     </tr>
                 }
             </tbody>
@@ -49,14 +58,53 @@
     </div>
 
     <div class="total-users-pagination">
-        <span id="pagination-info">Page @Model.CurrentPage of @Model.TotalPages</span>
-        <div id="pagination-buttons">
-            @for (int i = 1; i <= Model.TotalPages; i++)
-            {
-                <a href="@Url.Action("Inquiries", new { page = i, searchTerm = Model.SearchTerm })">@i</a>
-            }
-        </div>
+        <div id="pagination-info"></div>
+        <div id="pagination-buttons"></div>
     </div>
 </div>
 
-<script src="~/js/site.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const tableBody = document.getElementById("messageTableBody");
+        const rows = Array.from(tableBody.querySelectorAll("tr"));
+        const paginationButtons = document.getElementById("pagination-buttons");
+        const paginationInfo = document.getElementById("pagination-info");
+
+        const rowsPerPage = 6;
+        let currentPage = 1;
+
+        function renderTablePage(page) {
+            const start = (page - 1) * rowsPerPage;
+            const end = start + rowsPerPage;
+
+            rows.forEach((row, index) => {
+                row.style.display = index >= start && index < end ? "" : "none";
+            });
+
+            paginationInfo.textContent = `Showing ${Math.min(start + 1, rows.length)} to ${Math.min(end, rows.length)} of ${rows.length} messages`;
+        }
+
+        function renderPaginationButtons() {
+            paginationButtons.innerHTML = "";
+            const totalPages = Math.ceil(rows.length / rowsPerPage);
+
+            for (let i = 1; i <= totalPages; i++) {
+                const button = document.createElement("button");
+                button.textContent = i;
+                button.className = `pagination-btn ${i === currentPage ? "active" : ""}`;
+                button.addEventListener("click", () => {
+                    currentPage = i;
+                    renderTablePage(currentPage);
+                    renderPaginationButtons();
+                });
+                paginationButtons.appendChild(button);
+            }
+        }
+
+        // Initialize pagination
+        if (rows.length > 0) {
+            renderTablePage(currentPage);
+            renderPaginationButtons();
+        }
+    });
+</script>

@@ -2,7 +2,7 @@
 @{
     Layout = "_AdminLayout";
     ViewData["Title"] = "Admin Dashboard";
-    ViewData["ActivePage"] = "Edit_Properties";
+    ViewData["ActivePage"] = "Edit_Property";
 }
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -10,41 +10,43 @@
 <div class="container mt-5">
     <div class="card p-4 shadow-sm">
         <h2 class="text-left mb-4">Edit Property</h2>
-        <form asp-action="Edit" method="post" enctype="multipart/form-data">
+
+        <form asp-action="Edit_Property" asp-controller="Semi_admin" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="id" value="@Model.PropertyId" />
             <div class="mb-3">
                 <label class="form-label fw-bold">Property Title</label>
-                <input asp-for="Title" class="form-control" value="Luxury Apartment">
+                <input asp-for="Title" class="form-control" />
             </div>
 
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label class="form-label fw-bold">Price</label>
-                    <input asp-for="Price" class="form-control" value="250000">
+                    <input asp-for="Price" class="form-control" />
                 </div>
                 <div class="col-md-6 mb-3">
                     <label class="form-label fw-bold">Square Footage</label>
-                    <input asp-for="SquareFootage" class="form-control" value="1200">
+                    <input asp-for="SquareFootage" class="form-control" />
                 </div>
             </div>
 
             <div class="mb-3">
                 <label class="form-label fw-bold">Address</label>
-                <input asp-for="Address" class="form-control" value="123 Main Street, New York">
+                <input asp-for="Address" class="form-control" />
             </div>
 
             <div class="row">
                 <div class="col-md-4 mb-3">
                     <label class="form-label fw-bold">Bedrooms</label>
-                    <input asp-for="Bedrooms" class="form-control" value="3">
+                    <input asp-for="Bedrooms" class="form-control" />
                 </div>
                 <div class="col-md-4 mb-3">
                     <label class="form-label fw-bold">Bathrooms</label>
-                    <input asp-for="Bathrooms" class="form-control" value="2">
+                    <input asp-for="Bathrooms" class="form-control" />
                 </div>
                 <div class="col-md-4 mb-3">
                     <label class="form-label fw-bold">Property Type</label>
                     <select asp-for="PropertyType" class="form-select">
-                        <option value="Apartment" selected>Apartment</option>
+                        <option value="Apartment">Apartment</option>
                         <option value="Villa">Villa</option>
                         <option value="Condo">Condo</option>
                     </select>
@@ -55,68 +57,65 @@
             <div class="mb-3">
                 <label class="form-label fw-bold">Amenities</label>
                 <div class="row gy-3">
-                    @foreach (var amenity in new List<(string, string, bool)>{
-                    ("WiFi", "fa-wifi", true), ("Parking Space", "fa-car", true),
-                    ("Fitness Center", "fa-dumbbell", true), ("Swimming Pool", "fa-person-swimming", false),
-                    ("Elevator", "fa-elevator", false), ("Smart TV", "fa-tv", false),
-                    ("Security", "fa-shield-halved", false), ("Kitchen", "fa-utensils", false),
-                    ("Laundry", "fa-soap", false) })
+                    @foreach (var amenity in new List<(string Name, string Icon)>
+                    {
+                    ("WiFi", "fa-wifi"), ("Parking Space", "fa-car"), ("Fitness Center", "fa-dumbbell"),
+                    ("Swimming Pool", "fa-person-swimming"), ("Elevator", "fa-elevator"),
+                    ("Smart TV", "fa-tv"), ("Security", "fa-shield-halved"),
+                    ("Kitchen", "fa-utensils"), ("Laundry", "fa-soap")
+                    })
                     {
                         <div class="col-md-3">
                             <div class="form-check d-flex align-items-center">
-                                <input type="checkbox" name="Amenities" value="@amenity.Item1" class="form-check-input" @(amenity.Item3 ? "checked" : "")>
+                                <input type="checkbox" name="Amenities" value="@amenity.Name" class="form-check-input"
+                                @(Model.Amenities != null && Model.Amenities.Contains(amenity.Name) ? "checked" : "")>
                                 <label class="form-check-label ms-2">
-                                    <i class="fa-solid @amenity.Item2"></i> @amenity.Item1
+                                    <i class="fa-solid @amenity.Icon"></i> @amenity.Name
                                 </label>
                             </div>
                         </div>
                     }
                 </div>
             </div>
-           
-   
-            <!-- Image Upload Section -->
-            <div class="mb-3 ">
+
+            <!-- Image Upload and Preview -->
+            <div class="mb-3">
                 <label class="form-label fw-bold">Property Images</label>
                 <div class="border mb-4">
-                    <!-- Image Preview Section with Delete Icon -->
                     <div class="mt-3 d-flex flex-wrap" id="imagePreview">
-                        <div class="position-relative m-1">
-                            <img src="~/assets/Property5.jpg" class="img-thumbnail" width="100">
-                            <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0" onclick="removeImage(this)">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                        <div class="position-relative m-1">
-                            <img src="~/assets/Property4.jpg" class="img-thumbnail" width="100">
-                            <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0" onclick="removeImage(this)">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                        <div class="position-relative m-1">
-                            <img src="~/assets/Property3.jpg" class="img-thumbnail" width="100">
-                            <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0" onclick="removeImage(this)">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
+                        @if (Model.ExistingImages != null)
+                        {
+                            foreach (var image in Model.ExistingImages)
+                            {
+                                <div class="position-relative m-1">
+                                    <img src="@Url.Content($"~/UploadedImages/{image}")" class="img-thumbnail" width="100" />
+                                    <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0"
+                                            onclick="deleteImage('@image', this)">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            }
+                        }
                     </div>
-                <div class="p-4 rounded text-center " onclick="document.getElementById('fileInput').click()" style="cursor: pointer;">
-                    <i class="fas fa-cloud-upload-alt text-primary fs-3"></i>
-                    <p>Click to upload images</p>
-                    <p class="text-muted">Maximum 8 images allowed</p>
-                    <input type="file" id="fileInput" name="Images" multiple class="d-none" accept="image/*" onchange="previewImages(event)">
-                    <button type="button" class="btn btn-light mt-2" onclick="document.getElementById('fileInput').click()">Select Files</button>
+
+                    <div class="p-4 rounded text-center" style="cursor: pointer;" onclick="document.getElementById('imageUploadInput').click();">
+                        <i class="fas fa-cloud-upload-alt bg-light fs-3"></i>
+                        <p>Drag & drop images here or click to upload</p>
+                        <p class="text-muted">Maximum 8 images allowed</p>
+                        <input type="file" asp-for="Images" multiple class="form-control d-none" accept="image/*" id="imageUploadInput" onchange="previewImages();">
+                        <button type="button" class="btn btn-light mt-2" onclick="document.getElementById('imageUploadInput').click(); event.stopPropagation();">
+                            Select Files
+                        </button>
+                    </div>
                 </div>
-                </div>
-                <!-- Image Preview Section -->
-                
+            </div>
 
             <div class="text-center">
-                <button type="submit" class="btn btn-primary w-30  @(ViewData["ActivePage"] == "Property_Details" ? "active" : "")"
-                               asp-controller="Semi_admin" asp-action="Property_Details"><i class="fas fa-save me-2"></i>Update Property</button>
+                <button type="submit" class="btn btn-primary w-30">
+                    <i class="fas fa-save me-2"></i>Update Property
+                </button>
             </div>
         </form>
-    </div>
     </div>
 </div>
 
@@ -151,18 +150,84 @@
         Array.from(files).forEach(file => {
             let reader = new FileReader();
             reader.onload = function (e) {
+                let imgDiv = document.createElement('div');
+                imgDiv.classList.add('position-relative', 'm-1');
+
                 let img = document.createElement('img');
                 img.src = e.target.result;
-                img.classList.add('img-thumbnail', 'm-1');
+                img.classList.add('img-thumbnail');
                 img.width = 100;
-                previewContainer.appendChild(img);
+
+                imgDiv.appendChild(img);
+                previewContainer.appendChild(imgDiv);
             };
             reader.readAsDataURL(file);
         });
     }
 
+    function deleteImage(imageName, btn) {
+        if (confirm("Are you sure you want to delete this image?")) {
+            fetch(`/Semi_admin/DeleteImage?imageName=${encodeURIComponent(imageName)}`, {
+                method: "POST"
+            }).then(res => {
+                if (res.ok) {
+                    btn.closest(".position-relative").remove();
+                } else {
+                    alert("Failed to delete image.");
+                }
+            });
+        }
+    }
+</script>
+<script>
+    function previewImages() {
+        const fileInput = document.getElementById('imageUploadInput');
+        const previewContainer = document.getElementById('imagePreview');
+        previewContainer.innerHTML = "";  // Clear previous previews
 
-    function removeImage(button) {
-        button.parentElement.remove(); // Remove the entire div containing the image and delete button
+        for (let i = 0; i < fileInput.files.length; i++) {
+            const file = fileInput.files[i];
+            const reader = new FileReader();
+
+            reader.onload = function (event) {
+                const imgElement = document.createElement('img');
+                imgElement.src = event.target.result;
+                previewContainer.appendChild(imgElement);
+            };
+
+            reader.readAsDataURL(file);
+        }
+    }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    let selectedFilesArray = [];
+
+    function previewImages() {
+        const fileInput = document.getElementById('imageUploadInput');
+        const previewContainer = document.getElementById('imagePreview');
+
+        for (let i = 0; i < fileInput.files.length; i++) {
+            const file = fileInput.files[i];
+
+            // Prevent adding duplicates
+            if (!selectedFilesArray.some(f => f.name === file.name && f.size === file.size)) {
+                selectedFilesArray.push(file);
+
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    const imgElement = document.createElement('img');
+                    imgElement.src = event.target.result;
+                    previewContainer.appendChild(imgElement);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Create a new DataTransfer to reassign the file input with selectedFilesArray
+        const dataTransfer = new DataTransfer();
+        selectedFilesArray.forEach(f => dataTransfer.items.add(f));
+        fileInput.files = dataTransfer.files;
     }
 </script>

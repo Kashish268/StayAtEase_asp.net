@@ -1,6 +1,4 @@
-﻿
-
-@{
+﻿@{
     ViewBag.Title = "Super Admin Dashboard";
     Layout = "~/Views/Shared/_SuperAdminLayout.cshtml";
 }
@@ -30,22 +28,31 @@
                     </tr>
                 </thead>
                 <tbody id="adminTableBody">
-                    @foreach (var user in Model)
+                    @if (Model != null)
+                    {
+                        @foreach (var user in Model)
+                        {
+                            <tr>
+                                <td>@user.UserId</td>
+                                <td>@user.Name</td>
+                                <td>@user.Mobile</td>
+                                <td>@user.CreatedAt.ToString("yyyy-MM-dd")</td>
+                                <td>@user.Status</td>
+                                <td>
+                                    <form asp-action="Total_Admin" method="post" onsubmit="return confirm('Are you sure you want to delete this user?');" style="display:inline;">
+                                        <input type="hidden" name="id" value="@user.UserId" />
+                                        <button type="submit" style="background:none;border:none;color:red;" title="Delete">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
                     {
                         <tr>
-                            <td>@user.UserId</td>
-                            <td>@user.Name</td>
-                            <td>@user.Mobile</td>
-                            <td>@user.CreatedAt.ToString("yyyy-MM-dd")</td>
-                            <td>@user.Status</td>
-                            <td>
-                                <form asp-action="Total_Admin" method="post" onsubmit="return confirm('Are you sure you want to delete this user?');" style="display:inline;">
-                                    <input type="hidden" name="id" value="@user.UserId" />
-                                    <button type="submit" style="background:none;border:none;color:red;" title="Delete">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                </form>
-                            </td>
+                            <td colspan="6" style="text-align: center;">No property owners found</td>
                         </tr>
                     }
                 </tbody>
@@ -54,9 +61,54 @@
     </div>
 
     <div class="total-users-pagination">
-        <span id="pagination-info"></span>
+        <div id="pagination-info"></div>
         <div id="pagination-buttons"></div>
     </div>
 </div>
 
 <script src="~/js/site.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const tableBody = document.getElementById("adminTableBody");
+        const rows = Array.from(tableBody.querySelectorAll("tr"));
+        const paginationButtons = document.getElementById("pagination-buttons");
+        const paginationInfo = document.getElementById("pagination-info");
+
+        const rowsPerPage = 6;
+        let currentPage = 1;
+
+        function renderTablePage(page) {
+            const start = (page - 1) * rowsPerPage;
+            const end = start + rowsPerPage;
+
+            rows.forEach((row, index) => {
+                row.style.display = index >= start && index < end ? "" : "none";
+            });
+
+            paginationInfo.textContent = `Showing ${Math.min(start + 1, rows.length)} to ${Math.min(end, rows.length)} of ${rows.length} property owners`;
+        }
+
+        function renderPaginationButtons() {
+            paginationButtons.innerHTML = "";
+            const totalPages = Math.ceil(rows.length / rowsPerPage);
+
+            for (let i = 1; i <= totalPages; i++) {
+                const button = document.createElement("button");
+                button.textContent = i;
+                button.className = `pagination-btn ${i === currentPage ? "active" : ""}`;
+                button.addEventListener("click", () => {
+                    currentPage = i;
+                    renderTablePage(currentPage);
+                    renderPaginationButtons();
+                });
+                paginationButtons.appendChild(button);
+            }
+        }
+
+        // Initialize pagination
+        if (rows.length > 0) {
+            renderTablePage(currentPage);
+            renderPaginationButtons();
+        }
+    });
+</script>

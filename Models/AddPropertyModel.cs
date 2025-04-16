@@ -6,6 +6,7 @@ namespace WebApplication1.Models
 {
     public class AddPropertyModel
     {
+        public int PropertyId { get; set; }
         [Required]
         public string Title { get; set; }
 
@@ -37,7 +38,7 @@ namespace WebApplication1.Models
         [Required(ErrorMessage = "At least one image is required.")]
         [MaxLength(8, ErrorMessage = "You can only upload up to 8 images.")]
         public List<IFormFile> Images { get; set; } = new List<IFormFile>();
-
+        public List<string> ExistingImages { get; set; } = new List<string>();
         // Foreign Key to associate property with a user
         [Required]
         public int UserId { get; set; }
@@ -45,7 +46,7 @@ namespace WebApplication1.Models
         // Validation for file size (for each image)
         [DataType(DataType.Upload)]
         public string ImageUrl { get; set; } // First image
-        public List<IFormFile> ImageFiles { get; set; } = new List<IFormFile>();
+        public List<string> ImageFiles { get; set; } = new();
 
         // Add any custom validation for files (example: image size)
         public string ValidateImageFiles(IList<IFormFile> files)

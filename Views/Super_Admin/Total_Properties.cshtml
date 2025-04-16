@@ -7,7 +7,7 @@
 }
 
 <link rel="stylesheet" href="~/Content/site.css" />
-
+<script src="~/js/site.js"></script>
 <div class="property-container">
     <h1 class="property-title">Total Properties</h1>
 
@@ -57,43 +57,65 @@
             </tr>
         </thead>
             <tbody id="propertyTableBody">
-                @foreach (var property in Model)
+                @if (Model != null )
+                {
+                    foreach (var property in Model)
+                    {
+                        <tr>
+                            <td>
+                                @if (!string.IsNullOrEmpty(property.ImageUrl))
+                                {
+                                    <img src="@property.ImageUrl" alt="Property Image" width="60" />
+                                }
+                                else
+                                {
+                                    <span>No Image</span>
+                                }
+                            </td>
+                            <td>@property.Title</td>
+                            <td>₹@property.Price.ToString("N0")</td>
+                            <td>@property.Address</td>
+                            <td>@property.AddedBy</td>
+                            <td>@property.Status</td>
+                            <td>@property.TotalReviews</td>
+                            <td>@property.TotalInquiries</td>
+                            <td>
+                                <!-- Delete Button -->
+                                <form asp-action="Total_Properties" method="post" onsubmit="return confirm('Delete this property?');">
+                                    <a asp-route-id="@property.Id" class="btn btn-sm btn-primary @(ViewData["ActivePage"] == "Property_Details" ? "active" : "")"
+                                       asp-controller="Semi_admin" asp-action="Property_Details">
+                                        <i class="fas fa-eye"></i> View
+                                    </a>
+
+
+
+                                    <input type="hidden" name="id" value="@property.Id" />
+                                    <button type="submit" style="background:none;border:none;color:red;" title="Delete">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
+
+                                <!-- View Button (Navigate to Property Details) -->
+                              
+                            </td>
+
+                        </tr>
+                    }
+                }
+                else
                 {
                     <tr>
-                        <td>
-                            @if (!string.IsNullOrEmpty(property.ImageUrl))
-                            {
-                                <img src="@property.ImageUrl" alt="Property Image" width="60" />
-                            }
-                            else
-                            {
-                                <span>No Image</span>
-                            }
-                        </td>
-                        <td>@property.Title</td>
-                        <td>₹@property.Price.ToString("N0")</td>
-                        <td>@property.Address</td>
-                        <td>@property.AddedBy</td>
-                        <td>@property.Status</td>
-                        <td>@property.TotalReviews</td>
-                        <td>@property.TotalInquiries</td>
-                        <td>
-                            <form asp-action="DeleteProperty" method="post" onsubmit="return confirm('Delete this property?');">
-                                <input type="hidden" name="id" value="@property.Id" />
-                                <button type="submit" style="background:none;border:none;color:red;" title="Delete">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
-                            </form>
-                        </td>
+                        <td colspan="9" style="text-align:center; padding:20px;">No properties found</td>
                     </tr>
                 }
             </tbody>
 
+
     </table>
 </div>
 <div class="total-users-pagination">
-    <span id="pagination-info"></span>
-    <div id="pagination-buttons"></div>
+        <div id="pagination-info"></div>
+        <div id="pagination-buttons"></div>
 </div>
 </div>
 
@@ -101,3 +123,48 @@
 
 <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 <script src="~/js/site.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const tableBody = document.getElementById("propertyTableBody");
+        const rows = Array.from(tableBody.querySelectorAll("tr"));
+        const paginationButtons = document.getElementById("pagination-buttons");
+        const paginationInfo = document.getElementById("pagination-info");
+
+        const rowsPerPage = 6;
+        let currentPage = 1;
+
+        function renderTablePage(page) {
+            const start = (page - 1) * rowsPerPage;
+            const end = start + rowsPerPage;
+
+            rows.forEach((row, index) => {
+                row.style.display = index >= start && index < end ? "" : "none";
+            });
+
+            paginationInfo.textContent = `Showing ${Math.min(start + 1, rows.length)} to ${Math.min(end, rows.length)} of ${rows.length} properties`;
+        }
+
+        function renderPaginationButtons() {
+            paginationButtons.innerHTML = "";
+            const totalPages = Math.ceil(rows.length / rowsPerPage);
+
+            for (let i = 1; i <= totalPages; i++) {
+                const button = document.createElement("button");
+                button.textContent = i;
+                button.className = `pagination-btn ${i === currentPage ? "active" : ""}`;
+                button.addEventListener("click", () => {
+                    currentPage = i;
+                    renderTablePage(currentPage);
+                    renderPaginationButtons();
+                });
+                paginationButtons.appendChild(button);
+            }
+        }
+
+        // Initialize pagination
+        if (rows.length > 0) {
+            renderTablePage(currentPage);
+            renderPaginationButtons();
+        }
+    });
+</script>

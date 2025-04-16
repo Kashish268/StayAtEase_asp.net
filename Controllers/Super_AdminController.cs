@@ -481,11 +481,186 @@ public IActionResult Total_Properties(int id)
 
     return RedirectToAction("TotalProperties"); // Redirect back to property list view
 }
-
-        public IActionResult Particular_property()
+        public async Task<IActionResult> Particular_property(int id)
         {
-            ViewData["ActivePage"] = "Total_Properties";
-            return View();
+            ViewData["ActivePage"] = "Particular_property";
+
+            var redirect = RedirectToLoginIfNotLoggedIn();
+            if (redirect != null) return redirect;
+
+            int? userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                TempData["Error"] = "User not logged in.";
+                return RedirectToAction("Login", "Account");
+            }
+
+            var propertyDetails = new PropertyDetailsViewModel
+            {
+                Reviews = new List<ReviewModel>(),
+                Inquiries = new List<InquiryModel>()
+            };
+
+            string connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+            using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                await con.OpenAsync();
+
+                // Fetch Property Details
+                string query = @"
+            SELECT p.PropertyId, p.Title, p.Address, p.Price, p.ImagePaths,
+                   u.Name, u.Email, u.Mobile
+            FROM Properties p
+            INNER JOIN Users u ON u.user_id = p.UserId
+            WHERE p.PropertyId = @PropertyId";
+
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    cmd.Parameters.AddWithValue("@PropertyId", id);
+
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        if (await reader.ReadAsync())
+                        {
+                            propertyDetails.PropertyId = reader["PropertyId"].ToString();
+                            propertyDetails.Title = reader["Title"].ToString();
+                            propertyDetails.Address = reader["Address"].ToString();
+                            propertyDetails.Price = Convert.ToDecimal(reader["Price"]);
+                            propertyDetails.ImageUrl = reader["ImagePaths"].ToString()?.Split(',').FirstOrDefault();
+                            propertyDetails.OwnerName = reader["Name"].ToString();
+                            propertyDetails.OwnerEmail = reader["Email"].ToString();
+                            propertyDetails.OwnerMobile = reader["Mobile"].ToString();
+                        }
+                    }
+                }
+
+                // Fetch Reviews
+                string reviewQuery = @"
+            SELECT r.ReviewId, r.Comment, r.Rating, r.ReviewDate, u.Name AS ReviewerName, p.Title
+            FROM Reviews r
+            INNER JOIN Users u ON u.user_id = r.UserId
+            INNER JOIN Properties p ON p.PropertyId = r.PropertyId
+            WHERE r.PropertyId = @PropertyId";
+
+                using (SqlCommand cmd = new SqlCommand(reviewQuery, con))
+                {
+                    cmd.Parameters.AddWithValue("@PropertyId", id);
+
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            propertyDetails.Reviews.Add(new ReviewModel
+                            {
+                                ReviewId = Convert.ToInt32(reader["ReviewId"]),
+                                PropertyTitle = reader["Title"].ToString(),
+                                ReviewerName = reader["ReviewerName"].ToString(),
+                                Date = Convert.ToDateTime(reader["ReviewDate"]),
+                                Rating = Convert.ToInt32(reader["Rating"]),
+                                Comment = reader["Comment"].ToString()
+                            });
+                        }
+                    }
+                }
+
+                // Fetch Inquiries
+                string inquiryQuery = @"
+            SELECT 
+                i.InquiryId, 
+                u.Name, 
+                u.Email, 
+                u.Mobile, 
+                i.Message
+            FROM 
+                Inquiries i
+            INNER JOIN 
+                Users u ON i.UserId = u.user_id
+            WHERE 
+                i.PropertyId = @PropertyId";
+
+                using (SqlCommand cmd = new SqlCommand(inquiryQuery, con))
+                {
+                    cmd.Parameters.AddWithValue("@PropertyId", id);
+
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            propertyDetails.Inquiries.Add(new InquiryModel
+                            {
+                                InquiryId = Convert.ToInt32(reader["InquiryId"]),
+                                GuestName = reader["Name"].ToString(),
+                                Email = reader["Email"].ToString(),
+                                Contact = reader["Mobile"].ToString(),
+                                Message = reader["Message"].ToString()
+                            });
+                        }
+                    }
+                }
+            }
+
+            return View("Particular_property", propertyDetails); ;
+        }
+        [HttpDelete]
+        public IActionResult DeleteInquiry(int inquiryId, int propertyId)
+        {
+            // Define the connection string (ensure to replace with your actual connection string)
+            string connectionString = "YourConnectionStringHere";
+
+            // Define the query to delete the inquiry
+            string query = "DELETE FROM Inquiries WHERE InquiryId = @InquiryId";
+
+            // Use ADO.NET to execute the query
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                SqlCommand command = new SqlCommand(query, connection);
+                command.Parameters.AddWithValue("@InquiryId", inquiryId);
+
+                try
+                {
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+                catch (Exception ex)
+                {
+                    // Handle exceptions (logging, etc.)
+                    ViewBag.ErrorMessage = "Error deleting inquiry: " + ex.Message;
+                }
+            }
+
+            // Redirect to the property details page after deletion
+            return RedirectToAction("Particular_property", new { id = propertyId });
+        }
+        [HttpDelete]
+        public IActionResult DeleteReview(int reviewId, int propertyId)
+        {
+            // Define the connection string (ensure to replace with your actual connection string)
+            string connectionString = "YourConnectionStringHere";
+
+            // Define the query to delete the review
+            string query = "DELETE FROM Reviews WHERE ReviewId = @ReviewId";
+
+            // Use ADO.NET to execute the query
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                SqlCommand command = new SqlCommand(query, connection);
+                command.Parameters.AddWithValue("@ReviewId", reviewId);
+
+                try
+                {
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+                catch (Exception ex)
+                {
+                    // Handle exceptions (logging, etc.)
+                    ViewBag.ErrorMessage = "Error deleting review: " + ex.Message;
+                }
+            }
+
+            // Redirect to the property details page after deletion
+            return RedirectToAction("Particular_property", new { id = propertyId });
         }
         public IActionResult AdminProfile() {
 

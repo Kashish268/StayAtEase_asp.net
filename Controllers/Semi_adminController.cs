@@ -8,13 +8,18 @@ namespace WebApplication1.Controllers
     public class Semi_adminController : BaseController
     {
         private readonly IConfiguration _configuration;
+        private readonly IWebHostEnvironment _env;
 
-        public Semi_adminController(IConfiguration configuration) : base(configuration)
+        public Semi_adminController(IConfiguration configuration, IWebHostEnvironment env) : base(configuration)
         {
             _configuration = configuration;
+            _env = env;
 
         }
+  
 
+
+       
         public override void OnActionExecuting(ActionExecutingContext context)
         {
             int? userId = HttpContext.Session.GetInt32("UserId");
@@ -530,26 +535,351 @@ namespace WebApplication1.Controllers
         }
 
         // POST: MyProfile
-       
+
 
 
         // Property Details Action
-        public IActionResult Property_Details()
+        public async Task<IActionResult> Property_Details(int id)
         {
+            ViewData["ActivePage"] = "PropertyDetails";
+
             var redirect = RedirectToLoginIfNotLoggedIn();
             if (redirect != null) return redirect;
 
-            return View();
+            int? userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                TempData["Error"] = "User not logged in.";
+                return RedirectToAction("Login", "Account");
+            }
+
+            var propertyDetails = new PropertyDetailsViewModel
+            {
+                Reviews = new List<ReviewModel>(),
+                Inquiries = new List<InquiryModel>()
+            };
+
+            string connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+            using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                await con.OpenAsync();
+
+                // Fetch Property Details
+                string query = @"
+            SELECT p.PropertyId, p.Title, p.Address, p.Price, p.ImagePaths,
+                   u.name, u.Email, u.Mobile
+            FROM Properties p
+            INNER JOIN Users u ON u.user_id = p.UserId
+            WHERE p.PropertyId = @PropertyId";
+
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    cmd.Parameters.AddWithValue("@PropertyId", id);
+
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        if (await reader.ReadAsync())
+                        {
+                            propertyDetails.PropertyId = reader["PropertyId"].ToString();
+                            propertyDetails.Title = reader["Title"].ToString();
+                            propertyDetails.Address = reader["Address"].ToString();
+                            propertyDetails.Price = Convert.ToDecimal(reader["Price"]);
+                            propertyDetails.ImageUrl = reader["ImagePaths"].ToString()?.Split(',').FirstOrDefault();
+                            propertyDetails.OwnerName = reader["Name"].ToString();
+                            propertyDetails.OwnerEmail = reader["Email"].ToString();
+                            propertyDetails.OwnerMobile = reader["Mobile"].ToString();
+                        }
+                    }
+                }
+
+                // Fetch Reviews
+                string reviewQuery = @"
+            SELECT r.ReviewId, r.Comment, r.Rating, r.ReviewDate, u.name AS ReviewerName, p.Title
+            FROM Reviews r
+            INNER JOIN Users u ON u.user_id = r.UserId
+            INNER JOIN Properties p ON p.PropertyId = r.PropertyId
+            WHERE r.PropertyId = @PropertyId";
+
+                using (SqlCommand cmd = new SqlCommand(reviewQuery, con))
+                {
+                    cmd.Parameters.AddWithValue("@PropertyId", id);
+
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            propertyDetails.Reviews.Add(new ReviewModel
+                            {
+                                ReviewId = Convert.ToInt32(reader["ReviewId"]),
+                                PropertyTitle = reader["Title"].ToString(),
+                                ReviewerName = reader["ReviewerName"].ToString(),
+                                Date = Convert.ToDateTime(reader["ReviewDate"]),
+                                Rating = Convert.ToInt32(reader["Rating"]),
+                                Comment = reader["Comment"].ToString()
+                            });
+                        }
+                    }
+                }
+
+                // Fetch Inquiries
+                string inquiryQuery = @"
+          SELECT 
+    i.InquiryId, 
+    u.Name, 
+    u.email, 
+    u.mobile, 
+    i.Message
+FROM 
+    Inquiries i
+INNER JOIN 
+    Users u ON i.UserId = u.user_id
+WHERE 
+    i.PropertyId  = @PropertyId";
+
+                using (SqlCommand cmd = new SqlCommand(inquiryQuery, con))
+                {
+                    cmd.Parameters.AddWithValue("@PropertyId", id);
+
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            propertyDetails.Inquiries.Add(new InquiryModel
+                            {
+                                InquiryId = Convert.ToInt32(reader["InquiryId"]),
+                                GuestName = reader["Name"].ToString(),
+                                Email = reader["email"].ToString(),
+                                Contact = reader["mobile"].ToString(),
+                                Message = reader["Message"].ToString()
+                            });
+                        }
+                    }
+                }
+            }
+
+            return View(propertyDetails);
         }
 
+        public IActionResult DeleteInquiry(int inquiryId, int propertyId)
+        {
+            // Define the connection string (ensure to replace with your actual connection string)
+            string connectionString = "YourConnectionStringHere";
+
+            // Define the query to delete the inquiry
+            string query = "DELETE FROM Inquiries WHERE InquiryId = @InquiryId";
+
+            // Use ADO.NET to execute the query
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                SqlCommand command = new SqlCommand(query, connection);
+                command.Parameters.AddWithValue("@InquiryId", inquiryId);
+
+                try
+                {
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+                catch (Exception ex)
+                {
+                    // Handle exceptions (logging, etc.)
+                    ViewBag.ErrorMessage = "Error deleting inquiry: " + ex.Message;
+                }
+            }
+
+            // Redirect to the property details page after deletion
+            return RedirectToAction("Property_Details", new { id = propertyId });
+        }
+        [HttpDelete]
+        public IActionResult DeleteReview(int reviewId, int propertyId)
+        {
+            // Define the connection string (ensure to replace with your actual connection string)
+            string connectionString = "YourConnectionStringHere";
+
+            // Define the query to delete the review
+            string query = "DELETE FROM Reviews WHERE ReviewId = @ReviewId";
+
+            // Use ADO.NET to execute the query
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                SqlCommand command = new SqlCommand(query, connection);
+                command.Parameters.AddWithValue("@ReviewId", reviewId);
+
+                try
+                {
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+                catch (Exception ex)
+                {
+                    // Handle exceptions (logging, etc.)
+                    ViewBag.ErrorMessage = "Error deleting review: " + ex.Message;
+                }
+            }
+
+            // Redirect to the property details page after deletion
+            return RedirectToAction("Property_Details", new { id = propertyId });
+        }
         // Edit Property Action
-        public IActionResult Edit_Property()
+        [HttpGet]
+        public IActionResult Edit_Property(int id)
         {
-            var redirect = RedirectToLoginIfNotLoggedIn();
-            if (redirect != null) return redirect;
+            var model = new AddPropertyModel();
+            model.PropertyId = id; // ensure the ID is carried over to the view
 
-            return View();
+            using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+            {
+                string query = "SELECT * FROM Properties WHERE PropertyId = @PropertyId";
+                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@PropertyId", id);
+                conn.Open();
+
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        model.Title = reader["Title"]?.ToString();
+                        model.Price = reader["Price"] != DBNull.Value ? Convert.ToDecimal(reader["Price"]) : 0;
+                        model.SquareFootage = reader["SquareFootage"] != DBNull.Value ? Convert.ToInt32(reader["SquareFootage"]) : 0;
+                        model.Address = reader["Address"]?.ToString();
+                        model.Bedrooms = reader["Bedrooms"] != DBNull.Value ? Convert.ToInt32(reader["Bedrooms"]) : 0;
+                        model.Bathrooms = reader["Bathrooms"] != DBNull.Value ? Convert.ToInt32(reader["Bathrooms"]) : 0;
+                        model.PropertyType = reader["PropertyType"]?.ToString();
+                        model.UserId = reader["UserId"] != DBNull.Value ? Convert.ToInt32(reader["UserId"]) : 0;
+
+                        var amenitiesStr = reader["Amenities"]?.ToString();
+                        if (!string.IsNullOrEmpty(amenitiesStr))
+                        {
+                            model.Amenities = amenitiesStr.Split(',').Select(a => a.Trim()).ToList();
+                        }
+
+                        var images = reader["ImagePaths"]?.ToString();
+                        if (!string.IsNullOrEmpty(images))
+                        {
+                            model.ExistingImages = images.Split(',').Select(i => i.Trim()).ToList();
+                        }
+                    }
+                }
+            }
+
+            return View(model);
         }
-    
+
+        [HttpPost]
+     
+            public async Task<IActionResult> Edit_Property(int id, AddPropertyModel model, List<IFormFile> Images, string[] Amenities)
+            {
+                if (!ModelState.IsValid)
+                    return View(model);
+
+                string uploadsFolder = Path.Combine(_env.WebRootPath, "/images/properties/");
+                List<string> uploadedImagePaths = new List<string>();
+
+                // Handle new image uploads
+                foreach (var file in Images)
+                {
+                    if (file.Length > 0)
+                    {
+                        var uniqueName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                        string filePath = Path.Combine(uploadsFolder, uniqueName);
+                        using (var fs = new FileStream(filePath, FileMode.Create))
+                        {
+                            await file.CopyToAsync(fs);
+                        }
+                        uploadedImagePaths.Add("/images/properties/" + uniqueName);
+                    }
+                }
+
+                // Combine new images with existing images
+                string newImagePathStr = string.Join(",", uploadedImagePaths);
+                string existingImagesStr = string.Join(",", model.ExistingImages ?? new List<string>());
+                string finalImagePaths = string.IsNullOrEmpty(newImagePathStr)
+                    ? existingImagesStr
+                    : string.Join(",", existingImagesStr, newImagePathStr).Trim(',');
+
+                // Join amenities into a string
+                string amenitiesStr = string.Join(",", Amenities);
+
+                string connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+                try
+                {
+                    using (SqlConnection con = new SqlConnection(connectionString))
+                    {
+                        string updateQuery = @"UPDATE Properties SET 
+                Title = @Title, Price = @Price, SquareFootage = @SquareFootage, 
+                Address = @Address, Bedrooms = @Bedrooms, Bathrooms = @Bathrooms,
+                PropertyType = @PropertyType, Amenities = @Amenities, ImagePaths = @ImagePaths
+                WHERE PropertyId = @PropertyId";
+
+                        using (SqlCommand cmd = new SqlCommand(updateQuery, con))
+                        {
+                            cmd.Parameters.AddWithValue("@Title", model.Title);
+                            cmd.Parameters.AddWithValue("@Price", model.Price);
+                            cmd.Parameters.AddWithValue("@SquareFootage", model.SquareFootage);
+                            cmd.Parameters.AddWithValue("@Address", model.Address);
+                            cmd.Parameters.AddWithValue("@Bedrooms", model.Bedrooms);
+                            cmd.Parameters.AddWithValue("@Bathrooms", model.Bathrooms);
+                            cmd.Parameters.AddWithValue("@PropertyType", model.PropertyType);
+                            cmd.Parameters.AddWithValue("@Amenities", amenitiesStr);
+                            cmd.Parameters.AddWithValue("@ImagePaths", finalImagePaths); // Updated image paths
+                            cmd.Parameters.AddWithValue("@PropertyId", id);
+
+                            con.Open();
+                            int rowsAffected = await cmd.ExecuteNonQueryAsync();
+
+                            if (rowsAffected == 0)
+                            {
+                                ModelState.AddModelError("", "Failed to update the property.");
+                                return View(model);
+                            }
+                        }
+                    }
+
+                    TempData["Success"] = "Property updated successfully!";
+                    return RedirectToAction("Property_Details", new { id = id }); // Redirect to Property Details page after successful update
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine($"Error updating property: {ex.Message}");
+                    ModelState.AddModelError("", "An error occurred while updating the property. Please try again.");
+                    return View(model);
+                }
+            }
+
+        
+
+        // Action to handle image deletion
+        public IActionResult DeleteImage(int id, string imagePath)
+        {
+            string uploadsFolder = Path.Combine(_env.WebRootPath, "/images/properties/");
+            string fullImagePath = Path.Combine(uploadsFolder, Path.GetFileName(imagePath.TrimStart('/')));
+
+            // Delete image from file system
+            if (System.IO.File.Exists(fullImagePath))
+            {
+                System.IO.File.Delete(fullImagePath);
+            }
+
+            // Now, remove image from the database
+            using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+            {
+                string deleteImageQuery = @"UPDATE Properties 
+                                    SET ImagePaths = REPLACE(ImagePaths, @ImagePath, '') 
+                                    WHERE PropertyId = @PropertyId";
+
+                SqlCommand cmd = new SqlCommand(deleteImageQuery, conn);
+                cmd.Parameters.AddWithValue("@ImagePath", imagePath);
+                cmd.Parameters.AddWithValue("@PropertyId", id);
+
+                conn.Open();
+                cmd.ExecuteNonQuery();
+            }
+
+            // Redirect to the Property Details page after deletion
+            return RedirectToAction("Property_Details", new { id = id });
+        }
+
+
     }
 }

@@ -1,21 +1,14 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
-@{
-    ViewBag.Title = "Super Admin Dashboard";
+﻿@{
+    ViewBag.Title = "Total User";
     Layout = "~/Views/Shared/_SuperAdminLayout.cshtml";
 }
 
 <link rel="stylesheet" href="~/Content/site.css" />
 
-
 <div class="total-users-container">
     <h2 class="total-users-title">Tenants</h2>
 
     <div class="total-users-wrapper">
-        
         <div class="search-container">
             <i class="fas fa-search search-icon"></i>  <!-- Font Awesome icon -->
             <input type="text" class="total-users-search" placeholder="Search users...">
@@ -34,27 +27,33 @@
                     </tr>
                 </thead>
                 <tbody id="userTableBody">
-                <tbody id="userTableBody">
+                    @if (Model != null)
+                    {
                         @foreach (var user in Model)
                         {
-                        <tr>
-                            <td>@user.UserId</td>
-                            <td>@user.Name</td>
-                            <td>@user.Mobile</td>
-                            <td>@user.CreatedAt.ToString("dd MMM yyyy")</td>
-                            <td>@user.Status</td>
-                            <td>
-                                <form asp-action="Total_User" method="post" onsubmit="return confirm('Are you sure you want to delete this user?');" style="display:inline;">
-                                    <input type="hidden" name="id" value="@user.UserId" />
-                                    <button type="submit" style="background:none;border:none;color:red;" title="Delete">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
+                            <tr>
+                                <td>@user.UserId</td>
+                                <td>@user.Name</td>
+                                <td>@user.Mobile</td>
+                                <td>@user.CreatedAt.ToString("dd MMM yyyy")</td>
+                                <td>@user.Status</td>
+                                <td>
+                                    <form asp-action="Total_User" method="post" onsubmit="return confirm('Are you sure you want to delete this user?');" style="display:inline;">
+                                        <input type="hidden" name="id" value="@user.UserId" />
+                                        <button type="submit" style="background:none;border:none;color:red;" title="Delete">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
                         }
-                </tbody>
-
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" style="text-align: center;">No users found</td>
+                        </tr>
+                    }
                 </tbody>
             </table>
         </div>
@@ -66,7 +65,48 @@
     </div>
 </div>
 
-<!-- Include External JavaScript -->
-<script src="~/js/site.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const tableBody = document.getElementById("userTableBody");
+        const rows = Array.from(tableBody.querySelectorAll("tr"));
+        const paginationButtons = document.getElementById("pagination-buttons");
+        const paginationInfo = document.getElementById("pagination-info");
 
+        const rowsPerPage = 6;
+        let currentPage = 1;
 
+        function renderTablePage(page) {
+            const start = (page - 1) * rowsPerPage;
+            const end = start + rowsPerPage;
+
+            rows.forEach((row, index) => {
+                row.style.display = index >= start && index < end ? "" : "none";
+            });
+
+            paginationInfo.textContent = `Showing ${Math.min(start + 1, rows.length)} to ${Math.min(end, rows.length)} of ${rows.length} users`;
+        }
+
+        function renderPaginationButtons() {
+            paginationButtons.innerHTML = "";
+            const totalPages = Math.ceil(rows.length / rowsPerPage);
+
+            for (let i = 1; i <= totalPages; i++) {
+                const button = document.createElement("button");
+                button.textContent = i;
+                button.className = `pagination-btn ${i === currentPage ? "active" : ""}`;
+                button.addEventListener("click", () => {
+                    currentPage = i;
+                    renderTablePage(currentPage);
+                    renderPaginationButtons();
+                });
+                paginationButtons.appendChild(button);
+            }
+        }
+
+        // Initialize pagination
+        if (rows.length > 0) {
+            renderTablePage(currentPage);
+            renderPaginationButtons();
+        }
+    });
+</script>

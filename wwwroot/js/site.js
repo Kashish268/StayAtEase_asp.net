@@ -162,9 +162,102 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 //================================================for super admin ==============================================
+document.addEventListener("DOMContentLoaded", function () {
+    // Shared Pagination Logic
+    function setupPagination(data, rowsPerPage, containerId, infoId, renderFunction) {
+        let currentPage = 1;
 
-//--------------------------total - users----------------
+        function updatePagination() {
+            const container = document.getElementById(containerId);
+            const info = document.getElementById(infoId);
+            container.innerHTML = "";
 
+            const totalPages = Math.ceil(data.length / rowsPerPage);
+            const start = (currentPage - 1) * rowsPerPage;
+            const end = Math.min(start + rowsPerPage, data.length);
+
+            if (info) {
+                info.textContent = `Showing ${start + 1} to ${end} of ${data.length}`;
+            }
+
+            for (let i = 1; i <= totalPages; i++) {
+                const pageBtn = document.createElement("button");
+                pageBtn.textContent = i;
+                pageBtn.className = `pagination-btn ${i === currentPage ? "active" : ""}`;
+                pageBtn.addEventListener("click", function () {
+                    currentPage = i;
+                    renderFunction(currentPage, rowsPerPage);
+                    updatePagination();
+                });
+                container.appendChild(pageBtn);
+            }
+        }
+
+        // Initial call
+        renderFunction(currentPage, rowsPerPage);
+        updatePagination();
+    }
+
+    // ---------------------------------- USERS ----------------------------------
+    if (typeof users !== "undefined") {
+        function renderUsers(page, size) {
+            const start = (page - 1) * size;
+            const paginatedUsers = users.slice(start, start + size);
+            // Render user table here...
+            console.log("Rendering Users:", paginatedUsers);
+        }
+        setupPagination(users, 4, "pagination-buttons", "pagination-info", renderUsers);
+    }
+
+    // ---------------------------------- ADMINS ----------------------------------
+    if (typeof admins !== "undefined") {
+        function renderAdmins(page, size) {
+            const start = (page - 1) * size;
+            const paginatedAdmins = admins.slice(start, start + size);
+            // Render admin table here...
+            console.log("Rendering Admins:", paginatedAdmins);
+        }
+        setupPagination(admins, 4, "pagination-buttons", "pagination-info", renderAdmins);
+    }
+
+    // ---------------------------------- REVIEWS ----------------------------------
+    if (typeof reviews !== "undefined") {
+        function renderReviews(page, size) {
+            const start = (page - 1) * size;
+            const paginatedReviews = reviews.slice(start, start + size);
+            // Render reviews here...
+            console.log("Rendering Reviews:", paginatedReviews);
+        }
+        setupPagination(reviews, 6, "pagination-buttons", "pagination-info", renderReviews);
+    }
+
+    // ---------------------------------- MESSAGES / INQUIRIES ----------------------------------
+    if (typeof messages !== "undefined") {
+        function renderMessages(page, size) {
+            const start = (page - 1) * size;
+            const paginatedMessages = messages.slice(start, start + size);
+            // Render messages/inquiries here...
+            console.log("Rendering Messages:", paginatedMessages);
+        }
+        setupPagination(messages, 6, "pagination-buttons", "pagination-info", renderMessages);
+    }
+
+    // ---------------------------------- PROPERTIES ----------------------------------
+    if (typeof properties !== "undefined") {
+        function renderProperties(page, size) {
+            const start = (page - 1) * size;
+            const paginatedProps = properties.slice(start, start + size);
+            // Render properties here...
+            console.log("Rendering Properties:", paginatedProps);
+
+            // Update stats
+            document.getElementById("totalProperties").textContent = properties.length;
+            document.getElementById("activeListings").textContent = properties.filter(p => p.status === "Available").length;
+            document.getElementById("totalInquiries").textContent = properties.reduce((sum, p) => sum + (p.inquiries || 0), 0);
+        }
+        setupPagination(properties, 6, "pagination-buttons", "pagination-info", renderProperties);
+    }
+});
 
 
 
