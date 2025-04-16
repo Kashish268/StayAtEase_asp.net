@@ -2,7 +2,7 @@
 
 public class ResetPasswordViewModel
 {
-    public string Token { get; set; }
+    public string token { get; set; }
 
     [Required]
     [MinLength(6, ErrorMessage = "Password must be at least 6 characters.")]

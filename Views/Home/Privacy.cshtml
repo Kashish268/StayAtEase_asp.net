@@ -2,6 +2,8 @@
     ViewData["Title"] = "Privacy";
 }
 
+<!-- Yeh line page ke kisi bhi jagah ho sakti hai -->
+<input type="hidden" id="loggedInUserId" value="@Context.Session.GetInt32("UserId")" />
 
 <div class="p-5" style="background-color:#F9FAFB;">
     <h2 class="fw-bold" style="letter-spacing:0.1px; margin-left:12px;">Find Your Perfect Stay</h2>
@@ -34,59 +36,88 @@
             <button class="btn btn-outline-primary filter-btn" onclick="toggleActive(this)">Price Descending</button>
         </div>
     </div>
-    <div class="container"> 
-    
-        <div class="row g-4">
-            @foreach (var property in new[]
-            {
-        new {Image="/assets/Property5.jpg", Title="Luxury Beachfront Villa", Location="Miami Beach, Florida", Beds="4", Baths="3", Size="2800 sqft", Price="₹1,950/month", Rating="4.3", Reviews="124"},
-        new {Image="/assets/Property4.jpg", Title="Modern Luxury Apartment", Location="Downtown, New York", Beds="3", Baths="2", Size="2200 sqft", Price="₹2,500/month", Rating="4.8", Reviews="98"},
-        new {Image="/assets/Property3.jpg", Title="Cozy Studio Apartment", Location="Brooklyn, New York", Beds="1", Baths="1", Size="900 sqft", Price="₹1,800/month", Rating="4.5", Reviews="67"},
-        new {Image="/assets/Property2.jpg", Title="Spacious Family Home", Location="Los Angeles, California", Beds="5", Baths="4", Size="3500 sqft", Price="₹3,200/month", Rating="4.7", Reviews="142"},
-        new {Image="/assets/Property1.jpg", Title="Penthouse Suite", Location="San Francisco, California", Beds="3", Baths="3", Size="2800 sqft", Price="₹4,500/month", Rating="4.9", Reviews="189"},
-        new {Image="/assets/Property6.jpg", Title="Lakeview Cabin", Location="Austin, Texas", Beds="2", Baths="1", Size="1500 sqft", Price="₹2,100/month", Rating="4.6", Reviews="75"},
-        new {Image="/assets/Property5.jpg", Title="Modern Condo", Location="Seattle, Washington", Beds="2", Baths="2", Size="1300 sqft", Price="₹2,700/month", Rating="4.5", Reviews="88"},
-        new {Image="/assets/Property4.jpg", Title="Luxury Townhouse", Location="Chicago, Illinois", Beds="4", Baths="3", Size="2600 sqft", Price="₹3,800/month", Rating="4.7", Reviews="112"},
-        new {Image="/assets/Property3.jpg", Title="Garden Apartment", Location="Boston, Massachusetts", Beds="2", Baths="2", Size="1100 sqft", Price="₹2,300/month", Rating="4.4", Reviews="69"}
-            })
-            {
-                <div class="col-md-4">
-                    <div class="card shadow-sm">
-                        <!-- Property Image -->
-                        <img src="@property.Image" class="card-img-top" alt="Property Image">
+    @model List<WebApplication1.Models.UserProperty>
+<input type="hidden" id="loggedInUserId" value="@Context.Session.GetInt32("UserId")" />
 
-                        <!-- Like Button -->
-                        <button class="like-btn position-absolute top-0 end-0 m-2">
-                            <i class="fa fa-heart"></i>
+<div class="container py-4">
+    <div class="row g-4">
+        @foreach (var property in Model)
+        {
+            <div class="col-md-4">
+                <div class="card shadow-sm h-100 position-relative">
+                    <img src="@property.ImagePath" class="card-img-top" alt="Image of @property.Title">
+
+                    <!-- Like Button -->
+                        <!-- Heart button with dynamic class -->
+                        <button class="like-btn position-absolute top-0 end-0 m-2" data-id="@property.PropertyID">
+                            <i class="fa fa-heart @(property.IsWishlisted ? "text-danger" : "text-secondary")"></i>
                         </button>
 
-                        <!-- Card Body -->
-                        <div class="card-body">
-                            <h5 class="card-title">@property.Title</h5>
-                            <p class="text-muted">📍 @property.Location</p>
+                        
 
-                            <!-- Property Features -->
-                            <div class="d-flex align-items-center mb-2">
-                                <span class="me-3"><i class="fa fa-bed"></i> @property.Beds beds</span>
-                                <span class="me-3"><i class="fa fa-bath"></i> @property.Baths baths</span>
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">@property.Title</h5>
+                            <p class="text-muted mb-2">📍 @property.Location</p>
+
+                            <div class="d-flex justify-content-between text-muted mb-2">
+                                <span><i class="fa fa-bed"></i> @property.Beds beds</span>
+                                <span><i class="fa fa-bath"></i> @property.Baths baths</span>
                                 <span><i class="fa fa-expand"></i> @property.Size</span>
                             </div>
 
-                            <!-- Rating -->
                             <div class="d-flex align-items-center mb-2">
-                                <span class="text-warning me-2">⭐ @property.Rating</span>
-                                <small class="text-muted">(@property.Reviews)</small>
+                                <span class="text-warning fw-semibold me-2">⭐ @property.Rating</span>
+                                <small class="text-muted">(@property.Reviews reviews)</small>
                             </div>
 
-                            <!-- Price -->
                             <h6 class="text-primary fw-bold">@property.Price</h6>
 
-                            <!-- View Details Button -->
-                        <a class="btn btn-primary w-100 mt-2@(ViewData["ActivePage"] == "Property_details" ? "active" : "")" asp-area="" asp-controller="Home" asp-action="Property_details">View Details</a>
+                            <a class="btn btn-primary w-100 mt-2" asp-controller="Home" asp-action="Property_details" asp-route-id="@property.PropertyID">View Details</a>
+
                         </div>
                     </div>
                 </div>
             }
         </div>
     </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const likeButtons = document.querySelectorAll(".like-btn");
+            const userId = document.getElementById("loggedInUserId").value;
+
+            likeButtons.forEach(btn => {
+                btn.addEventListener("click", function () {
+                    if (!userId) {
+                        alert("Please login to add in wishlist");
+                        return;
+                    }
+
+                    const propertyId = btn.getAttribute("data-id");
+
+                    fetch("/Wishlist/Toggle", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({ propertyId: parseInt(propertyId) })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            const icon = btn.querySelector("i");
+                            if (data.isWishlisted) {
+                                icon.classList.remove("text-secondary");
+                                icon.classList.add("text-danger");
+                            } else {
+                                icon.classList.remove("text-danger");
+                                icon.classList.add("text-secondary");
+                            }
+                        } else {
+                            alert(data.message); // If not logged in
+                        }
+                    });
+                });
+            });
+        });
+    </script>
 

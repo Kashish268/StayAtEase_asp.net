@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using WebApplication1.Models;
@@ -23,6 +24,7 @@ namespace WebApplication1.Controllers
 
         [HttpPost]
         public IActionResult Login(LoginModel model)
+        
         {
             // Check if model is valid
             if (string.IsNullOrWhiteSpace(model.email) || string.IsNullOrWhiteSpace(model.password))
@@ -146,6 +148,58 @@ namespace WebApplication1.Controllers
             ViewBag.UserId = userId;
 
             return View();
+        }
+
+        public override void OnActionExecuting(ActionExecutingContext context)
+        {
+            int? userId = HttpContext.Session.GetInt32("UserId");
+
+            if (userId.HasValue)
+            {
+                ViewBag.ProfileImage = GetProfileImagePath(userId.Value);
+            }
+
+            base.OnActionExecuting(context);
+        }
+
+        protected string GetProfileImagePath(int userId)
+        {
+            string profilePath = null;
+
+            // Shared connection string (update with your actual connection string)
+            string connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                string query = "SELECT profile_pic FROM users WHERE user_id = @UserId";
+                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@UserId", userId);
+
+                conn.Open();
+                var result = cmd.ExecuteScalar();
+                if (result != null && result != DBNull.Value)
+                {
+                    profilePath = result.ToString();
+                }
+            }
+
+            return profilePath;
+        }
+
+
+        public IActionResult Logout()
+        {
+            // Clear the session
+            HttpContext.Session.Remove("UserId");
+
+            // You can clear all session data if needed
+             HttpContext.Session.Clear();
+            Console.WriteLine("Logout successfully!");
+            
+            TempData["LogoutMessage"] = "You have been logged out successfully!";
+            // Redirect to home or login page
+            return RedirectToAction("Index", "Home");
         }
     }
 }
