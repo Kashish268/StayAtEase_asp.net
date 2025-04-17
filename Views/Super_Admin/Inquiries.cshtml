@@ -41,3 +41,30 @@
 </div>
 
 <script src="~/js/site.js"></script>
+<script>
+        document.addEventListener("DOMContentLoaded", function () {
+        const searchInput = document.getElementById("searchMessages");
+        const tableBody = document.getElementById("messageTableBody");
+
+        searchInput.addEventListener("input", function () {
+            const query = searchInput.value.toLowerCase();
+            const rows = tableBody.getElementsByTagName("tr");
+
+            Array.from(rows).forEach(row => {
+                const cells = row.getElementsByTagName("td");
+                let matchFound = false;
+
+                // Loop through each cell in the row
+                Array.from(cells).forEach(cell => {
+                    if (cell.textContent.toLowerCase().includes(query)) {
+                        matchFound = true;
+                    }
+                });
+
+                // Toggle row visibility based on match
+                row.style.display = matchFound ? "" : "none";
+            });
+        });
+    });
+
+</script>

@@ -48,4 +48,36 @@
 <!-- Include External JavaScript -->
 <script src="~/js/site.js"></script>
 
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const searchInput = document.querySelector(".total-users-search");
+        const tableBody = document.getElementById("adminTableBody");
+
+        searchInput.addEventListener("input", function () {
+            const query = searchInput.value.toLowerCase();
+            const rows = tableBody.querySelectorAll("tr");
+            let matchFound = false;
+
+            rows.forEach(row => {
+                const rowText = row.textContent.toLowerCase();
+                const isMatch = rowText.includes(query);
+                row.style.display = isMatch ? "" : "none";
+                if (isMatch) matchFound = true;
+            });
+
+            // Handle "Not found" row
+            let noResultRow = tableBody.querySelector(".no-result");
+            if (!matchFound) {
+                if (!noResultRow) {
+                    noResultRow = document.createElement("tr");
+                    noResultRow.classList.add("no-result");
+                    noResultRow.innerHTML = `<td colspan="6" style="text-align:center; color:#999;">Not found</td>`;
+                    tableBody.appendChild(noResultRow);
+                }
+            } else {
+                if (noResultRow) noResultRow.remove();
+            }
+        });
+    });
+</script>
 

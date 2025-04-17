@@ -69,3 +69,48 @@
 
 <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 <script src="~/js/site.js"></script>
+<script>
+        document.addEventListener("DOMContentLoaded", function () {
+        const searchInput = document.querySelector(".property-search-input");
+        const filterSelect = document.querySelector(".property-search-select");
+        const tableBody = document.getElementById("propertyTableBody");
+
+        function filterProperties() {
+            const query = searchInput.value.toLowerCase();
+            const selectedType = filterSelect.value.toLowerCase();
+            const rows = tableBody.querySelectorAll("tr");
+
+            let matchFound = false;
+
+            rows.forEach(row => {
+                const rowText = row.textContent.toLowerCase();
+                const rowType = row.cells[0]?.textContent.toLowerCase(); // assuming first cell has type
+
+                const matchesSearch = rowText.includes(query);
+                const matchesType = !selectedType || rowType === selectedType;
+
+                const showRow = matchesSearch && matchesType;
+                row.style.display = showRow ? "" : "none";
+
+                if (showRow) matchFound = true;
+            });
+
+            // Handle "No results found"
+            let noResultRow = tableBody.querySelector(".no-result");
+            if (!matchFound) {
+                if (!noResultRow) {
+                    noResultRow = document.createElement("tr");
+                    noResultRow.classList.add("no-result");
+                    noResultRow.innerHTML = `<td colspan="100%" style="text-align:center; color:#999;">No results found</td>`;
+                    tableBody.appendChild(noResultRow);
+                }
+            } else {
+                if (noResultRow) noResultRow.remove();
+            }
+        }
+
+        searchInput.addEventListener("input", filterProperties);
+        filterSelect.addEventListener("change", filterProperties);
+    });
+
+</script>
