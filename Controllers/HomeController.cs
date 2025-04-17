@@ -6,6 +6,8 @@ using System.Net;
 using WebApplication1.Models;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System.Globalization;
 
 
 namespace WebApplication1.Controllers
@@ -63,31 +65,55 @@ namespace WebApplication1.Controllers
         public IActionResult Index()
         {
             ViewData["ActivePage"] = "Home";
-            //int? userId = HttpContext.Session.GetInt32("UserId");
 
-            //if (userId.HasValue)
-            //{
-            //    string profilePath = GetProfileImagePath(userId.Value); // Use .Value to unwrap the nullable int
-            //    ViewBag.ProfileImage = string.IsNullOrEmpty(profilePath) ? "/assets/default-user.png" : profilePath;
-            //}
-            //var userId = HttpContext.Session.GetInt32("UserId");
-            //var role = HttpContext.Session.GetString("UserRole");
+            List<UserProperty> featuredProperties = new List<UserProperty>();
+            string connectionString = _configuration.GetConnectionString("DefaultConnection");
 
-            //if (userId != null)
-            //{
-            //    switch (role)
-            //    {
-            //        case "admin":
-            //            return RedirectToAction("Super_AdminDashboard", "Account");
-            //        case "roomowner":
-            //            return RedirectToAction("Dashboard", "Account");
-            //        case "tenant":
-            //            return RedirectToAction("Index", "Tenant"); // or wherever tenant goes
-            //    }
-            //}
-            return View();
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                string query = @"
+            SELECT TOP 6 
+                p.PropertyId, 
+                p.Title, 
+                p.Address AS Location, 
+                p.Price,
+                p.ImagePaths AS Image,
+                CAST(ROUND(ISNULL(AVG(r.Rating), 0), 1) AS DECIMAL(2,1)) AS Rating,
+                p.PropertyType
+            FROM Properties p
+            LEFT JOIN Reviews r ON p.PropertyId = r.PropertyID
+            GROUP BY 
+                p.PropertyId, p.Title, p.Address, p.Price, p.ImagePaths, p.PropertyType
+            ORDER BY NEWID()";
+
+                SqlCommand cmd = new SqlCommand(query, conn);
+                conn.Open();
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    // Safe conversions with null checks
+                    decimal price = 0.0m;
+                    decimal.TryParse(reader["Price"]?.ToString(), out price);
+
+                    decimal rating = 0.0m;
+                    decimal.TryParse(reader["Rating"]?.ToString(), out rating);
+
+                    featuredProperties.Add(new UserProperty
+                    {
+                        PropertyID = reader["PropertyId"] != DBNull.Value ? Convert.ToInt32(reader["PropertyId"]) : 0,
+                        Title = reader["Title"]?.ToString() ?? "Untitled Property",
+                        Location = reader["Location"]?.ToString() ?? "Location not specified",
+                        Price = "₹" + price.ToString("N0") + "/month",  // Changed $ to ₹
+                        ImagePath = reader["Image"]?.ToString() ?? "/assets/default-property.jpg",
+                        Rating = rating,
+                        PropertyType = reader["PropertyType"]?.ToString() ?? "Unknown"
+                    });
+                }
+            }
+
+            return View(featuredProperties);
         }
-
 
         //private string GetProfileImagePath(int? userId)
         //{
@@ -160,6 +186,7 @@ namespace WebApplication1.Controllers
                 p.Address AS Location, 
                 p.Bedrooms AS Beds, 
                 p.Bathrooms AS Baths, 
+p.PropertyType ,
                 CAST(p.SquareFootage AS NVARCHAR) + ' sqft' AS Size, 
                 N'₹' + CAST(p.Price AS NVARCHAR) + '/month' AS Price, 
                 p.ImagePaths AS ImagePath, 
@@ -170,7 +197,7 @@ namespace WebApplication1.Controllers
             LEFT JOIN Reviews r ON p.PropertyId = r.PropertyID
             GROUP BY 
                 p.PropertyId, p.Title, p.Address, p.Bedrooms, p.Bathrooms, 
-                p.SquareFootage, p.Price, p.ImagePaths";
+                p.SquareFootage, p.Price, p.ImagePaths, p.PropertyType";
                 }
 
                 SqlCommand cmd = new SqlCommand(query, conn);
@@ -195,6 +222,7 @@ namespace WebApplication1.Controllers
                         Size = reader["Size"].ToString(),
                         Price = reader["Price"].ToString(),
                         ImagePath = reader["ImagePath"].ToString(),
+                        PropertyType = reader["PropertyType"].ToString(),
                         Rating = Convert.ToDecimal(reader["Rating"]),
                         Reviews = Convert.ToInt32(reader["Reviews"]),
                         IsWishlisted = Convert.ToInt32(reader["IsWishlisted"]) == 1
@@ -340,7 +368,7 @@ GROUP BY
             return View(property);  // Passing the property details to the view.
         }
 
-        
+
         [HttpPost]
         public IActionResult SubmitReview(int propertyId, int userId, int rating, string comment)
         {
@@ -381,7 +409,7 @@ GROUP BY
             return RedirectToAction("Property_details", new { id = propertyId });
         }
 
-       
+
         [HttpPost]
         public IActionResult SubmitInquiry(int userId, int propertyId, string message)
         {
@@ -420,36 +448,164 @@ GROUP BY
             return RedirectToAction("Property_details", new { id = propertyId });
         }
 
+
+        [HttpGet]
         public IActionResult Profile_details()
         {
             ViewData["Title"] = "Profile_details";
-            //var userId = HttpContext.Session.GetInt32("UserId");
-            ////if (!int.TryParse(userIdString, out int userId))
-            ////    return RedirectToAction("Index");
+            int userId = Convert.ToInt32(HttpContext.Session.GetInt32("UserId"));
+            string connectionString = _configuration.GetConnectionString("DefaultConnection");
 
-            //string connectionString = _configuration.GetConnectionString("DefaultConnection");
+            UserProfile model = new UserProfile();
 
-            //string profileImagePath = ""; // Default image
+            using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                string query = "SELECT name, email, mobile, profile_pic FROM users WHERE user_id = @UserId";
+                SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Parameters.AddWithValue("@UserId", userId);
 
-            //using (SqlConnection connection = new SqlConnection(connectionString))
-            //{
-            //    string query = "SELECT profile_pic FROM users WHERE user_id  = @UserId";
+                con.Open();
+                SqlDataReader reader = cmd.ExecuteReader();
+                if (reader.Read())
+                {
+                    model.UserId = userId;
+                    model.FirstName = reader["name"].ToString();
+                    model.Email = reader["email"].ToString();
+                    model.Phone = reader["mobile"].ToString();
+                    model.ProfileImage = reader["profile_pic"].ToString();
+                    //model.CreateAt = Convert.ToDateTime(reader["created_at"]).ToString("yyyy-MM-dd HH:mm:ss");
+                }
+                con.Close();
+            }
 
-            //    SqlCommand command = new SqlCommand(query, connection);
-            //    command.Parameters.AddWithValue("@UserId", userId);
-
-            //    connection.Open();
-            //    var result = command.ExecuteScalar();
-            //    if (result != null && result != DBNull.Value)
-            //    {
-            //        profileImagePath = result.ToString();
-            //    }
-            //}
-
-            //ViewBag.ProfileImage = profileImagePath;
-            //Console.WriteLine(profileImagePath);
-            return View();
+            return View(model);
         }
+
+       
+        [HttpPost]
+        public IActionResult Profile_details(UserProfile model, IFormFile ProfilePicFile)
+        {
+            string formType = Request.Form["FormType"];
+
+            if (formType == "ProfileUpdate")
+            {
+                // Manual validation for Profile Update
+                if (string.IsNullOrEmpty(model.FirstName) || string.IsNullOrEmpty(model.Phone))
+                {
+                    ViewBag.Error = "First name and phone number are required.";
+                    return View(model);
+                }
+
+                string imagePathInDb = model.ProfileImage;
+
+                if (ProfilePicFile != null && ProfilePicFile.Length > 0)
+                {
+                    string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images");
+                    string uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(ProfilePicFile.FileName);
+                    string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        ProfilePicFile.CopyTo(stream);
+                    }
+
+                    imagePathInDb = "/images/" + uniqueFileName;
+                }
+
+                using (SqlConnection con = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+                {
+                    string updateQuery = "UPDATE users SET name = @FirstName, mobile = @Phone, profile_pic = @ProfilePic WHERE user_id = @UserId";
+                    SqlCommand cmd = new SqlCommand(updateQuery, con);
+                    cmd.Parameters.AddWithValue("@FirstName", model.FirstName);
+                    cmd.Parameters.AddWithValue("@Phone", model.Phone);
+                    cmd.Parameters.AddWithValue("@ProfilePic", imagePathInDb ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@UserId", model.UserId);
+
+                    con.Open();
+                    cmd.ExecuteNonQuery();
+                    con.Close();
+                }
+
+                model.ProfileImage = imagePathInDb;
+                ViewBag.Message = "Profile updated successfully!";
+                return View(model);
+            }
+
+            else if (formType == "PasswordChange")
+            {
+                if (string.IsNullOrEmpty(model.CurrentPassword) || string.IsNullOrEmpty(model.NewPassword) || string.IsNullOrEmpty(model.ConfirmPassword))
+                {
+                    ViewBag.Error = "Please fill in all password fields.";
+                    FillUserProfileData(model);
+                    return View(model);
+                }
+
+                if (model.NewPassword != model.ConfirmPassword)
+                {
+                    ViewBag.Error = "New password and confirm password do not match.";
+                    FillUserProfileData(model);
+                    return View(model);
+                }
+
+                using (SqlConnection con = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+                {
+                    string checkPasswordQuery = "SELECT password FROM users WHERE user_id = @UserId";
+                    SqlCommand checkCmd = new SqlCommand(checkPasswordQuery, con);
+                    checkCmd.Parameters.AddWithValue("@UserId", model.UserId);
+
+                    con.Open();
+                    var existingPassword = checkCmd.ExecuteScalar()?.ToString();
+                    con.Close();
+
+                    if (existingPassword != model.CurrentPassword)
+                    {
+                        ViewBag.Error = "Incorrect current password.";
+                        FillUserProfileData(model);
+                        return View(model);
+                    }
+
+                    string updatePasswordQuery = "UPDATE users SET password = @NewPassword WHERE user_id = @UserId";
+                    SqlCommand updatePassCmd = new SqlCommand(updatePasswordQuery, con);
+                    updatePassCmd.Parameters.AddWithValue("@NewPassword", model.NewPassword);
+                    updatePassCmd.Parameters.AddWithValue("@UserId", model.UserId);
+
+                    con.Open();
+                    updatePassCmd.ExecuteNonQuery();
+                    con.Close();
+                }
+
+                ViewBag.Message = "Password updated successfully!";
+                FillUserProfileData(model);
+                return View(model);
+            }
+
+            ViewBag.Error = "Unknown form submitted.";
+            FillUserProfileData(model);
+            return View("Index","Home");
+        }
+
+
+        private void FillUserProfileData(UserProfile model)
+        {
+            using (SqlConnection con = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+            {
+                string query = "SELECT name, email, mobile FROM users WHERE user_id = @UserId";
+                SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Parameters.AddWithValue("@UserId", model.UserId);
+
+                con.Open();
+                SqlDataReader reader = cmd.ExecuteReader();
+                if (reader.Read())
+                {
+                    model.FirstName = reader["name"].ToString();
+                    model.Email = reader["email"].ToString();
+                    model.Phone = reader["mobile"].ToString();
+                }
+                con.Close();
+            }
+        }
+
+
 
 
         //public IActionResult Dashboard() { 
@@ -474,6 +630,7 @@ GROUP BY
         //    ViewBag.Error = "Invalid";
         //    return View();
         //}
+
         public IActionResult Register()
         {
             return View();

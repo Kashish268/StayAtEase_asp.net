@@ -10,28 +10,34 @@
     <div class="container content">
         <h1 class="fw-bold text-white mb-4" style="letter-spacing:1px;">Find Your Perfect Home</h1>
         <div class="search-container p-4 rounded shadow-lg d-inline-block">
-            <div class="d-flex flex-wrap justify-content-center">
-                <select class="form-select me-2 mb-2 search-input">
-                    <option selected>📍 Location</option>
-                    <option>New York</option>
-                    <option>Los Angeles</option>
-                    <option>Chicago</option>
-                </select>
-                <select class="form-select me-2 mb-2 search-input">
-                    <option selected>🏠 Property Type</option>
-                    <option>Apartment</option>
-                    <option>House</option>
-                    <option>Villa</option>
-                </select>
-                <select class="form-select me-2 mb-2 search-input">
-                    <option selected>💰 Budget</option>
-                    <option>$100k - $300k</option>
-                    <option>$300k - $600k</option>
-                    <option>$600k+</option>
-                </select>
-                <button class="btn btn-primary search-button">Search</button>
-            </div>
+            <form method="get" action="/Home/Privacy">
+                <div class="d-flex flex-wrap justify-content-center">
+                    <select name="location" class="form-select me-2 mb-2 search-input">
+                        <option value="" selected>📍 Location</option>
+                        <option>Rajkot</option>
+                        <option>Ahemdabad</option>
+                        <option>Baroda</option>
+                    </select>
+                    <select name="propertyType" class="form-select me-2 mb-2 search-input">
+                        <option value="" selected>🏠 Property Type</option>
+                        <option>Apartment</option>
+                        <option>House</option>
+                        <option>Villa</option>
+                    </select>
+                    <select name="priceRange" class="form-select me-2 mb-2 search-input">
+                        <option value="" selected>💰 Budget</option>
+                        <option value="0-5000">Under ₹5,000</option>
+                        <option value="5001-10000">₹5,001 - ₹10,000</option>
+                        <option value="10001-15000">₹10,001 - ₹15,000</option>
+                        <option value="15001-20000">₹15,001 - ₹20,000</option>
+                        <option value="20001-30000">₹20,001 - ₹30,000</option>
+                        <option value="30001">Above ₹30,000</option>
+                    </select>
+                    <button type="submit" class="btn btn-primary search-button">Search</button>
+                </div>
+            </form>
         </div>
+    </div>
     </div>
 </div>
 
@@ -39,34 +45,30 @@
 <div class="p-5" style="background-color:#F9FAFB;">
     <div class="d-flex justify-content-between align-items-center mb-4" style="padding-left:10px; padding-right:10px;">
         <h2 class="fw-bold mt-3" style="letter-spacing:0.1px;">Featured Properties</h2>
-        <button href="#" class="btn btn-outline-primary" style="background-color:#1A237E;color:white;border-color:#1A237E">View All</button>
+        <a asp-action="Privacy" asp-controller="Home" class="btn btn-outline-primary" style="background-color:#1A237E;color:white;border-color:#1A237E">
+            View All
+        </a>
     </div>
     <div class="row g-4">
-        @foreach (var property in new[]
-        {
-        new {Image="/assets/Property5.jpg", Title="Modern Luxury Apartment", Location="Downtown, New York", Price="$2,500/month", Rating="4.8"},
-        new {Image="/assets/Property4.jpg", Title="Cozy Studio Apartment", Location="Brooklyn, New York", Price="$1,800/month", Rating="4.5"},
-        new {Image="/assets/Property3.jpg", Title="Spacious Family Home", Location="Queens, New York", Price="$3,200/month", Rating="4.9"},
-        new {Image="/assets/Property2.jpg", Title="Penthouse with City View", Location="Manhattan, New York", Price="$5,000/month", Rating="4.7"},
-        new {Image="/assets/Property1.jpg", Title="Garden Apartment", Location="Staten Island, New York", Price="$2,200/month", Rating="4.6"},
-        new {Image="/assets/Property6.jpg", Title="Historic Brownstone", Location="Brooklyn Heights, New York", Price="$4,500/month", Rating="4.8"}
-        })
-        {
-            <div class="col-md-4">
-                <div class="card shadow-sm">
-                    <img src="@property.Image" class="card-img-top" alt="Property Image">
-                    <button class="like-btn position-absolute top-0 end-0 m-2">
-                        <i class="fa fa-heart"></i>
-                    </button>
-                    <div class="card-body">
-                        <h5 class="card-title">@property.Title</h5>
-                        <p class="text-muted">📍 @property.Location</p>
-                        <h6 class="text-primary fw-bold">@property.Price</h6>
-                        <p class="text-warning">⭐ @property.Rating</p>
+        @model List<WebApplication1.Models.UserProperty>
+        <!-- Other index page content remains the same -->
+
+        <div class="row g-4">
+            @foreach (var property in Model)
+            {
+                <div class="col-md-4">
+                    <div class="card shadow-sm">
+                        <img src="@property.ImagePath" class="card-img-top" alt="Property Image">
+                        <div class="card-body">
+                            <h5 class="card-title">@property.Title</h5>
+                            <p class="text-muted">📍 @property.Location</p>
+                            <h6 class="text-primary fw-bold">@property.Price</h6>
+                            <p class="text-warning">⭐ @property.Rating</p>
+                        </div>
                     </div>
                 </div>
-            </div>
-        }
+            }
+        </div>
     </div>
 </div>
 
@@ -81,7 +83,7 @@
                     Tenants can browse through a wide range of verified listings, filter options based on their preferences, and directly connect with property owners to schedule visits.
                     Property owners can easily list their properties, manage inquiries, and secure reliable tenants through a streamlined dashboard.
                 </p>
-                <a href="#" class="btn btn-primary">Explore Listings</a>
+                <a asp-action="Privacy" asp-controller="Home" class="btn btn-primary">Explore Listings</a>
             </div>
         </div>
         <div class="col-md-5">

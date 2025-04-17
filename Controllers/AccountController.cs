@@ -123,73 +123,10 @@ namespace WebApplication1.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
-            DashboardViewModel viewModel = new DashboardViewModel
+            if (userId == null)
             {
-                Messages = new List<DashboardMessage>(),
-                Reviews = new List<LatestReview>()
-            };
-
-            string connectionString = _configuration.GetConnectionString("DefaultConnection");
-
-            using (SqlConnection con = new SqlConnection(connectionString))
-            {
-                await con.OpenAsync();
-
-                // Total Properties
-                using (SqlCommand cmd = new SqlCommand("SELECT COUNT(*) FROM Properties WHERE UserId = @UserID", con))
-                {
-                    cmd.Parameters.AddWithValue("@UserID", userId);
-                    viewModel.TotalProperties = Convert.ToInt32(await cmd.ExecuteScalarAsync());
-                }
-
-                // Active Listings
-                using (SqlCommand cmd = new SqlCommand("SELECT COUNT(*) FROM Properties WHERE UserId = @UserID AND IsAvailable = 0", con))
-                {
-                    cmd.Parameters.AddWithValue("@UserID", userId);
-                    viewModel.ActiveListings = Convert.ToInt32(await cmd.ExecuteScalarAsync());
-                }
-
-                // Total Inquiries
-                using (SqlCommand cmd = new SqlCommand("SELECT COUNT(*) FROM Inquiries WHERE PropertyID IN (SELECT PropertyID FROM Properties WHERE UserId = @UserID)", con))
-                {
-                    cmd.Parameters.AddWithValue("@UserID", userId);
-                    viewModel.TotalInquiries = Convert.ToInt32(await cmd.ExecuteScalarAsync());
-                }
-
-                // Average Rating
-                using (SqlCommand cmd = new SqlCommand("SELECT AVG(Rating) FROM Reviews WHERE PropertyID IN (SELECT PropertyID FROM Properties WHERE UserId = @UserID)", con))
-                {
-                    cmd.Parameters.AddWithValue("@UserID", userId);
-                    object avgResult = await cmd.ExecuteScalarAsync();
-                    viewModel.AverageRating = avgResult != DBNull.Value ? Convert.ToDecimal(avgResult) : 0;
-                }
-
-                // Latest Messages
-                string msgQuery = @"
-        SELECT TOP 10 i.Message, i.PropertyID, u.name, u.Email, u.mobile
-        FROM Inquiries i
-        JOIN Users u ON i.UserId = u.user_id
-        WHERE i.PropertyID IN (SELECT PropertyID FROM Properties WHERE UserId = @UserID)
-        ORDER BY i.InquiryDate DESC";
-
-                using (SqlCommand cmd = new SqlCommand(msgQuery, con))
-                {
-                    cmd.Parameters.AddWithValue("@UserID", userId);
-                    using (var reader = await cmd.ExecuteReaderAsync())
-                    {
-                        while (await reader.ReadAsync())
-                        {
-                            viewModel.Messages.Add(new DashboardMessage
-                            {
-                                Name = reader["name"].ToString(),
-                                PropertyId = reader["PropertyID"].ToString(),
-                                Email = reader["Email"].ToString(),
-                                Contact = reader["mobile"].ToString(),
-                                MessageText = reader["Message"].ToString()
-                            });
-                        }
-                    }
-                }
+                return RedirectToAction("Index", "Home");
+            }
 
                 // ✅ Latest Reviews (Top 3)
                 string reviewQuery = @"
