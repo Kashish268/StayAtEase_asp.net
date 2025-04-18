@@ -18,6 +18,7 @@
         public int TotalInquiries { get; set; }
         public int TotalProperties { get; set; }
         public int ActiveListings { get; set; }
+        public decimal RentAmount { get; set; }
 
     }
     public class PropertyStatsViewModel

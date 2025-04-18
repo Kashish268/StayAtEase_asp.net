@@ -1,0 +1,141 @@
+﻿
+@{
+    ViewData["Title"] = "Payment_Details";
+    Layout = "~/Views/Shared/_SuperAdminLayout.cshtml";
+}
+
+
+
+<link rel="stylesheet" href="~/Content/site.css" />
+
+<div class="total-users-container">
+    <h2 class="total-users-title">Payment Details</h2>
+
+    <div class="total-users-wrapper">
+        <div class="search-container">
+            <i class="fas fa-search search-icon"></i>  <!-- Font Awesome icon -->
+            <input type="text" class="total-users-search" placeholder="Search users...">
+        </div>
+
+        <div class="total-users-table-container">
+            <table class="total-users-table">
+                <thead>
+                    <tr>
+                        <th>PaymentId</th>
+                        <th>OrderId</th>
+                        <th>PropertyTitle</th>
+                        <th>User</th>
+                        <th>PaymentGateway</th>
+                        <th>Amount</th>
+                        <th>PaymentStatus</th>
+                     
+                           <th>PaymentId</th>
+                     
+                        <th>PaymentDate</th>
+                        
+                    </tr>
+                </thead>
+                <tbody id="userTableBody">
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.PaymentId</td>
+                            <td>@item.OrderId</td>
+                            <td>@item.PropertyTitle</td>
+                            <td>@item.UserName</td>
+                            <td>@item.PaymentGateway</td>
+                            <td>@item.Amount.ToString("C")</td>
+                            <td>@item.PaymentStatus</td>
+                            <td>@item.RazorpayPaymentId</td>
+                            <td>@item.PaymentDate.ToString("yyyy-MM-dd HH:mm")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="total-users-pagination">
+        <span id="pagination-info"></span>
+        <div id="pagination-buttons"></div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const tableBody = document.getElementById("userTableBody");
+        const rows = Array.from(tableBody.querySelectorAll("tr"));
+        const paginationButtons = document.getElementById("pagination-buttons");
+        const paginationInfo = document.getElementById("pagination-info");
+
+        const rowsPerPage = 6;
+        let currentPage = 1;
+
+        function renderTablePage(page) {
+            const start = (page - 1) * rowsPerPage;
+            const end = start + rowsPerPage;
+
+            rows.forEach((row, index) => {
+                row.style.display = index >= start && index < end ? "" : "none";
+            });
+
+            paginationInfo.textContent = `Showing ${Math.min(start + 1, rows.length)} to ${Math.min(end, rows.length)} of ${rows.length} users`;
+        }
+
+        function renderPaginationButtons() {
+            paginationButtons.innerHTML = "";
+            const totalPages = Math.ceil(rows.length / rowsPerPage);
+
+            for (let i = 1; i <= totalPages; i++) {
+                const button = document.createElement("button");
+                button.textContent = i;
+                button.className = `pagination-btn ${i === currentPage ? "active" : ""}`;
+                button.addEventListener("click", () => {
+                    currentPage = i;
+                    renderTablePage(currentPage);
+                    renderPaginationButtons();
+                });
+                paginationButtons.appendChild(button);
+            }
+        }
+
+        // Initialize pagination
+        if (rows.length > 0) {
+            renderTablePage(currentPage);
+            renderPaginationButtons();
+        }
+    });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const searchInput = document.querySelector(".total-users-search");
+        const tableBody = document.getElementById("userTableBody");
+
+        searchInput.addEventListener("input", function () {
+            const query = searchInput.value.toLowerCase();
+            const rows = tableBody.querySelectorAll("tr");
+            let matchFound = false;
+
+            rows.forEach(row => {
+                const rowText = row.textContent.toLowerCase();
+                const isMatch = rowText.includes(query);
+                row.style.display = isMatch ? "" : "none";
+                if (isMatch) matchFound = true;
+            });
+
+            // Show "Not found" if no match
+            let noResultRow = tableBody.querySelector(".no-result");
+            if (!matchFound) {
+                if (!noResultRow) {
+                    noResultRow = document.createElement("tr");
+                    noResultRow.classList.add("no-result");
+                    noResultRow.innerHTML = `<td colspan="6" style="text-align:center; color:#999;">Not found</td>`;
+                    tableBody.appendChild(noResultRow);
+                }
+            } else {
+                if (noResultRow) noResultRow.remove();
+            }
+        });
+    });
+</script>
+

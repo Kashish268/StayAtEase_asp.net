@@ -447,7 +447,8 @@ namespace WebApplication1.Controllers
                     AddedBy = reader["AddedBy"].ToString(),
                     TotalReviews = Convert.ToInt32(reader["TotalReviews"]),
                     TotalInquiries = Convert.ToInt32(reader["TotalInquiries"]),
-                    Status = reader["IsAvailable"] != DBNull.Value ? Convert.ToInt32(reader["IsAvailable"]).ToString() : "Active"
+                    Status = reader["IsAvailable"] != DBNull.Value && Convert.ToBoolean(reader["IsAvailable"]) ? "Available" : "Unavailable"
+
 
 
                 });
@@ -850,6 +851,57 @@ public IActionResult Total_Properties(int id)
                 }
                 con.Close();
             }
+        }
+
+
+        public IActionResult Payment_Details()
+        {
+            var payments = new List<PaymentDisplayViewModel>();
+
+            using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+            {
+                string query = @"
+            SELECT 
+                p.PaymentId,
+                p.OrderId,
+                pr.Title AS PropertyTitle,    
+                u.name AS UserName,           
+                p.PaymentGateway,
+                p.Amount,
+                p.PaymentStatus,
+         
+                p.RazorpayPaymentId,
+      
+                p.PaymentDate
+            FROM Payments p
+            INNER JOIN Properties pr ON p.PropertyId = pr.PropertyId
+            INNER JOIN users u ON p.UserId = u.user_id
+            ORDER BY p.PaymentDate DESC;";
+
+                SqlCommand cmd = new SqlCommand(query, conn);
+                conn.Open();
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    payments.Add(new PaymentDisplayViewModel
+                    {
+                        PaymentId = Convert.ToInt32(reader["PaymentId"]),
+                        OrderId = reader["OrderId"].ToString(),
+                        PropertyTitle = reader["PropertyTitle"].ToString(),
+                        UserName = reader["UserName"].ToString(),
+                        PaymentGateway = reader["PaymentGateway"].ToString(),
+                        Amount = Convert.ToDecimal(reader["Amount"]),
+                        PaymentStatus = reader["PaymentStatus"].ToString(),
+                       
+                        RazorpayPaymentId = reader["RazorpayPaymentId"].ToString(),
+                      
+                        PaymentDate = Convert.ToDateTime(reader["PaymentDate"])
+                    });
+                }
+            }
+
+            return View(payments);
         }
 
 

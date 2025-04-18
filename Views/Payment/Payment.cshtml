@@ -1,0 +1,68 @@
+﻿@model WebApplication1.Models.PaymentViewModel
+@{
+    ViewBag.Title = "Payment";
+    var isLoggedIn = ViewBag.IsLoggedIn as bool?;
+}
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<div class="p-5" style="background-color:#F9FAFB;">
+    <h2 class="fw-bold" style="letter-spacing:0.1px; margin-left:12px;">Payment</h2>
+    <p style="letter-spacing:0.1px; margin-left:12px;color:#64748B;">Secure your selected property</p>
+
+    <div class="row justify-content-center">
+        @if (isLoggedIn == false)
+        {
+            <div class="col-12 d-flex justify-content-center">
+                <div class="card shadow-sm" style="width: 600px; border-radius: 20px; overflow: hidden;">
+                    <img src="/assets/without_login.jpg" class="card-img-top" alt="Property Image" style="height: 250px; object-fit: cover;">
+
+                    <div class="card-body text-center">
+                        <h5 class="card-title text-danger fw-bold">Please login before proceeding to payment.</h5>
+                        <p class="card-text text-muted">You need to be logged in to complete your payment.</p>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            var details = ViewBag.PaymentDetails as WebApplication1.Models.PaymentViewModel;
+            if (details != null)
+            {
+                <div class="col-md-6">
+                    <div class="card shadow-sm" style="border-radius: 20px; overflow: hidden;">
+                        <!-- Property Image -->
+
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold">@details.PropertyTitle</h5>
+                            <p class="text-muted">📍 @details.PropertyLocation</p>
+
+                            <div class="d-flex justify-content-between text-muted mb-2">
+                                <span><strong>User ID:</strong> @details.UserId</span>
+                                <span><strong>Property ID:</strong> @details.PropertyId</span>
+                            </div>
+
+                            <h6 class="text-success fw-bold mb-3">Rent Amount: ₹@details.RentAmount</h6>
+
+                            <form method="post" action="/Payment/ProceedPayment">
+                                <input type="hidden" name="userId" value="@details.UserId" />
+                                <input type="hidden" name="propertyId" value="@details.PropertyId" />
+                                <input type="hidden" name="amount" value="@details.RentAmount" />
+                                <button type="submit" class="btn btn-primary w-100">Proceed to Pay</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="col-md-6">
+                    <div class="card shadow-sm text-center p-4">
+                        <h5 class="text-danger fw-bold">Error: Payment details are missing.</h5>
+                        <p class="text-muted">Please go back and select a property again.</p>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>

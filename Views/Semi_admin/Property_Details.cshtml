@@ -7,19 +7,15 @@
 
 <link rel="stylesheet" href="~/Content/site.css" />
 
-@if (Model.Reviews != null && Model.Reviews.Any())
-{
-    <span>Average Rating: @Model.Reviews.Average(r => r.Rating).ToString("0.0")</span>
-}
 
 
 <div class="apartment-container">
     <header class="apartment-header">
         <div class="header-left">
             <h1 class="apartment-title">@Model.Title</h1>
-            <span class="apartment-status">
+            @* <span class="apartment-status">
                 <i class="fas fa-check-circle status-icon"></i> Available
-            </span>
+            </span> *@
         </div>
         <div class="header-right">
             <div class="review-button">

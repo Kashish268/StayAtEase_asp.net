@@ -1,0 +1,61 @@
+﻿@{
+    ViewData["Title"] = "PaymentConformation";
+}
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<div class="p-5" style="background-color:#F9FAFB;">
+    <h2 class="fw-bold" style="letter-spacing:0.1px; margin-left:12px;">Confirm Payment</h2>
+    <p style="letter-spacing:0.1px; margin-left:12px;color:#64748B;">Complete your transaction securely</p>
+
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm p-4" style="border-radius: 20px;">
+                <div class="card-body text-center">
+
+                    <h4 class="fw-bold text-success mb-3">Pay Now</h4>
+
+                    <p class="mb-2"><strong>Order ID:</strong> <span class="text-muted">@ViewBag.orderId</span></p>
+                    <p class="mb-4"><strong>Amount:</strong> ₹@ViewBag.Amount</p>
+
+                    <!-- Auto trigger Razorpay -->
+                    <script>
+                        var options = {
+                            "key": "@ViewBag.Key",
+                            "amount": "@((decimal)ViewBag.Amount * 100)",
+                            "currency": "INR",
+                            "name": "StayAtEase",
+                            "description": "Property Rent Payment",
+                            "order_id": "@ViewBag.orderId",
+                            "handler": function (response) {
+                                fetch('/Payment/VerifyPayment', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                                    body: `razorpayPaymentId=${response.razorpay_payment_id}&orderId=${response.razorpay_order_id}&razorpaySignature=${response.razorpay_signature}`
+                                }).then(response => window.location.href = response.url);
+                            },
+                            "prefill": {
+                                "name": "Test User",
+                                "email": "test@example.com"
+                            },
+                            "theme": { "color": "#F37254" }
+                        };
+                        var rzp1 = new Razorpay(options);
+                        rzp1.open();
+                    </script>
+
+                    <div class="mt-4">
+                        <h6 class="fw-bold text-secondary">Manual Verification (Fallback)</h6>
+                        <form method="post" action="/Payment/VerifyPayment" class="mt-2">
+                            <input type="hidden" name="orderId" value="@ViewBag.OrderId" />
+                            <input type="hidden" name="razorpayPaymentId" value="your_payment_id_here" />
+                            <input type="hidden" name="razorpaySignature" value="your_signature_here" />
+                            <button type="submit" class="btn btn-outline-primary w-100 mt-2">Verify Payment Manually</button>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

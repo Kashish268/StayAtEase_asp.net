@@ -21,6 +21,12 @@
 
         public string RatingDisplay => Rating > 0 ? Rating.ToString("0.0") : "N/A";
 
-
+       
+    }
+    public class Review
+    {
+        public int ReviewID { get; set; }
+        public int Rating { get; set; }
+        public string Comment { get; set; }
     }
 }

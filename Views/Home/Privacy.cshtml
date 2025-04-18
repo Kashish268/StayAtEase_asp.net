@@ -42,11 +42,18 @@
             @*     <option value="30001">Above ₹30,000</option> *@
             @* </select> *@
 
-            <div class="d-flex align-items-center">
-                <label class="me-2 fw-bold">Price:</label>
-                <input type="range" min="1000" max="30000" step="1000" class="form-range" style="width: 150px;" value="30000">
-                <span id="priceValue" class="ms-2 fw-bold">₹30000</span>
+            <div class="d-flex flex-column">
+                <label class="fw-bold mb-1">Price:</label>
+                <div class="d-flex align-items-center">
+                    <input type="range" id="priceRange" min="1000" max="30000" step="1000" class="form-range" style="width: 200px;" value="30000">
+                    <span id="priceValue" class="ms-3 fw-bold">₹30000</span>
+                </div>
+                <div class="d-flex justify-content-between mt-1 px-1" style="width: 200px;">
+                    <small>₹1,000</small>
+                    <small>₹30,000+</small>
+                </div>
             </div>
+
         </div>
         </div>
 
@@ -329,6 +336,108 @@
         });
     });
 
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // DOM elements
+        const searchInput = document.querySelector('input.search-input');
+        const propertyTypeSelect = document.getElementById('propertyType');
+        const priceRange = document.querySelector('input[type="range"]');
+        const priceValue = document.getElementById('priceValue');
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const propertyCards = document.querySelectorAll('.property-card');
+
+        // URL filter values
+        const initialLocation = document.getElementById('initialLocation').value;
+        const initialPropertyType = document.getElementById('initialPropertyType').value;
+        const initialPriceRange = document.getElementById('initialPriceRange').value;
+
+        // Set initial filters if available
+        if (initialLocation) searchInput.value = initialLocation;
+        if (initialPropertyType) propertyTypeSelect.value = initialPropertyType;
+        if (initialPriceRange) {
+            let maxPrice = 30000;
+            if (initialPriceRange === "30001") {
+                maxPrice = 30001;
+            } else if (initialPriceRange.includes('-')) {
+                maxPrice = parseInt(initialPriceRange.split('-')[1]);
+            }
+            priceRange.value = maxPrice;
+            priceValue.textContent = `₹${maxPrice}`;
+        } else {
+            priceRange.value = 30000;
+            priceValue.textContent = `₹30000`;
+        }
+
+        // Event listeners
+        searchInput.addEventListener('input', filterProperties);
+        propertyTypeSelect.addEventListener('change', filterProperties);
+        priceRange.addEventListener('input', function () {
+            priceValue.textContent = `₹${this.value}`;
+            filterProperties();
+        });
+
+        filterButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                this.classList.toggle('active');
+                filterProperties();
+            });
+        });
+
+        // Main filter function
+        function filterProperties() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const selectedType = propertyTypeSelect.value.toLowerCase();
+            const maxPrice = parseInt(priceRange.value);
+            const activeFilters = Array.from(document.querySelectorAll('.filter-btn.active'))
+                .map(btn => btn.textContent.trim());
+
+            propertyCards.forEach(card => {
+                const title = card.dataset.title || '';
+                const location = card.dataset.location || '';
+                const type = card.dataset.type || '';
+                const price = parseInt(card.dataset.price) || 0;
+                const dateStr = card.dataset.date;
+                const date = dateStr ? new Date(dateStr) : new Date();
+
+                const matchesSearch = searchTerm === '' || title.includes(searchTerm) || location.includes(searchTerm);
+                const matchesType = selectedType === '🏠 property type' || selectedType === type;
+                const matchesPrice = price <= maxPrice;
+
+                let matchesFilters = true;
+                if (activeFilters.includes('New')) {
+                    const oneWeekAgo = new Date();
+                    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+                    matchesFilters = matchesFilters && (date >= oneWeekAgo);
+                }
+
+                card.style.display = (matchesSearch && matchesType && matchesPrice && matchesFilters) ? 'block' : 'none';
+            });
+
+            if (activeFilters.includes('Price Ascending') || activeFilters.includes('Price Descending')) {
+                sortProperties(activeFilters.includes('Price Ascending') ? 'asc' : 'desc');
+            }
+        }
+
+        // Sorting function
+        function sortProperties(order) {
+            const container = document.querySelector('.row');
+            const cards = Array.from(container.querySelectorAll('.property-card'))
+                .filter(card => card.style.display === 'block');
+
+            cards.sort((a, b) => {
+                const priceA = parseInt(a.dataset.price) || 0;
+                const priceB = parseInt(b.dataset.price) || 0;
+                return order === 'asc' ? priceA - priceB : priceB - priceA;
+            });
+
+            cards.forEach(card => container.appendChild(card));
+        }
+
+        // Initial apply
+        filterProperties();
+    });
 </script>
 
 

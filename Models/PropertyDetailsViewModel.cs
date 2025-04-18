@@ -24,6 +24,13 @@ namespace WebApplication1.Models
         public double AverageRating { get; set; }
         public List<ReviewModel> Reviews { get; set; }
         public List<InquiryModel> Inquiries { get; set; }
+
+        public string OwnerProfilePic { get; set; }
+        public bool IsPaymentDone { get; set; }
+
+        public Review UserReview { get; set; }
+
+
     }
 
     public class ReviewModel
@@ -34,9 +41,12 @@ namespace WebApplication1.Models
         public DateTime Date { get; set; }
         public int Rating { get; set; }
         public string Comment { get; set; }
+
+        public string ProfilePic { get; set; }
         
 
     }
+
 
     public class InquiryModel
     {

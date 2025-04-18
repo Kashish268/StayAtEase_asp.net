@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Globalization;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 
 namespace WebApplication1.Controllers
@@ -309,22 +310,163 @@ GROUP BY
         //    return View();
         //}
 
+        /* public IActionResult Property_details(int id)
+         {
+             string connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+             var propertyDetails = new PropertyDetailsViewModel();
+             var reviews = new List<ReviewModel>();
+             var inquiries = new List<InquiryModel>();
+
+             using (SqlConnection conn = new SqlConnection(connectionString))
+             {
+                 conn.Open();
+
+                 using (SqlCommand cmd = new SqlCommand(@"
+     SELECT p.*, u.name AS OwnerName, u.email AS OwnerEmail, u.mobile AS OwnerMobile, u.profile_pic AS OwnerProfilePic
+     FROM Properties p
+     INNER JOIN users u ON u.user_id = p.UserId
+     WHERE p.PropertyId = @PropertyId", conn))
+                 {
+                     cmd.Parameters.AddWithValue("@PropertyId", id);
+
+                     using (SqlDataReader reader = cmd.ExecuteReader())
+                     {
+                         if (reader.Read())
+                         {
+                             propertyDetails.PropertyId = reader["PropertyId"].ToString();
+                             propertyDetails.Title = reader["Title"].ToString();
+                             propertyDetails.Address = reader["Address"].ToString();
+                             propertyDetails.Price = (decimal)reader["Price"];
+                             propertyDetails.SquareFootage = (int)reader["SquareFootage"];
+                             propertyDetails.Bedrooms = (int)reader["Bedrooms"];
+                             propertyDetails.Bathrooms = (int)reader["Bathrooms"];
+                             propertyDetails.ImageUrl = reader["ImagePaths"]?.ToString();
+
+                             // Fetch owner info
+                             propertyDetails.OwnerName = reader["OwnerName"].ToString();
+                             propertyDetails.OwnerEmail = reader["OwnerEmail"].ToString();
+                             propertyDetails.OwnerMobile = reader["OwnerMobile"].ToString();
+                             propertyDetails.OwnerProfilePic = reader["OwnerProfilePic"].ToString();
+                         }
+                     }
+                 }
+
+
+
+                 // Fetch Reviews
+                 using (SqlCommand cmd = new SqlCommand(@"SELECT r.ReviewId, r.Comment, r.Rating, r.ReviewDate,  u.profile_pic,
+                                             u.Name AS ReviewerName, p.Title 
+                                         FROM Reviews r
+                                         INNER JOIN Users u ON u.user_id = r.UserId
+                                         INNER JOIN Properties p ON p.PropertyId = r.PropertyId
+                                         WHERE r.PropertyId = @PropertyId", conn))
+                 {
+                     cmd.Parameters.AddWithValue("@PropertyId", id);
+                     using (SqlDataReader reader = cmd.ExecuteReader())
+                     {
+                        while (reader.Read())
+ {
+     var review = new ReviewModel
+     {
+         ReviewId = (int)reader["ReviewId"],
+         Comment = reader["Comment"].ToString(),
+         // Handle decimal to int conversion for Rating
+         Rating = reader["Rating"] != DBNull.Value ? Convert.ToInt32(reader["Rating"]) : 0, 
+         Date = (DateTime)reader["ReviewDate"],
+         ReviewerName = reader["ReviewerName"].ToString(),
+         PropertyTitle = reader["Title"].ToString(),
+         ProfilePic = reader["profile_pic"].ToString()
+     };
+     reviews.Add(review);
+ }
+
+                     }
+                 }
+
+
+                 // Fetch Inquiries
+
+
+                 propertyDetails.Reviews = reviews;
+
+                 //string currentUserId = User.FindFirst("user_id")?.Value;
+                 int? currentUserId = HttpContext.Session.GetInt32("UserId");
+
+                 if (currentUserId.HasValue)
+                 {
+                     using (SqlCommand cmd = new SqlCommand(@"
+         SELECT COUNT(*) 
+         FROM Payments 
+         WHERE PropertyId = @PropertyId AND UserId = @UserId", conn))
+                     {
+                         cmd.Parameters.AddWithValue("@PropertyId", id);
+                         cmd.Parameters.AddWithValue("@UserId", currentUserId.Value);
+
+                         int count = (int)cmd.ExecuteScalar();
+                         propertyDetails.IsPaymentDone = count > 0;
+                     }
+                 }
+                 else
+                 {
+                     Console.WriteLine("UserId not found in session (as int).");
+                     propertyDetails.IsPaymentDone = false;
+                 }
+
+                 if (userId.HasValue)
+                 {
+                     using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+                     {
+                         string query = "SELECT TOP 1 * FROM Reviews WHERE PropertyID = @PropertyID AND UserID = @UserID";
+                         using (SqlCommand cmd = new SqlCommand(query, conn))
+                         {
+                             cmd.Parameters.AddWithValue("@PropertyID", id);
+                             cmd.Parameters.AddWithValue("@UserID", userId);
+
+                             conn.Open();
+                             using (SqlDataReader reader = cmd.ExecuteReader())
+                             {
+                                 if (reader.Read())
+                                 {
+                                     model.UserReview = new Review
+                                     {
+                                         ReviewID = Convert.ToInt32(reader["ReviewID"]),
+                                         Rating = Convert.ToInt32(reader["Rating"]),
+                                         Comment = reader["Comment"].ToString()
+                                     };
+                                 }
+                             }
+                         }
+                     }
+                 }
+
+             }
+
+
+
+             // Return the propertyDetails to the view
+             return View(propertyDetails);
+         }*/
+
         public IActionResult Property_details(int id)
         {
             string connectionString = _configuration.GetConnectionString("DefaultConnection");
 
             var propertyDetails = new PropertyDetailsViewModel();
             var reviews = new List<ReviewModel>();
-            var inquiries = new List<InquiryModel>();
 
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 conn.Open();
 
-                using (SqlCommand cmd = new SqlCommand("SELECT * FROM Properties WHERE PropertyId = @PropertyId", conn))
+                // Fetch Property + Owner Info
+                using (SqlCommand cmd = new SqlCommand(@"
+            SELECT p.*, u.name AS OwnerName, u.email AS OwnerEmail, u.mobile AS OwnerMobile, u.profile_pic AS OwnerProfilePic
+            FROM Properties p
+            INNER JOIN users u ON u.user_id = p.UserId
+            WHERE p.PropertyId = @PropertyId", conn))
                 {
                     cmd.Parameters.AddWithValue("@PropertyId", id);
-
                     using (SqlDataReader reader = cmd.ExecuteReader())
                     {
                         if (reader.Read())
@@ -336,56 +478,133 @@ GROUP BY
                             propertyDetails.SquareFootage = (int)reader["SquareFootage"];
                             propertyDetails.Bedrooms = (int)reader["Bedrooms"];
                             propertyDetails.Bathrooms = (int)reader["Bathrooms"];
-
-                            // Add this line to fetch image paths
                             propertyDetails.ImageUrl = reader["ImagePaths"]?.ToString();
+
+                            propertyDetails.OwnerName = reader["OwnerName"].ToString();
+                            propertyDetails.OwnerEmail = reader["OwnerEmail"].ToString();
+                            propertyDetails.OwnerMobile = reader["OwnerMobile"].ToString();
+                            propertyDetails.OwnerProfilePic = reader["OwnerProfilePic"].ToString();
                         }
                     }
                 }
 
-
                 // Fetch Reviews
-                using (SqlCommand cmd = new SqlCommand(@"SELECT r.ReviewId, r.Comment, r.Rating, r.ReviewDate, 
-                                            u.Name AS ReviewerName, p.Title 
-                                        FROM Reviews r
-                                        INNER JOIN Users u ON u.user_id = r.UserId
-                                        INNER JOIN Properties p ON p.PropertyId = r.PropertyId
-                                        WHERE r.PropertyId = @PropertyId", conn))
+                using (SqlCommand cmd = new SqlCommand(@"
+            SELECT r.ReviewId, r.Comment, r.Rating, r.ReviewDate, u.profile_pic,
+                   u.Name AS ReviewerName, p.Title 
+            FROM Reviews r
+            INNER JOIN Users u ON u.user_id = r.UserId
+            INNER JOIN Properties p ON p.PropertyId = r.PropertyId
+            WHERE r.PropertyId = @PropertyId", conn))
                 {
                     cmd.Parameters.AddWithValue("@PropertyId", id);
                     using (SqlDataReader reader = cmd.ExecuteReader())
                     {
-                       while (reader.Read())
-{
-    var review = new ReviewModel
-    {
-        ReviewId = (int)reader["ReviewId"],
-        Comment = reader["Comment"].ToString(),
-        // Handle decimal to int conversion for Rating
-        Rating = reader["Rating"] != DBNull.Value ? Convert.ToInt32(reader["Rating"]) : 0, 
-        Date = (DateTime)reader["ReviewDate"],
-        ReviewerName = reader["ReviewerName"].ToString(),
-        PropertyTitle = reader["Title"].ToString()
-    };
-    reviews.Add(review);
-}
-
+                        while (reader.Read())
+                        {
+                            reviews.Add(new ReviewModel
+                            {
+                                ReviewId = (int)reader["ReviewId"],
+                                Comment = reader["Comment"].ToString(),
+                                Rating = reader["Rating"] != DBNull.Value ? Convert.ToInt32(reader["Rating"]) : 0,
+                                Date = (DateTime)reader["ReviewDate"],
+                                ReviewerName = reader["ReviewerName"].ToString(),
+                                PropertyTitle = reader["Title"].ToString(),
+                                ProfilePic = reader["profile_pic"].ToString()
+                            });
+                        }
                     }
                 }
 
-
-                // Fetch Inquiries
-
-
                 propertyDetails.Reviews = reviews;
-              
+
+                // Get current user ID from session
+                int? userId = HttpContext.Session.GetInt32("UserId");
+
+                if (userId.HasValue)
+                {
+                    // Check if payment is done
+                    using (SqlCommand cmd = new SqlCommand(@"
+                SELECT COUNT(*) 
+                FROM Payments 
+                WHERE PropertyId = @PropertyId AND UserId = @UserId", conn))
+                    {
+                        cmd.Parameters.AddWithValue("@PropertyId", id);
+                        cmd.Parameters.AddWithValue("@UserId", userId.Value);
+                        int count = (int)cmd.ExecuteScalar();
+                        propertyDetails.IsPaymentDone = count > 0;
+                    }
+
+                    // Check if user has already submitted a review
+                    using (SqlCommand cmd = new SqlCommand(@"
+                SELECT TOP 1 * 
+                FROM Reviews 
+                WHERE PropertyID = @PropertyID AND UserID = @UserID", conn))
+                    {
+                        cmd.Parameters.AddWithValue("@PropertyID", id);
+                        cmd.Parameters.AddWithValue("@UserID", userId.Value);
+
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                propertyDetails.UserReview = new Review
+                                {
+                                    ReviewID = Convert.ToInt32(reader["ReviewID"]),
+                                    Rating = Convert.ToInt32(reader["Rating"]),
+                                    Comment = reader["Comment"].ToString()
+                                };
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    propertyDetails.IsPaymentDone = false;
+                }
             }
 
-            // Return the propertyDetails to the view
             return View(propertyDetails);
         }
 
+        [HttpPost]
+        public IActionResult UpdateReview(int reviewId, int propertyId, int rating, string comment)
+        {
+            if (rating == 0 || string.IsNullOrWhiteSpace(comment))
+            {
+                TempData["ErrorMessage"] = "Rating and comment are required.";
+                return RedirectToAction("Property_details", new { id = propertyId });
+            }
 
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+                {
+                    string query = @"UPDATE Reviews 
+                             SET Rating = @Rating, Comment = @Comment, ReviewDate = @UpdatedAt 
+                             WHERE ReviewID = @ReviewID";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@Rating", rating);
+                        cmd.Parameters.AddWithValue("@Comment", comment);
+                        cmd.Parameters.AddWithValue("@UpdatedAt", DateTime.Now);
+                        cmd.Parameters.AddWithValue("@ReviewID", reviewId);
+
+                        conn.Open();
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+
+                TempData["SuccessMessage"] = "Review updated successfully.";
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "Error updating review: " + ex.Message;
+            }
+
+            return RedirectToAction("Property_details", new { id = propertyId });
+        }
 
         [HttpGet]
         public IActionResult Profile_details()

@@ -107,6 +107,7 @@
                                     @(property.p.IsAvailable ? "Available" : "Unavailable")
                                 </span>
                             </td>
+
                             <td class="py-3">
                                 <a asp-route-id="@property.p.Id" class="btn btn-sm btn-primary @(ViewData["ActivePage"] == "Property_Details" ? "active" : "")"
                                    asp-controller="Semi_admin" asp-action="Property_Details">

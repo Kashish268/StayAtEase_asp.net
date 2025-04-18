@@ -431,7 +431,7 @@ namespace WebApplication1.Controllers
 
 
         // Profile Action
-      
+
         [HttpGet]
         public async Task<IActionResult> Property_List(string? searchTerm, int page = 1, string filter = "all")
         {
@@ -457,7 +457,7 @@ namespace WebApplication1.Controllers
 
                 // Adjust query to only use existing columns
                 string query = @"
-        SELECT PropertyId, Title, Price, SquareFootage, Address, ImagePaths 
+        SELECT PropertyId, Title, Price, SquareFootage, Address, ImagePaths , IsAvailable
         FROM Properties 
         WHERE UserId = @UserId";
 
@@ -482,23 +482,19 @@ namespace WebApplication1.Controllers
                                 ? rawImagePaths.Split(',').Select(p => p.Trim()).ToList()
                                 : new List<string>();
 
-                           bool hasIsAvailable = Enumerable.Range(0, reader.FieldCount)
-                                .Select(reader.GetName)
-                                .Contains("IsAvailable", StringComparer.OrdinalIgnoreCase);
-
-properties.Add(new PropertyViewModel
-{
-    Id = Convert.ToInt32(reader["PropertyId"]),
-    Title = reader["Title"].ToString(),
-    Price = Convert.ToDecimal(reader["Price"]),
-    Area = Convert.ToInt32(reader["SquareFootage"]),
-    Address = reader["Address"].ToString(),
-    IsAvailable = hasIsAvailable && !reader.IsDBNull(reader.GetOrdinal("IsAvailable")) && reader.GetBoolean(reader.GetOrdinal("IsAvailable")),
-    ImageUrl = reader["ImagePaths"].ToString()?.Split(',').FirstOrDefault()
-});
-
+                            // No need to use `IsAvailable` outside properties.Add
+                            properties.Add(new PropertyViewModel
+                            {
+                                Id = Convert.ToInt32(reader["PropertyId"]),
+                                Title = reader["Title"].ToString(),
+                                Price = Convert.ToDecimal(reader["Price"]),
+                                Area = Convert.ToInt32(reader["SquareFootage"]),
+                                Address = reader["Address"].ToString(),
+                                // Get IsAvailable properly from the reader
+                                IsAvailable = !reader.IsDBNull(reader.GetOrdinal("IsAvailable")) && reader.GetBoolean(reader.GetOrdinal("IsAvailable")),
+                                ImageUrl = reader["ImagePaths"].ToString()?.Split(',').FirstOrDefault()
+                            });
                         }
-
                     }
                 }
             }
