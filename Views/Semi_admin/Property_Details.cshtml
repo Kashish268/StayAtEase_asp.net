@@ -5,34 +5,39 @@
     ViewData["Title"] = "Property Details";
 }
 
-
-
 <link rel="stylesheet" href="~/Content/site.css" />
+
+@if (Model.Reviews != null && Model.Reviews.Any())
+{
+    <span>Average Rating: @Model.Reviews.Average(r => r.Rating).ToString("0.0")</span>
+}
+
 
 <div class="apartment-container">
     <header class="apartment-header">
         <div class="header-left">
             <h1 class="apartment-title">@Model.Title</h1>
-            <span class="apartment-status"><i class="fas fa-check-circle status-icon"></i> Available</span>
+            <span class="apartment-status">
+                <i class="fas fa-check-circle status-icon"></i> Available
+            </span>
         </div>
         <div class="header-right">
             <div class="review-button">
-                <div class="apartment-rating">
-                    <i class="fas fa-star rating-icon"></i> 
-                    @Model.Reviews.Average(r => r.Rating).ToString("0.0") 
-                    (@Model.Reviews.Count reviews)
-                </div>
+                @if (Model.Reviews.Any())
+                {
+                    <div class="apartment-rating">
+                        <i class="fas fa-star rating-icon"></i>
+                        @Model.Reviews.Average(r => r.Rating).ToString("0.0")
+                        (@Model.Reviews.Count reviews)
+                    </div>
+                }
                 <div class="apartment-actions">
-                    <a asp-route-id="@Model.PropertyId"
-                       asp-controller="Semi_admin"
+                    <a asp-controller="Semi_admin"
                        asp-action="Edit_Property"
+                       asp-route-id="@Model.PropertyId"
                        class="btn btn-sm btn-primary @(ViewData["ActivePage"] == "Edit_Property" ? "active" : "")">
-                        <i class="fas fa-eye"></i> View
+                        <i class="fas fa-eye"></i> Edit
                     </a>
-
-
-
-                
                 </div>
             </div>
             <div class="apartment-user">
@@ -44,21 +49,23 @@
     </header>
 
     <section class="apartment-main-image">
-        <img src="@Model.ImageUrl" alt="Apartment Image" class="main-image">
+        <img src="@Model.ImageUrl" alt="Main Apartment Image" class="main-image" />
     </section>
 
     <section class="apartment-gallery">
-        <!-- Placeholder gallery; you can loop through additional image URLs if available -->
-        <img src="@Model.ImageUrl" alt="Interior 1" class="gallery-image" />
-        <img src="@Model.ImageUrl" alt="Interior 2" class="gallery-image" />
-        <img src="@Model.ImageUrl" alt="Interior 3" class="gallery-image" />
-        <img src="@Model.ImageUrl" alt="Interior 4" class="gallery-image" />
+        @{
+            var imageUrls = Model.ImageUrl?.Split(',') ?? new string[0];
+        }
+        @foreach (var img in imageUrls.Take(4))
+        {
+            <img src="@img" alt="Gallery Image" class="gallery-image" />
+        }
     </section>
 
     <section class="apartment-about">
         <h2 class="about-title">About Property</h2>
         <p class="about-description">
-            <!-- Replace with actual property description if available -->
+            <!-- Placeholder description -->
             This stunning apartment offers modern living at its finest...
         </p>
     </section>
@@ -70,7 +77,7 @@
 
     <section class="apartment-details">
         <div class="detail-item">
-            <h4 class="detail-title"><i class="fas fa-home detail-icon"></i> 75 m²</h4>
+            <h4 class="detail-title"><i class="fas fa-home detail-icon"></i> @Model.SquareFootage m²</h4>
             <p class="detail-text">Square Footage</p>
         </div>
         <div class="detail-item">
@@ -78,97 +85,112 @@
             <p class="detail-text">Address</p>
         </div>
         <div class="detail-item">
-            <h4 class="detail-title"><i class="fas fa-building detail-icon"></i> Apartment</h4>
+            <h4 class="detail-title"><i class="fas fa-building detail-icon"></i> @Model.PropertyType</h4>
             <p class="detail-text">Property Type</p>
         </div>
     </section>
 
     <section class="apartment-specs">
         <div class="spec-item">
-            <h4 class="spec-title"><i class="fas fa-bed spec-icon"></i> 2 Bedrooms</h4>
+            <h4 class="spec-title"><i class="fas fa-bed spec-icon"></i> @Model.Bedrooms Bedroom@(Model.Bedrooms > 1 ? "s" : "")</h4>
             <p class="spec-text">Spacious rooms</p>
         </div>
         <div class="spec-item">
-            <h4 class="spec-title"><i class="fas fa-bath spec-icon"></i> 1 Bathroom</h4>
+            <h4 class="spec-title"><i class="fas fa-bath spec-icon"></i> @Model.Bathrooms Bathroom@(Model.Bathrooms > 1 ? "s" : "")</h4>
             <p class="spec-text">Modern fixtures</p>
         </div>
     </section>
+
 </div>
 
 <div class="total-users-container" style="max-width: 1400px;">
-    <h2 class="total-users-title" style="margin-bottom:30px;">Reviews For @Model.Title</h2>
-    <div class="total-users-table-container">
-        <table class="total-users-table">
-            <thead>
-                <tr>
-                    <th>Property ID</th>
-                    <th>Property Title</th>
-                    <th>Reviewer</th>
-                    <th>Date</th>
-                    <th>Rating</th>
-                    <th>Review</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var review in Model.Reviews)
-                {
+    <h2 class="total-users-title mb-4">Reviews For @Model.Title</h2>
+    @if (Model.Reviews.Any())
+    {
+        <div class="total-users-table-container">
+            <table class="total-users-table">
+                <thead>
                     <tr>
-                        <td>@Model.PropertyId</td>
-                        <td>@Model.Title</td>
-                        <td>@review.ReviewerName</td>
-                        <td>@review.Date.ToString("dd-MM-yyyy")</td>
-                        <td>@review.Rating</td>
-                        <td>@review.Comment</td>
-                        <td>
-                            <form method="post" action="@Url.Action("DeleteReview", "Semi_admin")">
-                                <input type="hidden" name="reviewId" value="@review.ReviewId" />
-                                <input type="hidden" name="propertyId" value="@Model.PropertyId" />
-                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                            </form>
-                        </td>
+                        <th>Property ID</th>
+                        <th>Property Title</th>
+                        <th>Reviewer</th>
+                        <th>Date</th>
+                        <th>Rating</th>
+                        <th>Review</th>
+                        <th>Action</th>
                     </tr>
-                }
-            </tbody>
-        </table>
-    </div>
+                </thead>
+                <tbody>
+                    @foreach (var review in Model.Reviews)
+                    {
+                        <tr>
+                            <td>@Model.PropertyId</td>
+                            <td>@Model.Title</td>
+                            <td>@review.ReviewerName</td>
+                            <td>@review.Date.ToString("dd-MM-yyyy")</td>
+                            <td>@review.Rating</td>
+                            <td>@review.Comment</td>
+                            <td>
+                                <form method="post" action="@Url.Action("DeleteReview", "Semi_admin")">
+                                    <input type="hidden" name="reviewId" value="@review.ReviewId" />
+                                    <input type="hidden" name="propertyId" value="@Model.PropertyId" />
+                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <p>No reviews found for this property.</p>
+    }
 </div>
 
 <div class="total-users-container" style="max-width: 1400px;">
-    <h2 class="total-users-title" style="margin-bottom:30px;">Inquiries For @Model.Title</h2>
-    <div class="total-users-table-container">
-        <table class="total-users-table">
-            <thead>
-                <tr>
-                    <th>Guest Name</th>
-                    <th>Property ID</th>
-                    <th>Email Address</th>
-                    <th>Contact No</th>
-                    <th>Message</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var inquiry in Model.Inquiries)
-                {
+    <h2 class="total-users-title mb-4">Inquiries For @Model.Title</h2>
+    @if (Model.Inquiries.Any())
+    {
+        <div class="total-users-table-container">
+            <table class="total-users-table">
+                <thead>
                     <tr>
-                        <td>@inquiry.GuestName</td>
-                        <td>@Model.PropertyId</td>
-                        <td>@inquiry.Email</td>
-                        <td>@inquiry.Contact</td>
-                        <td>@inquiry.Message</td>
-                        <td>
-                            <form method="post" action="@Url.Action("DeleteInquiry", "Semi_admin")">
-                                <input type="hidden" name="inquiryId" value="@inquiry.InquiryId" />
-                                <input type="hidden" name="propertyId" value="@Model.PropertyId" />
-                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                            </form>
-                        </td>
+                        <th>Guest Name</th>
+                        <th>Property ID</th>
+                        <th>Email Address</th>
+                        <th>Contact No</th>
+                        <th>Message</th>
+                        <th>Action</th>
                     </tr>
-                }
-            </tbody>
-        </table>
-    </div>
+                </thead>
+                <tbody>
+                    @foreach (var inquiry in Model.Inquiries)
+                    {
+                        <tr>
+                            <td>@inquiry.GuestName</td>
+                            <td>@Model.PropertyId</td>
+                            <td>@inquiry.Email</td>
+                            <td>@inquiry.Contact</td>
+                            <td>@inquiry.Message</td>
+                            <td>
+                                <form method="post" action="@Url.Action("DeleteInquiry", "Semi_admin")">
+                                    <input type="hidden" name="inquiryId" value="@inquiry.InquiryId" />
+                                    <input type="hidden" name="propertyId" value="@Model.PropertyId" />
+                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <p>No inquiries found for this property.</p>
+    }
 </div>
 
 <script src="~/js/site.js"></script>

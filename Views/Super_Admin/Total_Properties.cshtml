@@ -15,17 +15,17 @@
         <div class="property-stat-box">
             <i class="fas fa-building fa-2x"></i>
             <p>Total Properties</p>
-            <h2 id="total-properties">0</h2>
+            <h2 id="total-properties">@Model.TotalProperties</h2>
         </div>
         <div class="property-stat-box">
             <i class="fas fa-list-alt fa-2x"></i>
             <p>Active Listings</p>
-            <h2 id="active-listings">0</h2>
+            <h2 id="active-listings">@Model.ActiveListings</h2>
         </div>
         <div class="property-stat-box">
             <i class="fas fa-comments fa-2x"></i>
             <p>Inquiries</p>
-            <h2 id="total-inquiries">0</h2>
+            <h2 id="total-inquiries">@Model.TotalInquiries</h2>
         </div>
     </div>
 
@@ -59,7 +59,8 @@
             <tbody id="propertyTableBody">
                 @if (Model != null )
                 {
-                    foreach (var property in Model)
+                    foreach (var property in Model.Properties)
+
                     {
                         <tr>
                             <td>
@@ -82,8 +83,8 @@
                             <td>
                                 <!-- Delete Button -->
                                 <form asp-action="Total_Properties" method="post" onsubmit="return confirm('Delete this property?');">
-                                    <a asp-route-id="@property.Id" class="btn btn-sm btn-primary @(ViewData["ActivePage"] == "Property_Details" ? "active" : "")"
-                                       asp-controller="Semi_admin" asp-action="Property_Details">
+                                    <a asp-route-id="@property.Id" class="btn btn-sm btn-primary @(ViewData["ActivePage"] == "Particular_property" ? "active" : "")"
+                                       asp-controller="Super_Admin" asp-action="Particular_property">
                                         <i class="fas fa-eye"></i> View
                                     </a>
 
@@ -167,4 +168,49 @@
             renderPaginationButtons();
         }
     });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const searchInput = document.querySelector(".property-search-input");
+        const filterSelect = document.querySelector(".property-search-select");
+        const tableBody = document.getElementById("propertyTableBody");
+
+        function filterProperties() {
+            const query = searchInput.value.toLowerCase();
+            const selectedType = filterSelect.value.toLowerCase();
+            const rows = tableBody.querySelectorAll("tr");
+
+            let matchFound = false;
+
+            rows.forEach(row => {
+                const rowText = row.textContent.toLowerCase();
+                const rowType = row.cells[0]?.textContent.toLowerCase(); // assuming first cell has type
+
+                const matchesSearch = rowText.includes(query);
+                const matchesType = !selectedType || rowType === selectedType;
+
+                const showRow = matchesSearch && matchesType;
+                row.style.display = showRow ? "" : "none";
+
+                if (showRow) matchFound = true;
+            });
+
+            // Handle "No results found"
+            let noResultRow = tableBody.querySelector(".no-result");
+            if (!matchFound) {
+                if (!noResultRow) {
+                    noResultRow = document.createElement("tr");
+                    noResultRow.classList.add("no-result");
+                    noResultRow.innerHTML = `<td colspan="100%" style="text-align:center; color:#999;">No results found</td>`;
+                    tableBody.appendChild(noResultRow);
+                }
+            } else {
+                if (noResultRow) noResultRow.remove();
+            }
+        }
+
+        searchInput.addEventListener("input", filterProperties);
+        filterSelect.addEventListener("change", filterProperties);
+    });
+
 </script>

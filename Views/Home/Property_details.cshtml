@@ -1,4 +1,6 @@
-﻿@{
+﻿@model WebApplication1.Models.PropertyDetailsViewModel
+
+@{
     ViewData["Title"] = "Property_details";
     var isLoggedIn = Context.Session.GetString("UserId") != null;
 
@@ -14,46 +16,65 @@
             color: #ffcc00;
         }
 </style>
-@model WebApplication1.Models.UserProperty
+
 
 <div class="property-info custom-property">
     <!-- Image & Details Row -->
-    <div class="row align-items-start">
-<h1>PropertyId : @Model.PropertyID</h1>
-        <!-- Main Image Column -->
+    @{
+        var imageList = Model.ImageUrl?.Split(',') ?? new string[0];
+        var hasImages = imageList.Any();
+        var mainImage = hasImages ? imageList[0] : Url.Content("~/assets/default-property.jpg");
+    }
+
+    <div class="row">
+        <!-- Main Image on the left -->
         <div class="col-md-8">
             <div class="main-image-container">
-                <img src="~/assets/Property1.jpg" class="img-fluid w-100 mb-3" 
-                alt="Main Property Image" style="max-height: 500px; object-fit: cover;">
+                <img src="@mainImage" class="img-fluid w-100 mb-3"
+                     alt="Main Property Image" style="max-height: 500px; object-fit: cover;">
             </div>
         </div>
 
-        <!-- Small Images Column -->
+        <!-- Thumbnail Images on the right -->
         <div class="col-md-4 d-flex flex-column">
-            <img src="~/assets/Property4.jpg" class="img-fluid mb-3" 
-            alt="Image 1" style="max-height: 240px; object-fit: cover;">
-            <span class="custom-image-container">
-                <img src="~/assets/Property2.jpg" class="img-fluid mb-3 open-slider"
-                alt="Image 2" style="max-height: 240px; object-fit: cover; "
-                data-bs-target="#imageModal" data-bs-slide-to="0">
-                <span class="custom-overlay">+ 7 more</span>
-            </span>
-            @* <img src="~/assets/Property3.jpg" class="img-fluid mb-3"  *@
-            @*      alt="Image 3" style="max-height: 100px; object-fit: cover;"> *@
-            @* <img src="~/assets/Property5.jpg" class="img-fluid mb-3"  *@
-            @*      alt="Image 4" style="max-height: 100px; object-fit: cover;"> *@
+            @if (hasImages && imageList.Length > 1)
+            {
+                @for (int i = 1; i < imageList.Length; i++)
+                {
+                    <img src="@imageList[i]" class="img-fluid mb-2"
+                         style="max-height: 240px; object-fit: cover;" alt="Property Image" />
+                }
+            }
+            else if (hasImages && imageList.Length == 1)
+            {
+                <!-- Show same image twice if only one image exists -->
+                @for (int i = 0; i < 2; i++)
+                {
+                    <img src="@imageList[0]" class="img-fluid mb-2"
+                         style="max-height: 240px; object-fit: cover;" alt="Repeated Image" />
+                }
+            }
+            else
+            {
+                <!-- Show two default images if no image exists -->
+                <img src="~/assets/default-property.jpg" class="img-fluid mb-2"
+                     style="max-height: 240px; object-fit: cover;" alt="Default Property Image" />
+                <img src="~/assets/default-property.jpg" class="img-fluid mb-2"
+                     style="max-height: 240px; object-fit: cover;" alt="Default Property Image" />
+            }
         </div>
     </div>
 
+
+
     <!-- Property Details & Agent Section -->
     <div class="row mt-4">
-
         <!-- Property Details Column -->
         <div class="col-md-8">
-            <h2 style="font-weight:600; letter-spacing:0.1px;">Luxury Apartment with City View</h2>
-            <p style="color:#4B5563;">123 Park Avenue, Mumbai, Maharashtra</p>
-            <h4 class="text-primary" style="font-weight:600;">₹45,000 / month</h4>
-            <p class="mt-2" style="color:#4B5563;">🛏 4 beds &nbsp; | &nbsp; 🛁 3 baths &nbsp; | &nbsp; 📏 2,450 sq ft</p>
+            <h2 style="font-weight:600; letter-spacing:0.1px;">@Model.Title</h2>
+            <p style="color:#4B5563;">@Model.Address</p>
+            <h4 class="text-primary" style="font-weight:600;">₹@Model.Price / month</h4>
+            <p class="mt-2" style="color:#4B5563;">🛏 @Model.Bedrooms beds &nbsp; | &nbsp; 🛁 @Model.Bathrooms baths &nbsp; | &nbsp; 📏 @Model.SquareFootage sq ft</p>
 
             <!-- Features & Amenities -->
             <h5 class="mt-3 p-3" style="font-weight:600;">Features & Amenities</h5>
@@ -75,22 +96,17 @@
             </div>
 
             <!-- About Property -->
-            <h5 class ="mt-3 p-3" style="font-weight:600;">
-                About this property</h5>
-            <p style="color:#4B5563; margin-left:12px; letter-spacing:0.2px;">
-                This stunning apartment offers modern living at its finest. With breathtaking city views, 
-                premium amenities, and a prime location, it's perfect for those seeking luxury and convenience.
-                The property features high-end finishes, spacious rooms, and state-of-the-art facilities.
-            </p>
+            <h5 class="mt-3 p-3" style="font-weight:600;">About this property</h5>
+           
         </div>
 
         <!-- Agent Contact Column -->
         <div class="col-md-4">
             <div class="agent-card p-3 border rounded shadow-sm">
                 <div class="d-flex align-items-center mb-3">
-                    <img src="~/assets/team-1.jpg" class="rounded-circle me-2" width="50" height="50" alt="Agent Image">
+                    <img src="~/assets/profile.png" class="rounded-circle me-2" width="50" height="50" alt="Agent Image">
                     <div>
-                        <h6 class="mb-0" style="font-weight:600">Michael Anderson</h6>
+                        <h6 class="mb-0" style="font-weight:600">Kashish Koshiys</h6>
                         <small style="color:#4B5563;">Senior Property Consultant</small>
                     </div>
                 </div>
@@ -107,135 +123,39 @@
                 <p style="color:#4B5563;">Sat: 10:00 AM - 4:00 PM</p>
             </div>
         </div>
-
     </div>
 
-
-
-
-
+    <!-- Testimonials Section -->
     <div class="container-fluid bg-body-tertiary py-3">
         <div id="testimonialCarousel" class="carousel">
             <div class="carousel-inner">
-                <div class="carousel-item active">
-                    <div class="card shadow-sm rounded-3">
-                        <div class="quotes display-2 text-body-tertiary">
-                            <i class="bi bi-quote"></i>
-                        </div>
-                        <div class="card-body">
-                            <p class="card-text">
-                                "Some quick example text to build on the card title and make up the
-                                bulk of the card's content."
-                            </p>
-                            <div class="d-flex align-items-center pt-2">
-                                <img src="~/assets/team-1.jpg" alt="bootstrap testimonial carousel slider 2">
-                                <div>
-                                    <h5 class="card-title fw-bold">Jane Doe</h5>
-                                    <span class="text-secondary">CEO, Example Company</span>
-                                    <div class="text-warning">
-                                        ★★★★☆
+                <!-- Loop through reviews -->
+                @foreach (var review in Model.Reviews)
+                {
+                    <div class="carousel-item @((Model.Reviews.IndexOf(review) == 0) ? "active" : "")">
+                        <div class="card shadow-sm rounded-3">
+                            <div class="quotes display-2 text-body-tertiary">
+                                <i class="bi bi-quote"></i>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text">
+                                    "@review.Comment"
+                                </p>
+                                <div class="d-flex align-items-center pt-2">
+                                    <img src="~/assets/testimonial-1.jpg" alt="bootstrap testimonial carousel slider 2">
+                                    <div>
+                                        <h5 class="card-title fw-bold">@review.ReviewerName</h5>
+                                        <span class="text-secondary">@review.Date.ToString("MMM dd, yyyy")</span>
+                                        <div class="text-warning">
+                                            @string.Concat(Enumerable.Repeat("★", review.Rating))
+                                            @string.Concat(Enumerable.Repeat("☆", 5 - review.Rating))
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <div class="carousel-item active">
-                    <div class="card shadow-sm rounded-3">
-                        <div class="quotes display-2 text-body-tertiary">
-                            <i class="bi bi-quote"></i>
-                        </div>
-                        <div class="card-body">
-                            <p class="card-text">
-                                "Some quick example text to build on the card title and make up the
-                                bulk of the card's content."
-                            </p>
-                            <div class="d-flex align-items-center pt-2">
-                                <img src="~/assets/team-2.jpg" alt="bootstrap testimonial carousel slider 2">
-                                <div>
-                                    <h5 class="card-title fw-bold">Jane Doe</h5>
-                                    <span class="text-secondary">CEO, Example Company</span>
-                                    <div class="text-warning">
-                                        ★★★★☆
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="carousel-item active">
-                    <div class="card shadow-sm rounded-3">
-                        <div class="quotes display-2 text-body-tertiary">
-                            <i class="bi bi-quote"></i>
-                        </div>
-                        <div class="card-body">
-                            <p class="card-text">
-                                "Some quick example text to build on the card title and make up the
-                                bulk of the card's content."
-                            </p>
-                            <div class="d-flex align-items-center pt-2">
-                                <img src="~/assets/team-4.jpg" alt="bootstrap testimonial carousel slider 2">
-                                <div>
-                                    <h5 class="card-title fw-bold">Jane Doe</h5>
-                                    <span class="text-secondary">CEO, Example Company</span>
-                                    <div class="text-warning">
-                                        ★★★★☆
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="carousel-item active">
-                    <div class="card shadow-sm rounded-3">
-                        <div class="quotes display-2 text-body-tertiary">
-                            <i class="bi bi-quote"></i>
-                        </div>
-                        <div class="card-body">
-                            <p class="card-text">
-                                "Some quick example text to build on the card title and make up the
-                                bulk of the card's content."
-                            </p>
-                            <div class="d-flex align-items-center pt-2">
-                                <img src="~/assets/testimonial-1.jpg" alt="bootstrap testimonial carousel slider 2">
-                                <div>
-                                    <h5 class="card-title fw-bold">Jane Doe</h5>
-                                    <span class="text-secondary">CEO, Example Company</span>
-                                    <div class="text-warning">
-                                        ★★★★☆
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="carousel-item">
-                    <div class="card shadow-sm rounded-3">
-                        <div class="quotes display-2 text-body-tertiary">
-                            <i class="bi bi-quote"></i>
-                        </div>
-                        <div class="card-body">
-                            <p class="card-text">
-                                "Some quick example text to build on the card title and make up the
-                                bulk of the card's content."
-                            </p>
-                            <div class="d-flex align-items-center pt-2">
-                                <img src="~/assets/testimonial-2.jpg" alt="bootstrap testimonial carousel slider 2">
-                                <div>
-                                    <h5 class="card-title fw-bold">June Doe</h5>
-                                    <span class="text-secondary">CEO, Example Company</span>
-                                    <div class="text-warning">
-                                        ★★★★★
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Repeat for remaining items -->
+                }
             </div>
             <button class="carousel-control-prev" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="prev">
                 <span class="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -247,7 +167,6 @@
             </button>
         </div>
     </div>
-
 </div>
 
 
@@ -267,7 +186,7 @@
 
                     <form method="POST" id="inquiryForm" action="@Url.Action("SubmitInquiry", "Home")">
     <input type="hidden" name="userId" value="@Context.Session.GetInt32("UserId")" />
-    <input type="hidden" name="propertyId" value="@Model.PropertyID" />
+    <input type="hidden" name="propertyId" value="@Model.PropertyId" />
 
     <div class="mb-3">
         <label for="message" class="form-label fw-semibold">Your Message</label>
@@ -320,7 +239,7 @@
                             <textarea class="form-control" id="reviewText" name="comment" rows="4" placeholder="Share your experience..."></textarea>
                         </div>
 
-                        <input type="hidden" name="propertyId" value="@Model.PropertyID" />
+                        <input type="hidden" name="propertyId" value="@Model.PropertyId" />
                         <input type="hidden" name="userId" value="@Context.Session.GetInt32("UserId")" />
 
                         <button type="submit" class="btn btn-primary w-100">Submit Review</button>
@@ -395,16 +314,7 @@
    
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-<script>
-    @* function setRating(rating) { *@
-    @*     document.getElementById("ratingInput").value = rating; // ⭐ Set hidden input value *@
 
-    @*     const stars = document.querySelectorAll('.star'); *@
-    @*     stars.forEach((star, index) => { *@
-    @*         star.style.color = index < rating ? '#ffcc00' : ''; *@
-    @*     }); *@
-    @* } *@
-</script>
         <script>
             const stars = document.querySelectorAll('.star');
             stars.forEach((star, index) => {

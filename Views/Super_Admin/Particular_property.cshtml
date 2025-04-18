@@ -2,10 +2,11 @@
 @{
     Layout = "_SuperAdminLayout";
     ViewData["Title"] = "Super Admin Dashboard";
-    ViewData["ActivePage"] = "Super_AdminDashboard";
+    ViewData["ActivePage"] = "Particular_property";
 }
-
 <link rel="stylesheet" href="~/Content/site.css" />
+
+
 
 <div class="apartment-container">
     <header class="apartment-header">
@@ -16,13 +17,26 @@
         <div class="header-right">
             <div class="review-button">
                 <div class="apartment-rating">
-                    <i class="fas fa-star rating-icon"></i>
-                    @Model.Reviews.Average(r => r.Rating).ToString("0.0")
-                    (@Model.Reviews.Count reviews)
+                
+                    @if (Model.Reviews != null && Model.Reviews.Any())
+                    {
+                        <div class="apartment-rating">
+                            <i class="fas fa-star rating-icon"></i>
+                            @Model.Reviews.Average(r => r.Rating).ToString("0.0")
+                            (@Model.Reviews.Count reviews)
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="apartment-rating">
+                            <i class="fas fa-star rating-icon"></i>
+                            No reviews yet
+                        </div>
+                    }
+
                 </div>
                 <div class="apartment-actions">
-                   
-                    
+                    <!-- Add any action buttons if needed -->
                 </div>
             </div>
             <div class="apartment-user">
@@ -38,7 +52,6 @@
     </section>
 
     <section class="apartment-gallery">
-        <!-- Placeholder gallery; you can loop through additional image URLs if available -->
         <img src="@Model.ImageUrl" alt="Interior 1" class="gallery-image" />
         <img src="@Model.ImageUrl" alt="Interior 2" class="gallery-image" />
         <img src="@Model.ImageUrl" alt="Interior 3" class="gallery-image" />
@@ -48,7 +61,6 @@
     <section class="apartment-about">
         <h2 class="about-title">About Property</h2>
         <p class="about-description">
-            <!-- Replace with actual property description if available -->
             This stunning apartment offers modern living at its finest...
         </p>
     </section>
@@ -101,22 +113,31 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var review in Model.Reviews)
+                @if (Model.Reviews != null && Model.Reviews.Any())
+                {
+                    foreach (var review in Model.Reviews)
+                    {
+                        <tr>
+                            <td>@Model.PropertyId</td>
+                            <td>@Model.Title</td>
+                            <td>@review.ReviewerName</td>
+                            <td>@review.Date.ToString("dd-MM-yyyy")</td>
+                            <td>@review.Rating</td>
+                            <td>@review.Comment</td>
+                            <td>
+                                <form method="post" action="@Url.Action("DeleteReview", "Semi_admin")">
+                                    <input type="hidden" name="reviewId" value="@review.ReviewId" />
+                                    <input type="hidden" name="propertyId" value="@Model.PropertyId" />
+                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
                 {
                     <tr>
-                        <td>@Model.PropertyId</td>
-                        <td>@Model.Title</td>
-                        <td>@review.ReviewerName</td>
-                        <td>@review.Date.ToString("dd-MM-yyyy")</td>
-                        <td>@review.Rating</td>
-                        <td>@review.Comment</td>
-                        <td>
-                            <form method="post" action="@Url.Action("DeleteReview", "Semi_admin")">
-                                <input type="hidden" name="reviewId" value="@review.ReviewId" />
-                                <input type="hidden" name="propertyId" value="@Model.PropertyId" />
-                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                            </form>
-                        </td>
+                        <td colspan="7" style="text-align:center;">No reviews available.</td>
                     </tr>
                 }
             </tbody>
@@ -139,21 +160,30 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var inquiry in Model.Inquiries)
+                @if (Model.Inquiries != null && Model.Inquiries.Any())
+                {
+                    foreach (var inquiry in Model.Inquiries)
+                    {
+                        <tr>
+                            <td>@inquiry.GuestName</td>
+                            <td>@Model.PropertyId</td>
+                            <td>@inquiry.Email</td>
+                            <td>@inquiry.Contact</td>
+                            <td>@inquiry.Message</td>
+                            <td>
+                                <form method="post" action="@Url.Action("DeleteInquiry", "Semi_admin")">
+                                    <input type="hidden" name="inquiryId" value="@inquiry.InquiryId" />
+                                    <input type="hidden" name="propertyId" value="@Model.PropertyId" />
+                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
                 {
                     <tr>
-                        <td>@inquiry.GuestName</td>
-                        <td>@Model.PropertyId</td>
-                        <td>@inquiry.Email</td>
-                        <td>@inquiry.Contact</td>
-                        <td>@inquiry.Message</td>
-                        <td>
-                            <form method="post" action="@Url.Action("DeleteInquiry", "Semi_admin")">
-                                <input type="hidden" name="inquiryId" value="@inquiry.InquiryId" />
-                                <input type="hidden" name="propertyId" value="@Model.PropertyId" />
-                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                            </form>
-                        </td>
+                        <td colspan="6" style="text-align:center;">No inquiries available.</td>
                     </tr>
                 }
             </tbody>

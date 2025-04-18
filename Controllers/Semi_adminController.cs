@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Data.SqlClient;
 using WebApplication1.Models;
 
@@ -74,24 +75,30 @@ namespace WebApplication1.Controllers
 
             return View();
         }
-
-        // Create Property (POST) Action
+      
         [HttpPost]
-        public async Task<IActionResult> Create(AddPropertyModel model)
+        public async Task<IActionResult> Add_Properties(AddPropertyModel model)
         {
             var redirect = RedirectToLoginIfNotLoggedIn();
             if (redirect != null) return redirect;
             int? userId = HttpContext.Session.GetInt32("UserId");
 
             // Ensure the user_id exists in the session before proceeding
-            if (userId==null)
+            if (userId == null)
             {
                 TempData["Error"] = "User not logged in.";
                 return RedirectToAction("Login", "Account");
             }
             ViewBag.UserId = userId;
             if (!ModelState.IsValid)
-                return View(model);
+                foreach (var entry in ModelState)
+                {
+                    foreach (var error in entry.Value.Errors)
+                    {
+                        Console.WriteLine($"Field: {entry.Key}, Error: {error.ErrorMessage}");
+                    }
+                }
+
 
             var amenities = Request.Form["Amenities"];
             string amenitiesString = string.Join(", ", amenities);
@@ -148,7 +155,6 @@ namespace WebApplication1.Controllers
                         cmd.Parameters.AddWithValue("@Amenities", amenitiesString);
                         cmd.Parameters.AddWithValue("@ImagePaths", imagePathString);
                         cmd.Parameters.AddWithValue("@UserId", userId);
-
                         con.Open();
                         int rowsAffected = await cmd.ExecuteNonQueryAsync();
                         if (rowsAffected == 0)
@@ -196,7 +202,7 @@ namespace WebApplication1.Controllers
                 await con.OpenAsync();
 
                 string query = @"
-            SELECT r.ReviewID, u.Name, r.ReviewDate, r.Rating, r.Comment, p.PropertyID, u.profile_pic
+            SELECT r.ReviewID, u.Name, r.ReviewDate, r.Rating, r.Comment, p.PropertyID,p.Title, u.profile_pic
             FROM Reviews r
             INNER JOIN Properties p ON p.PropertyID = r.PropertyID
             INNER JOIN Users u ON u.user_id = r.UserID
@@ -225,6 +231,7 @@ namespace WebApplication1.Controllers
                             {
                                 Id = Convert.ToInt32(reader["ReviewID"]),
                                 Name = reader["Name"].ToString(),
+                                PropertyTitle = reader["Title"].ToString(),
                                 Property = reader["PropertyID"].ToString(),
                                 Rating = Convert.ToInt32(reader["Rating"]),
                                 ReviewText = reader["Comment"].ToString(),
@@ -475,16 +482,21 @@ namespace WebApplication1.Controllers
                                 ? rawImagePaths.Split(',').Select(p => p.Trim()).ToList()
                                 : new List<string>();
 
-                            properties.Add(new PropertyViewModel
-                            {
-                                Id = Convert.ToInt32(reader["PropertyId"]),
-                                Title = reader["Title"].ToString(),
-                                Price = Convert.ToDecimal(reader["Price"]),
-                                Area = Convert.ToInt32(reader["SquareFootage"]),
-                                Address = reader["Address"].ToString(),
-                                IsAvailable = reader["IsAvailable"] != DBNull.Value && Convert.ToBoolean(reader["IsAvailable"]),
-                                ImageUrl = reader["ImagePaths"].ToString()?.Split(',').FirstOrDefault()
-                            });
+                           bool hasIsAvailable = Enumerable.Range(0, reader.FieldCount)
+                                .Select(reader.GetName)
+                                .Contains("IsAvailable", StringComparer.OrdinalIgnoreCase);
+
+properties.Add(new PropertyViewModel
+{
+    Id = Convert.ToInt32(reader["PropertyId"]),
+    Title = reader["Title"].ToString(),
+    Price = Convert.ToDecimal(reader["Price"]),
+    Area = Convert.ToInt32(reader["SquareFootage"]),
+    Address = reader["Address"].ToString(),
+    IsAvailable = hasIsAvailable && !reader.IsDBNull(reader.GetOrdinal("IsAvailable")) && reader.GetBoolean(reader.GetOrdinal("IsAvailable")),
+    ImageUrl = reader["ImagePaths"].ToString()?.Split(',').FirstOrDefault()
+});
+
                         }
 
                     }
@@ -664,7 +676,7 @@ namespace WebApplication1.Controllers
         }
 
         // POST: MyProfile
-       
+
 
 
         // Property Details Action
@@ -694,18 +706,18 @@ namespace WebApplication1.Controllers
             {
                 await con.OpenAsync();
 
-                // Fetch Property Details
+                // 🏠 Fetch Property Details (Updated with more fields)
                 string query = @"
-            SELECT p.PropertyId, p.Title, p.Address, p.Price, p.ImagePaths,
-                   u.name, u.Email, u.Mobile
-            FROM Properties p
-            INNER JOIN Users u ON u.user_id = p.UserId
-            WHERE p.PropertyId = @PropertyId";
+        SELECT p.PropertyId, p.Title, p.Address, p.Price, p.ImagePaths,
+               p.SquareFootage, p.Bedrooms, p.Bathrooms, p.PropertyType,
+               u.name, u.Email, u.Mobile
+        FROM Properties p
+        INNER JOIN Users u ON u.user_id = p.UserId
+        WHERE p.PropertyId = @PropertyId";
 
                 using (SqlCommand cmd = new SqlCommand(query, con))
                 {
                     cmd.Parameters.AddWithValue("@PropertyId", id);
-
                     using (var reader = await cmd.ExecuteReaderAsync())
                     {
                         if (await reader.ReadAsync())
@@ -715,25 +727,30 @@ namespace WebApplication1.Controllers
                             propertyDetails.Address = reader["Address"].ToString();
                             propertyDetails.Price = Convert.ToDecimal(reader["Price"]);
                             propertyDetails.ImageUrl = reader["ImagePaths"].ToString()?.Split(',').FirstOrDefault();
-                            propertyDetails.OwnerName = reader["Name"].ToString();
-                            propertyDetails.OwnerEmail = reader["Email"].ToString();
-                            propertyDetails.OwnerMobile = reader["Mobile"].ToString();
+
+                            propertyDetails.SquareFootage = Convert.ToInt32(reader["SquareFootage"]);
+                            propertyDetails.Bedrooms = Convert.ToInt32(reader["Bedrooms"]);
+                            propertyDetails.Bathrooms = Convert.ToInt32(reader["Bathrooms"]);
+                            propertyDetails.PropertyType = reader["PropertyType"].ToString();
+
+                            propertyDetails.OwnerName = reader["name"].ToString();
+                            propertyDetails.OwnerEmail = reader["email"].ToString();
+                            propertyDetails.OwnerMobile = reader["mobile"].ToString();
                         }
                     }
                 }
 
-                // Fetch Reviews
+                // ⭐ Fetch Reviews
                 string reviewQuery = @"
-            SELECT r.ReviewId, r.Comment, r.Rating, r.ReviewDate, u.name AS ReviewerName, p.Title
-            FROM Reviews r
-            INNER JOIN Users u ON u.user_id = r.UserId
-            INNER JOIN Properties p ON p.PropertyId = r.PropertyId
-            WHERE r.PropertyId = @PropertyId";
+        SELECT r.ReviewId, r.Comment, r.Rating, r.ReviewDate, u.name AS ReviewerName, p.Title
+        FROM Reviews r
+        INNER JOIN Users u ON u.user_id = r.UserId
+        INNER JOIN Properties p ON p.PropertyId = r.PropertyId
+        WHERE r.PropertyId = @PropertyId";
 
                 using (SqlCommand cmd = new SqlCommand(reviewQuery, con))
                 {
                     cmd.Parameters.AddWithValue("@PropertyId", id);
-
                     using (var reader = await cmd.ExecuteReaderAsync())
                     {
                         while (await reader.ReadAsync())
@@ -751,25 +768,20 @@ namespace WebApplication1.Controllers
                     }
                 }
 
-                // Fetch Inquiries
+                propertyDetails.AverageRating = propertyDetails.Reviews.Any()
+                    ? propertyDetails.Reviews.Average(r => r.Rating)
+                    : 0;
+
+                // 💬 Fetch Inquiries
                 string inquiryQuery = @"
-          SELECT 
-    i.InquiryId, 
-    u.Name, 
-    u.email, 
-    u.mobile, 
-    i.Message
-FROM 
-    Inquiries i
-INNER JOIN 
-    Users u ON i.UserId = u.user_id
-WHERE 
-    i.PropertyId  = @PropertyId";
+        SELECT i.InquiryId, u.Name, u.email, u.mobile, i.Message
+        FROM Inquiries i
+        INNER JOIN Users u ON i.UserId = u.user_id
+        WHERE i.PropertyId = @PropertyId";
 
                 using (SqlCommand cmd = new SqlCommand(inquiryQuery, con))
                 {
                     cmd.Parameters.AddWithValue("@PropertyId", id);
-
                     using (var reader = await cmd.ExecuteReaderAsync())
                     {
                         while (await reader.ReadAsync())
@@ -789,6 +801,8 @@ WHERE
 
             return View(propertyDetails);
         }
+
+
 
         public IActionResult DeleteInquiry(int inquiryId, int propertyId)
         {
@@ -886,6 +900,8 @@ WHERE
                         if (!string.IsNullOrEmpty(images))
                         {
                             model.ExistingImages = images.Split(',').Select(i => i.Trim()).ToList();
+                            Console.WriteLine("Images string from DB: " + images); // or use logging
+
                         }
                     }
                 }
@@ -895,98 +911,135 @@ WHERE
         }
 
         [HttpPost]
-     
-            public async Task<IActionResult> Edit_Property(int id, AddPropertyModel model, List<IFormFile> Images, string[] Amenities)
+
+        public async Task<IActionResult> Edit_Property(int id, AddPropertyModel model, List<IFormFile> Images, string[] Amenities)
+        {
+            if (!ModelState.IsValid)
             {
-                if (!ModelState.IsValid)
-                    return View(model);
-
-                string uploadsFolder = Path.Combine(_env.WebRootPath, "/images/properties/");
-                List<string> uploadedImagePaths = new List<string>();
-
-                foreach (var file in Images)
+                foreach (var entry in ModelState)
                 {
-                    if (file.Length > 0)
+                    foreach (var error in entry.Value.Errors)
                     {
-                        var uniqueName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-                        string filePath = Path.Combine(uploadsFolder, uniqueName);
-                        using (var fs = new FileStream(filePath, FileMode.Create))
-                        {
-                            await file.CopyToAsync(fs);
-                        }
-                        uploadedImagePaths.Add("/images/properties/" + uniqueName);
+                        Console.WriteLine($"Field: {entry.Key}, Error: {error.ErrorMessage}");
                     }
                 }
+               
+            }
 
-                // Combine new images with existing images
-                string newImagePathStr = string.Join(",", uploadedImagePaths);
-                string existingImagesStr = string.Join(",", model.ExistingImages ?? new List<string>());
-                string finalImagePaths = string.IsNullOrEmpty(newImagePathStr)
-                    ? existingImagesStr
-                    : string.Join(",", existingImagesStr, newImagePathStr).Trim(',');
+            string uploadsFolder = Path.Combine(_env.WebRootPath, "images", "properties");
 
-                // Join amenities into a string
-                string amenitiesStr = string.Join(",", Amenities);
+            // Ensure the upload folder exists
+            if (!Directory.Exists(uploadsFolder))
+            {
+                Directory.CreateDirectory(uploadsFolder);
+            }
 
-                string connectionString = _configuration.GetConnectionString("DefaultConnection");
+            // Convert amenities array to string
+            string amenitiesString = string.Join(", ", Amenities);
 
-                try
+            // Upload new images
+            var uploadedImagePaths = new List<string>();
+            if (Images != null && Images.Any())
+            {
+                foreach (var image in Images)
                 {
-                    using (SqlConnection con = new SqlConnection(connectionString))
+                    if (image.Length > 0)
                     {
-                        string updateQuery = @"UPDATE Properties SET 
-                Title = @Title, Price = @Price, SquareFootage = @SquareFootage, 
-                Address = @Address, Bedrooms = @Bedrooms, Bathrooms = @Bathrooms,
-                PropertyType = @PropertyType, Amenities = @Amenities, ImagePaths = @ImagePaths
-                WHERE PropertyId = @PropertyId";
+                        var fileName = Guid.NewGuid().ToString() + Path.GetExtension(image.FileName);
+                        var filePath = Path.Combine(uploadsFolder, fileName);
 
-                        using (SqlCommand cmd = new SqlCommand(updateQuery, con))
+                        using (var stream = new FileStream(filePath, FileMode.Create))
                         {
-                            cmd.Parameters.AddWithValue("@Title", model.Title);
-                            cmd.Parameters.AddWithValue("@Price", model.Price);
-                            cmd.Parameters.AddWithValue("@SquareFootage", model.SquareFootage);
-                            cmd.Parameters.AddWithValue("@Address", model.Address);
-                            cmd.Parameters.AddWithValue("@Bedrooms", model.Bedrooms);
-                            cmd.Parameters.AddWithValue("@Bathrooms", model.Bathrooms);
-                            cmd.Parameters.AddWithValue("@PropertyType", model.PropertyType);
-                            cmd.Parameters.AddWithValue("@Amenities", amenitiesStr);
-                            cmd.Parameters.AddWithValue("@ImagePaths", finalImagePaths); // Updated image paths
-                            cmd.Parameters.AddWithValue("@PropertyId", id);
-
-                            con.Open();
-                            int rowsAffected = await cmd.ExecuteNonQueryAsync();
-
-                            if (rowsAffected == 0)
-                            {
-                                ModelState.AddModelError("", "Failed to update the property.");
-                                return View(model);
-                            }
+                            await image.CopyToAsync(stream);
                         }
-                    }
 
-                    TempData["Success"] = "Property updated successfully!";
-                    return RedirectToAction("Property_Details", new { id = id }); // Redirect to Property Details page after successful update
-                }
-                catch (Exception ex)
-                {
-                    Console.Error.WriteLine($"Error updating property: {ex.Message}");
-                    ModelState.AddModelError("", "An error occurred while updating the property. Please try again.");
-                    return View(model);
+                        uploadedImagePaths.Add("/images/properties/" + fileName);
+                    }
                 }
             }
 
-        
+            // Merge old and new image paths
+            string oldImages = string.Join(", ", model.ExistingImages ?? new List<string>());
+            string newImages = string.Join(", ", uploadedImagePaths);
+            string imagePathString = string.IsNullOrEmpty(newImages)
+                ? oldImages
+                : string.IsNullOrEmpty(oldImages)
+                    ? newImages
+                    : oldImages + ", " + newImages;
+
+            string connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+            try
+            {
+                using (SqlConnection con = new SqlConnection(connectionString))
+                {
+                    string query = @"
+                UPDATE Properties SET 
+                    Title = @Title,
+                    Price = @Price,
+                    SquareFootage = @SquareFootage,
+                    Address = @Address,
+                    Bedrooms = @Bedrooms,
+                    Bathrooms = @Bathrooms,
+                    PropertyType = @PropertyType,
+                    Amenities = @Amenities,
+                    ImagePaths = @ImagePaths
+                WHERE PropertyId = @PropertyId";
+
+                    using (SqlCommand cmd = new SqlCommand(query, con))
+                    {
+                        cmd.Parameters.AddWithValue("@Title", model.Title);
+                        cmd.Parameters.AddWithValue("@Price", model.Price);
+                        cmd.Parameters.AddWithValue("@SquareFootage", model.SquareFootage);
+                        cmd.Parameters.AddWithValue("@Address", model.Address);
+                        cmd.Parameters.AddWithValue("@Bedrooms", model.Bedrooms);
+                        cmd.Parameters.AddWithValue("@Bathrooms", model.Bathrooms);
+                        cmd.Parameters.AddWithValue("@PropertyType", model.PropertyType);
+                        cmd.Parameters.AddWithValue("@Amenities", amenitiesString);
+                        cmd.Parameters.AddWithValue("@ImagePaths", imagePathString);
+                        cmd.Parameters.AddWithValue("@PropertyId", id);
+
+                        con.Open();
+                        int rowsAffected = await cmd.ExecuteNonQueryAsync();
+
+                        if (rowsAffected == 0)
+                        {
+                            ModelState.AddModelError("", "Failed to update the property.");
+                            return View(model);
+                        }
+                    }
+                }
+
+                TempData["Success"] = "Property updated successfully!";
+                return RedirectToAction("Property_Details", new { id = id });
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error updating property: {ex.Message}");
+                ModelState.AddModelError("", "An error occurred while updating the property. Please try again.");
+                return View(model);
+            }
+        }
+
+
+
 
         // Action to handle image deletion
         public IActionResult DeleteImage(int id, string imagePath)
         {
             string uploadsFolder = Path.Combine(_env.WebRootPath, "/images/properties/");
-            string fullImagePath = Path.Combine(uploadsFolder, Path.GetFileName(imagePath.TrimStart('/')));
-
-            // Delete image from file system
-            if (System.IO.File.Exists(fullImagePath))
+            if (!string.IsNullOrEmpty(imagePath))
             {
-                System.IO.File.Delete(fullImagePath);
+                string fullImagePath = Path.Combine(uploadsFolder, Path.GetFileName(imagePath.TrimStart('/')));
+
+                if (System.IO.File.Exists(fullImagePath))
+                {
+                    System.IO.File.Delete(fullImagePath);
+                }
+            }
+            else
+            {
+                Console.WriteLine("imagePath is null or empty. Cannot delete image.");
             }
 
             // Now, remove image from the database

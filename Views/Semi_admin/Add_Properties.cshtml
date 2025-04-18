@@ -33,7 +33,7 @@
             </div>
         }
 
-        <form asp-controller="Semi_admin" asp-action="Create" method="post" enctype="multipart/form-data">
+        <form asp-controller="Semi_admin" asp-action="Add_Properties" method="post" enctype="multipart/form-data">
             <div class="mb-3">
                 <label class="form-label fw-bold">Property Title</label>
                 <input asp-for="Title" class="form-control" placeholder="Enter property title">
@@ -163,33 +163,3 @@
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    let selectedFilesArray = [];
-
-    function previewImages() {
-        const fileInput = document.getElementById('imageUploadInput');
-        const previewContainer = document.getElementById('imagePreview');
-
-        for (let i = 0; i < fileInput.files.length; i++) {
-            const file = fileInput.files[i];
-
-            // Prevent adding duplicates
-            if (!selectedFilesArray.some(f => f.name === file.name && f.size === file.size)) {
-                selectedFilesArray.push(file);
-
-                const reader = new FileReader();
-                reader.onload = function (event) {
-                    const imgElement = document.createElement('img');
-                    imgElement.src = event.target.result;
-                    previewContainer.appendChild(imgElement);
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        // Create a new DataTransfer to reassign the file input with selectedFilesArray
-        const dataTransfer = new DataTransfer();
-        selectedFilesArray.forEach(f => dataTransfer.items.add(f));
-        fileInput.files = dataTransfer.files;
-    }
-</script>

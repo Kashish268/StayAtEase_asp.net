@@ -112,3 +112,62 @@
         }
     });
 </script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const searchInput = document.getElementById("searchMessages");
+        const tableBody = document.getElementById("messageTableBody");
+
+        searchInput.addEventListener("input", function () {
+            const query = searchInput.value.toLowerCase();
+            const rows = tableBody.getElementsByTagName("tr");
+
+            Array.from(rows).forEach(row => {
+                const cells = row.getElementsByTagName("td");
+                let matchFound = false;
+
+                // Loop through each cell in the row
+                Array.from(cells).forEach(cell => {
+                    if (cell.textContent.toLowerCase().includes(query)) {
+                        matchFound = true;
+                    }
+                });
+
+                // Toggle row visibility based on match
+                row.style.display = matchFound ? "" : "none";
+            });
+        });
+    });
+
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const searchInput = document.querySelector(".total-users-search");
+        const tableBody = document.getElementById("adminTableBody");
+
+        searchInput.addEventListener("input", function () {
+            const query = searchInput.value.toLowerCase();
+            const rows = tableBody.querySelectorAll("tr");
+            let matchFound = false;
+
+            rows.forEach(row => {
+                const rowText = row.textContent.toLowerCase();
+                const isMatch = rowText.includes(query);
+                row.style.display = isMatch ? "" : "none";
+                if (isMatch) matchFound = true;
+            });
+
+            // Handle "Not found" row
+            let noResultRow = tableBody.querySelector(".no-result");
+            if (!matchFound) {
+                if (!noResultRow) {
+                    noResultRow = document.createElement("tr");
+                    noResultRow.classList.add("no-result");
+                    noResultRow.innerHTML = `<td colspan="6" style="text-align:center; color:#999;">Not found</td>`;
+                    tableBody.appendChild(noResultRow);
+                }
+            } else {
+                if (noResultRow) noResultRow.remove();
+            }
+        });
+    });
+</script>

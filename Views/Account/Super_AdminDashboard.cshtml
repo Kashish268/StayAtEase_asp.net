@@ -37,7 +37,8 @@
         <div class="sad-table-container">
             <div class="sad-section-header">
                 <h4>Tenants</h4>
-                <a href="#" class="sad-view-all">View All →</a>
+                <a asp-controller="Super_Admin" asp-action="Total_User" class="sad-view-all">View All →</a>
+
             </div>
             <table class="sad-table">
                 <tr>
@@ -62,7 +63,8 @@
         <div class="sad-table-container">
             <div class="sad-section-header">
                 <h4>Property Owners</h4>
-                <a href="#" class="sad-view-all">View All →</a>
+                <a asp-controller="Super_Admin" asp-action="Total_Admin" class="sad-view-all">View All →</a>
+
             </div>
             <table class="sad-table">
                 <tr>
@@ -88,8 +90,9 @@
     <div class="sad-latest-section">
         <div class="sad-section-header">
             <h4>Latest Messages</h4>
-            <a href="#" class="sad-view-all">View All</a>
+            <a asp-controller="Super_Admin" asp-action="inquiries" class="sad-view-all">View All →</a>
         </div>
+
         <table class="sad-table">
             <tr>
                 <th>Guest Name</th>
@@ -98,24 +101,36 @@
                 <th>Contact No</th>
                 <th>Message</th>
             </tr>
-            @foreach (var msg in Model.LatestMessages)
+
+            @if (Model.LatestMessages != null && Model.LatestMessages.Any())
+            {
+                foreach (var msg in Model.LatestMessages)
+                {
+                    <tr>
+                        <td>@msg.Name</td>
+                        <td>@msg.PropertyId</td>
+                        <td>@msg.Email</td>
+                        <td>@msg.Contact</td>
+                        <td>@msg.Message</td>
+                    </tr>
+                }
+            }
+            else
             {
                 <tr>
-                    <td>@msg.Name</td>
-                    <td>@msg.PropertyId</td>
-                    <td>@msg.Email</td>
-                    <td>@msg.Contact</td>
-                    <td>@msg.Message</td>
+                    <td colspan="5" style="text-align:center;">No messages found.</td>
                 </tr>
             }
         </table>
     </div>
 
+
     <!-- Placeholder Review Section -->
     <div class="sad-latest-section">
         <div class="sad-section-header">
             <h4>Latest Reviews</h4>
-            <a href="#" class="sad-view-all">View All</a>
+            <a asp-controller="Super_Admin" asp-action="Property_Reviews" class="sad-view-all">View All →</a>
+
         </div>
         <div class="sad-reviews-container">
             @foreach (var review in Model.LatestReviews)

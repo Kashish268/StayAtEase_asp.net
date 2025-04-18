@@ -157,47 +157,48 @@ namespace WebApplication1.Controllers
                 {
                     // If user is logged in, join Wishlist and get IsWishlisted
                     query = @"
-            SELECT 
-                p.PropertyId, 
-                p.Title, 
-                p.Address AS Location, 
-                p.Bedrooms AS Beds, 
-                p.Bathrooms AS Baths, 
-                CAST(p.SquareFootage AS NVARCHAR) + ' sqft' AS Size, 
-                N'₹' + CAST(p.Price AS NVARCHAR) + '/month' AS Price, 
-                p.ImagePaths AS ImagePath, 
-                CAST(ROUND(ISNULL(AVG(r.Rating), 0), 1) AS DECIMAL(2,1)) AS Rating, 
-                COUNT(r.ReviewID) AS Reviews,
-                CASE WHEN w.UserID IS NOT NULL THEN 1 ELSE 0 END AS IsWishlisted
-            FROM Properties p
-            LEFT JOIN Reviews r ON p.PropertyId = r.PropertyID
-            LEFT JOIN Wishlist w ON p.PropertyId = w.PropertyID AND w.UserId = @UserId
-            GROUP BY 
-                p.PropertyId, p.Title, p.Address, p.Bedrooms, p.Bathrooms, 
-                p.SquareFootage, p.Price, p.ImagePaths, w.UserId";
+        SELECT 
+            p.PropertyId, 
+            p.Title, 
+            p.Address AS Location, 
+            p.Bedrooms AS Beds, 
+            p.Bathrooms AS Baths, 
+            p.PropertyType,  -- Added PropertyType here
+            CAST(p.SquareFootage AS NVARCHAR) + ' sqft' AS Size, 
+            N'₹' + CAST(p.Price AS NVARCHAR) + '/month' AS Price, 
+            p.ImagePaths AS ImagePath, 
+            CAST(ROUND(ISNULL(AVG(r.Rating), 0), 1) AS DECIMAL(2,1)) AS Rating, 
+            COUNT(r.ReviewID) AS Reviews,
+            CASE WHEN w.UserID IS NOT NULL THEN 1 ELSE 0 END AS IsWishlisted
+        FROM Properties p
+        LEFT JOIN Reviews r ON p.PropertyId = r.PropertyID
+        LEFT JOIN Wishlist w ON p.PropertyId = w.PropertyID AND w.UserId = @UserId
+        GROUP BY 
+            p.PropertyId, p.Title, p.Address, p.Bedrooms, p.Bathrooms, 
+            p.PropertyType, p.SquareFootage, p.Price, p.ImagePaths, w.UserId";
                 }
                 else
                 {
                     // If user is NOT logged in, IsWishlisted will always be false
                     query = @"
-            SELECT 
-                p.PropertyId, 
-                p.Title, 
-                p.Address AS Location, 
-                p.Bedrooms AS Beds, 
-                p.Bathrooms AS Baths, 
-p.PropertyType ,
-                CAST(p.SquareFootage AS NVARCHAR) + ' sqft' AS Size, 
-                N'₹' + CAST(p.Price AS NVARCHAR) + '/month' AS Price, 
-                p.ImagePaths AS ImagePath, 
-                CAST(ROUND(ISNULL(AVG(r.Rating), 0), 1) AS DECIMAL(2,1)) AS Rating, 
-                COUNT(r.ReviewID) AS Reviews,
-                0 AS IsWishlisted
-            FROM Properties p
-            LEFT JOIN Reviews r ON p.PropertyId = r.PropertyID
-            GROUP BY 
-                p.PropertyId, p.Title, p.Address, p.Bedrooms, p.Bathrooms, 
-                p.SquareFootage, p.Price, p.ImagePaths, p.PropertyType";
+        SELECT 
+            p.PropertyId, 
+            p.Title, 
+            p.Address AS Location, 
+            p.Bedrooms AS Beds, 
+            p.Bathrooms AS Baths, 
+            p.PropertyType,  -- Added PropertyType here as well
+            CAST(p.SquareFootage AS NVARCHAR) + ' sqft' AS Size, 
+            N'₹' + CAST(p.Price AS NVARCHAR) + '/month' AS Price, 
+            p.ImagePaths AS ImagePath, 
+            CAST(ROUND(ISNULL(AVG(r.Rating), 0), 1) AS DECIMAL(2,1)) AS Rating, 
+            COUNT(r.ReviewID) AS Reviews,
+            0 AS IsWishlisted
+        FROM Properties p
+        LEFT JOIN Reviews r ON p.PropertyId = r.PropertyID
+        GROUP BY 
+            p.PropertyId, p.Title, p.Address, p.Bedrooms, p.Bathrooms, 
+            p.PropertyType, p.SquareFootage, p.Price, p.ImagePaths";
                 }
 
                 SqlCommand cmd = new SqlCommand(query, conn);
@@ -214,15 +215,15 @@ p.PropertyType ,
                 {
                     properties.Add(new UserProperty
                     {
-                        PropertyID = Convert.ToInt32(reader["PropertyID"]),
+                        PropertyID = Convert.ToInt32(reader["PropertyId"]),  // Corrected to PropertyId instead of PropertyID
                         Title = reader["Title"].ToString(),
                         Location = reader["Location"].ToString(),
                         Beds = Convert.ToInt32(reader["Beds"]),
                         Baths = Convert.ToInt32(reader["Baths"]),
+                        PropertyType = reader["PropertyType"].ToString(),  // Added PropertyType
                         Size = reader["Size"].ToString(),
                         Price = reader["Price"].ToString(),
                         ImagePath = reader["ImagePath"].ToString(),
-                        PropertyType = reader["PropertyType"].ToString(),
                         Rating = Convert.ToDecimal(reader["Rating"]),
                         Reviews = Convert.ToInt32(reader["Reviews"]),
                         IsWishlisted = Convert.ToInt32(reader["IsWishlisted"]) == 1
@@ -233,7 +234,6 @@ p.PropertyType ,
             ViewData["ActivePage"] = "Privacy";
             return View(properties);
         }
-
         public IActionResult WishList()
         {
             ViewData["ActivePage"] = "WishList";
@@ -311,142 +311,80 @@ GROUP BY
 
         public IActionResult Property_details(int id)
         {
-            UserProperty property = null;
-
             string connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+            var propertyDetails = new PropertyDetailsViewModel();
+            var reviews = new List<ReviewModel>();
+            var inquiries = new List<InquiryModel>();
 
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
-                string query = @"
-        SELECT 
-            p.PropertyId, 
-            p.Title, 
-            p.Address AS Location, 
-            p.Bedrooms AS Beds, 
-            p.Bathrooms AS Baths, 
-            CAST(p.SquareFootage AS NVARCHAR) + ' sqft' AS Size, 
-            N'₹' + CAST(p.Price AS NVARCHAR) + '/month' AS Price, 
-            p.ImagePaths AS ImagePath, 
-            CAST(ROUND(ISNULL(AVG(r.Rating), 0), 1) AS DECIMAL(2,1)) AS Rating, 
-            COUNT(r.ReviewID) AS Reviews
-        FROM Properties p
-        LEFT JOIN Reviews r ON p.PropertyId = r.PropertyID
-        WHERE p.PropertyId = @PropertyId
-        GROUP BY 
-            p.PropertyId, p.Title, p.Address, p.Bedrooms, p.Bathrooms, 
-            p.SquareFootage, p.Price, p.ImagePaths";
-
-                SqlCommand cmd = new SqlCommand(query, conn);
-                cmd.Parameters.AddWithValue("@PropertyId", id);  // Passing the PropertyId to the query
-
                 conn.Open();
-                SqlDataReader reader = cmd.ExecuteReader();
 
-                if (reader.Read())
+                using (SqlCommand cmd = new SqlCommand("SELECT * FROM Properties WHERE PropertyId = @PropertyId", conn))
                 {
-                    property = new UserProperty
+                    cmd.Parameters.AddWithValue("@PropertyId", id);
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
                     {
-                        PropertyID = Convert.ToInt32(reader["PropertyID"]),
-                        Title = reader["Title"].ToString(),
-                        Location = reader["Location"].ToString(),
-                        Beds = Convert.ToInt32(reader["Beds"]),
-                        Baths = Convert.ToInt32(reader["Baths"]),
-                        Size = reader["Size"].ToString(),
-                        Price = reader["Price"].ToString(),
-                        ImagePath = reader["ImagePath"].ToString(),
-                        Rating = Convert.ToDecimal(reader["Rating"]),
-                        Reviews = Convert.ToInt32(reader["Reviews"])
-                    };
-                }
-            }
+                        if (reader.Read())
+                        {
+                            propertyDetails.PropertyId = reader["PropertyId"].ToString();
+                            propertyDetails.Title = reader["Title"].ToString();
+                            propertyDetails.Address = reader["Address"].ToString();
+                            propertyDetails.Price = (decimal)reader["Price"];
+                            propertyDetails.SquareFootage = (int)reader["SquareFootage"];
+                            propertyDetails.Bedrooms = (int)reader["Bedrooms"];
+                            propertyDetails.Bathrooms = (int)reader["Bathrooms"];
 
-            if (property == null)
-            {
-                return NotFound();  // If the property was not found, return a 404 error.
-            }
-
-            return View(property);  // Passing the property details to the view.
-        }
-
-
-        [HttpPost]
-        public IActionResult SubmitReview(int propertyId, int userId, int rating, string comment)
-        {
-            if (rating == 0 || string.IsNullOrWhiteSpace(comment))
-            {
-                TempData["ErrorMessage"] = "Rating and comment are required.";
-                return RedirectToAction("Property_details", new { id = propertyId });
-            }
-
-            try
-            {
-                using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    string query = @"INSERT INTO Reviews (PropertyID, UserID, Rating, Comment, ReviewDate)
-                             VALUES (@PropertyID, @UserID, @Rating, @Comment, @CreatedAt)";
-
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
-                    {
-                        cmd.Parameters.AddWithValue("@PropertyID", propertyId);
-                        cmd.Parameters.AddWithValue("@UserID", userId);
-                        cmd.Parameters.AddWithValue("@Rating", rating);
-                        cmd.Parameters.AddWithValue("@Comment", comment);
-                        cmd.Parameters.AddWithValue("@CreatedAt", DateTime.Now);
-
-                        conn.Open();
-                        cmd.ExecuteNonQuery();
+                            // Add this line to fetch image paths
+                            propertyDetails.ImageUrl = reader["ImagePaths"]?.ToString();
+                        }
                     }
                 }
 
-                TempData["SuccessMessage"] = "Review submitted successfully.";
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                TempData["ErrorMessage"] = "Error submitting review: " + ex.Message;
-            }
 
-            return RedirectToAction("Property_details", new { id = propertyId });
-        }
-
-
-        [HttpPost]
-        public IActionResult SubmitInquiry(int userId, int propertyId, string message)
-        {
-            if (string.IsNullOrWhiteSpace(message))
-            {
-                TempData["InquiryError"] = "Please enter a message.";
-                return RedirectToAction("Property_details", new { id = propertyId });
-            }
-
-            try
-            {
-                using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+                // Fetch Reviews
+                using (SqlCommand cmd = new SqlCommand(@"SELECT r.ReviewId, r.Comment, r.Rating, r.ReviewDate, 
+                                            u.Name AS ReviewerName, p.Title 
+                                        FROM Reviews r
+                                        INNER JOIN Users u ON u.user_id = r.UserId
+                                        INNER JOIN Properties p ON p.PropertyId = r.PropertyId
+                                        WHERE r.PropertyId = @PropertyId", conn))
                 {
-                    string query = @"INSERT INTO Inquiries (UserID, PropertyID, Message, InquiryDate)
-                             VALUES (@UserID, @PropertyID, @Message, @InquiryDate)";
-
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    cmd.Parameters.AddWithValue("@PropertyId", id);
+                    using (SqlDataReader reader = cmd.ExecuteReader())
                     {
-                        cmd.Parameters.AddWithValue("@UserID", userId);
-                        cmd.Parameters.AddWithValue("@PropertyID", propertyId);
-                        cmd.Parameters.AddWithValue("@Message", message);
-                        cmd.Parameters.AddWithValue("@InquiryDate", DateTime.Now);
+                       while (reader.Read())
+{
+    var review = new ReviewModel
+    {
+        ReviewId = (int)reader["ReviewId"],
+        Comment = reader["Comment"].ToString(),
+        // Handle decimal to int conversion for Rating
+        Rating = reader["Rating"] != DBNull.Value ? Convert.ToInt32(reader["Rating"]) : 0, 
+        Date = (DateTime)reader["ReviewDate"],
+        ReviewerName = reader["ReviewerName"].ToString(),
+        PropertyTitle = reader["Title"].ToString()
+    };
+    reviews.Add(review);
+}
 
-                        conn.Open();
-                        cmd.ExecuteNonQuery();
                     }
                 }
 
-                TempData["InquirySuccess"] = "Inquiry sent successfully!";
-            }
-            catch (Exception ex)
-            {
-                TempData["InquiryError"] = "Error: " + ex.Message;
+
+                // Fetch Inquiries
+
+
+                propertyDetails.Reviews = reviews;
+              
             }
 
-            return RedirectToAction("Property_details", new { id = propertyId });
+            // Return the propertyDetails to the view
+            return View(propertyDetails);
         }
+
 
 
         [HttpGet]
@@ -920,6 +858,85 @@ GROUP BY
             }
 
             return View();
+        }
+
+        [HttpPost]
+        public IActionResult SubmitReview(int propertyId, int userId, int rating, string comment)
+        {
+            if (rating == 0 || string.IsNullOrWhiteSpace(comment))
+            {
+                TempData["ErrorMessage"] = "Rating and comment are required.";
+                return RedirectToAction("Property_details", new { id = propertyId });
+            }
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+                {
+                    string query = @"INSERT INTO Reviews (PropertyID, UserID, Rating, Comment, ReviewDate)
+                     VALUES (@PropertyID, @UserID, @Rating, @Comment, @CreatedAt)";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@PropertyID", propertyId);
+                        cmd.Parameters.AddWithValue("@UserID", userId);
+                        cmd.Parameters.AddWithValue("@Rating", rating);
+                        cmd.Parameters.AddWithValue("@Comment", comment);
+                        cmd.Parameters.AddWithValue("@CreatedAt", DateTime.Now);
+
+                        conn.Open();
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+
+                TempData["SuccessMessage"] = "Review submitted successfully.";
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                TempData["ErrorMessage"] = "Error submitting review: " + ex.Message;
+            }
+
+            return RedirectToAction("Property_details", new { id = propertyId });
+        }
+
+
+        [HttpPost]
+        public IActionResult SubmitInquiry(int userId, int propertyId, string message)
+        {
+            if (string.IsNullOrWhiteSpace(message))
+            {
+                TempData["InquiryError"] = "Please enter a message.";
+                return RedirectToAction("Property_details", new { id = propertyId });
+            }
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+                {
+                    string query = @"INSERT INTO Inquiries (UserID, PropertyID, Message, InquiryDate)
+                     VALUES (@UserID, @PropertyID, @Message, @InquiryDate)";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@UserID", userId);
+                        cmd.Parameters.AddWithValue("@PropertyID", propertyId);
+                        cmd.Parameters.AddWithValue("@Message", message);
+                        cmd.Parameters.AddWithValue("@InquiryDate", DateTime.Now);
+
+                        conn.Open();
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+
+                TempData["InquirySuccess"] = "Inquiry sent successfully!";
+            }
+            catch (Exception ex)
+            {
+                TempData["InquiryError"] = "Error: " + ex.Message;
+            }
+
+            return RedirectToAction("Property_details", new { id = propertyId });
         }
 
         [HttpGet]

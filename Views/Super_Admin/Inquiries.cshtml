@@ -31,9 +31,9 @@
                 </tr>
             </thead>
             <tbody id="messageTableBody">
-                @if (Model != null)
+                @if (Model != null && Model.PagedMessages != null && Model.PagedMessages.Any())
                 {
-                    @foreach (var message in Model.PagedMessages)
+                    foreach (var message in Model.PagedMessages)
                     {
                         <tr>
                             <td>@message.Name</td>
@@ -42,7 +42,16 @@
                             <td>@message.Contact</td>
                             <td>@message.Message</td>
                             <td>
-                                <a href="#">View</a>
+                                <!-- Inquiry Deletion Form -->
+                                <form asp-action="DeleteInquiry" asp-controller="Super_Admin" method="post"
+                                      onsubmit="return confirm('Are you sure you want to delete this inquiry?');">
+                                    <input type="hidden" name="inquiryId" value="@message.Id" />
+                                    <input type="hidden" name="propertyId" value="@message.PropertyId" />
+                                    <button type="submit" style="background:none;border:none;color:red;" title="Delete">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
+
                             </td>
                         </tr>
                     }
@@ -54,6 +63,7 @@
                     </tr>
                 }
             </tbody>
+
         </table>
     </div>
 
@@ -107,4 +117,31 @@
             renderPaginationButtons();
         }
     });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const searchInput = document.getElementById("searchMessages");
+        const tableBody = document.getElementById("messageTableBody");
+
+        searchInput.addEventListener("input", function () {
+            const query = searchInput.value.toLowerCase();
+            const rows = tableBody.getElementsByTagName("tr");
+
+            Array.from(rows).forEach(row => {
+                const cells = row.getElementsByTagName("td");
+                let matchFound = false;
+
+                // Loop through each cell in the row
+                Array.from(cells).forEach(cell => {
+                    if (cell.textContent.toLowerCase().includes(query)) {
+                        matchFound = true;
+                    }
+                });
+
+                // Toggle row visibility based on match
+                row.style.display = matchFound ? "" : "none";
+            });
+        });
+    });
+
 </script>

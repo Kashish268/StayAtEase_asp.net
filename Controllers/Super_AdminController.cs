@@ -411,45 +411,71 @@ namespace WebApplication1.Controllers
         }
 
         [HttpGet]
-        public IActionResult Total_Properties()
+     public IActionResult Total_Properties()
+{
+    var model = new SuperAdminDashboardViewModel();
+    model.Properties = new List<PropertyViewModel>();
+
+    string connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+    using (SqlConnection conn = new SqlConnection(connectionString))
+    {
+        conn.Open();
+
+        // 1. Fetch Property Details
+        string propertyQuery = @"
+            SELECT 
+                p.PropertyId, p.Title, p.Price, p.Address, p.ImagePaths, p.IsAvailable,
+                u.name AS AddedBy,
+                (SELECT COUNT(*) FROM Reviews r WHERE r.PropertyID = p.PropertyId) AS TotalReviews,
+                (SELECT COUNT(*) FROM Inquiries i WHERE i.PropertyID = p.PropertyId) AS TotalInquiries
+            FROM Properties p
+            INNER JOIN users u ON p.UserId = u.user_id";
+
+        using (SqlCommand cmd = new SqlCommand(propertyQuery, conn))
+        using (SqlDataReader reader = cmd.ExecuteReader())
         {
-            List<PropertyViewModel> properties = new List<PropertyViewModel>();
-            string connectionString = _configuration.GetConnectionString("DefaultConnection");
-
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            while (reader.Read())
             {
-                string query = @"
-        SELECT 
-            p.PropertyId, p.Title, p.Price, p.Address, p.ImagePaths, 
-            u.name AS AddedBy,
-            (SELECT COUNT(*) FROM Reviews r WHERE r.PropertyID = p.PropertyId) AS TotalReviews,
-            (SELECT COUNT(*) FROM Inquiries i WHERE i.PropertyID = p.PropertyId) AS TotalInquiries
-        FROM Properties p
-        INNER JOIN users u ON p.UserId = u.user_id";
-
-                SqlCommand cmd = new SqlCommand(query, conn);
-                conn.Open();
-                SqlDataReader reader = cmd.ExecuteReader();
-
-                while (reader.Read())
+                model.Properties.Add(new PropertyViewModel
                 {
-                    properties.Add(new PropertyViewModel
-                    {
-                        Id = Convert.ToInt32(reader["PropertyId"]),
-                        Title = reader["Title"].ToString(),
-                        Price = Convert.ToDecimal(reader["Price"]),
-                        Address = reader["Address"].ToString(),
-                        ImageUrl = reader["ImagePaths"]?.ToString()?.Split(',')?.FirstOrDefault(), // if multiple images
-                        AddedBy = reader["AddedBy"].ToString(),
-                        TotalReviews = Convert.ToInt32(reader["TotalReviews"]),
-                        TotalInquiries = Convert.ToInt32(reader["TotalInquiries"]),
-                        Status = "Active" // you can later modify this with actual data
-                    });
-                }
-            }
+                    Id = Convert.ToInt32(reader["PropertyId"]),
+                    Title = reader["Title"].ToString(),
+                    Price = Convert.ToDecimal(reader["Price"]),
+                    Address = reader["Address"].ToString(),
+                    ImageUrl = reader["ImagePaths"]?.ToString()?.Split(',')?.FirstOrDefault(),
+                    AddedBy = reader["AddedBy"].ToString(),
+                    TotalReviews = Convert.ToInt32(reader["TotalReviews"]),
+                    TotalInquiries = Convert.ToInt32(reader["TotalInquiries"]),
+                    Status = reader["IsAvailable"] != DBNull.Value ? Convert.ToInt32(reader["IsAvailable"]).ToString() : "Active"
 
-            return View(properties);
+
+                });
+            }
         }
+
+                // 2. Fetch Counts
+                string countQuery = @"
+    SELECT 
+        (SELECT COUNT(*) FROM Properties) AS TotalProperties,
+        (SELECT COUNT(*) FROM Properties WHERE IsAvailable = 1) AS ActiveListings,
+        (SELECT COUNT(*) FROM Inquiries) AS TotalInquiries";
+
+                using (SqlCommand countCmd = new SqlCommand(countQuery, conn))
+        using (SqlDataReader countReader = countCmd.ExecuteReader())
+        {
+            if (countReader.Read())
+            {
+                model.TotalProperties = Convert.ToInt32(countReader["TotalProperties"]);
+                model.ActiveListings = Convert.ToInt32(countReader["ActiveListings"]);
+                model.TotalInquiries = Convert.ToInt32(countReader["TotalInquiries"]);
+            }
+        }
+    }
+
+    return View(model);
+}
+
         [HttpPost]
 public IActionResult Total_Properties(int id)
 {
@@ -478,7 +504,7 @@ public IActionResult Total_Properties(int id)
         }
     }
 
-    return RedirectToAction("TotalProperties"); // Redirect back to property list view
+    return RedirectToAction("Total_Properties"); // Redirect back to property list view
 }
         public async Task<IActionResult> Particular_property(int id)
         {
