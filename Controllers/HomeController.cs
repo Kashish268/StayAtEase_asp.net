@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Globalization;
+using Microsoft.EntityFrameworkCore;
+//using Razorpay.Api;
 
 
 namespace WebApplication1.Controllers
@@ -141,6 +143,99 @@ namespace WebApplication1.Controllers
         //}
 
 
+        //        public IActionResult Privacy()
+        //        {
+        //            List<UserProperty> properties = new List<UserProperty>();
+
+        //            string connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+        //            int? userId = HttpContext.Session.GetInt32("UserId"); // Login check
+
+        //            using (SqlConnection conn = new SqlConnection(connectionString))
+        //            {
+        //                string query;
+
+        //                if (userId != null)
+        //                {
+        //                    // If user is logged in, join Wishlist and get IsWishlisted
+        //                    query = @"
+        //            SELECT 
+        //                p.PropertyId, 
+        //                p.Title, 
+        //                p.Address AS Location, 
+        //                p.Bedrooms AS Beds, 
+        //                p.Bathrooms AS Baths, 
+        //                CAST(p.SquareFootage AS NVARCHAR) + ' sqft' AS Size, 
+        //                N'₹' + CAST(p.Price AS NVARCHAR) + '/month' AS Price, 
+        //                p.ImagePaths AS ImagePath, 
+        //                CAST(ROUND(ISNULL(AVG(r.Rating), 0), 1) AS DECIMAL(2,1)) AS Rating, 
+        //                COUNT(r.ReviewID) AS Reviews,
+        //                CASE WHEN w.UserID IS NOT NULL THEN 1 ELSE 0 END AS IsWishlisted
+        //            FROM Properties p
+        //            LEFT JOIN Reviews r ON p.PropertyId = r.PropertyID
+        //            LEFT JOIN Wishlist w ON p.PropertyId = w.PropertyID AND w.UserId = @UserId
+        //            GROUP BY 
+        //                p.PropertyId, p.Title, p.Address, p.Bedrooms, p.Bathrooms, 
+        //                p.SquareFootage, p.Price, p.ImagePaths, w.UserId";
+        //                }
+        //                else
+        //                {
+        //                    // If user is NOT logged in, IsWishlisted will always be false
+        //                    query = @"
+        //            SELECT 
+        //                p.PropertyId, 
+        //                p.Title, 
+        //                p.Address AS Location, 
+        //                p.Bedrooms AS Beds, 
+        //                p.Bathrooms AS Baths, 
+        //p.PropertyType ,
+        //                CAST(p.SquareFootage AS NVARCHAR) + ' sqft' AS Size, 
+        //                N'₹' + CAST(p.Price AS NVARCHAR) + '/month' AS Price, 
+        //                p.ImagePaths AS ImagePath, 
+        //                CAST(ROUND(ISNULL(AVG(r.Rating), 0), 1) AS DECIMAL(2,1)) AS Rating, 
+        //                COUNT(r.ReviewID) AS Reviews,
+        //                0 AS IsWishlisted
+        //            FROM Properties p
+        //            LEFT JOIN Reviews r ON p.PropertyId = r.PropertyID
+        //            GROUP BY 
+        //                p.PropertyId, p.Title, p.Address, p.Bedrooms, p.Bathrooms, 
+        //                p.SquareFootage, p.Price, p.ImagePaths, p.PropertyType";
+        //                }
+
+        //                SqlCommand cmd = new SqlCommand(query, conn);
+
+        //                if (userId != null)
+        //                {
+        //                    cmd.Parameters.AddWithValue("@UserId", userId);
+        //                }
+
+        //                conn.Open();
+        //                SqlDataReader reader = cmd.ExecuteReader();
+
+        //                while (reader.Read())
+        //                {
+        //                    properties.Add(new UserProperty
+        //                    {
+        //                        PropertyID = Convert.ToInt32(reader["PropertyID"]),
+        //                        Title = reader["Title"].ToString(),
+        //                        Location = reader["Location"].ToString(),
+        //                        Beds = Convert.ToInt32(reader["Beds"]),
+        //                        Baths = Convert.ToInt32(reader["Baths"]),
+        //                        Size = reader["Size"].ToString(),
+        //                        Price = reader["Price"].ToString(),
+        //                        ImagePath = reader["ImagePath"].ToString(),
+        //                        PropertyType = reader["PropertyType"].ToString(),
+        //                        Rating = Convert.ToDecimal(reader["Rating"]),
+        //                        Reviews = Convert.ToInt32(reader["Reviews"]),
+        //                        IsWishlisted = Convert.ToInt32(reader["IsWishlisted"]) == 1
+        //                    });
+        //                }
+        //            }
+
+        //            ViewData["ActivePage"] = "Privacy";
+        //            return View(properties);
+        //        }
+
         public IActionResult Privacy()
         {
             List<UserProperty> properties = new List<UserProperty>();
@@ -157,47 +252,48 @@ namespace WebApplication1.Controllers
                 {
                     // If user is logged in, join Wishlist and get IsWishlisted
                     query = @"
-            SELECT 
-                p.PropertyId, 
-                p.Title, 
-                p.Address AS Location, 
-                p.Bedrooms AS Beds, 
-                p.Bathrooms AS Baths, 
-                CAST(p.SquareFootage AS NVARCHAR) + ' sqft' AS Size, 
-                N'₹' + CAST(p.Price AS NVARCHAR) + '/month' AS Price, 
-                p.ImagePaths AS ImagePath, 
-                CAST(ROUND(ISNULL(AVG(r.Rating), 0), 1) AS DECIMAL(2,1)) AS Rating, 
-                COUNT(r.ReviewID) AS Reviews,
-                CASE WHEN w.UserID IS NOT NULL THEN 1 ELSE 0 END AS IsWishlisted
-            FROM Properties p
-            LEFT JOIN Reviews r ON p.PropertyId = r.PropertyID
-            LEFT JOIN Wishlist w ON p.PropertyId = w.PropertyID AND w.UserId = @UserId
-            GROUP BY 
-                p.PropertyId, p.Title, p.Address, p.Bedrooms, p.Bathrooms, 
-                p.SquareFootage, p.Price, p.ImagePaths, w.UserId";
+                SELECT 
+                    p.PropertyId, 
+                    p.Title, 
+                    p.Address AS Location, 
+                    p.Bedrooms AS Beds, 
+                    p.Bathrooms AS Baths, 
+                    p.PropertyType,  -- Added PropertyType here
+                    CAST(p.SquareFootage AS NVARCHAR) + ' sqft' AS Size, 
+                    N'₹' + CAST(p.Price AS NVARCHAR) + '/month' AS Price, 
+                    p.ImagePaths AS ImagePath, 
+                    CAST(ROUND(ISNULL(AVG(r.Rating), 0), 1) AS DECIMAL(2,1)) AS Rating, 
+                    COUNT(r.ReviewID) AS Reviews,
+                    CASE WHEN w.UserID IS NOT NULL THEN 1 ELSE 0 END AS IsWishlisted
+                FROM Properties p
+                LEFT JOIN Reviews r ON p.PropertyId = r.PropertyID
+                LEFT JOIN Wishlist w ON p.PropertyId = w.PropertyID AND w.UserId = @UserId
+                GROUP BY 
+                    p.PropertyId, p.Title, p.Address, p.Bedrooms, p.Bathrooms, 
+                    p.PropertyType, p.SquareFootage, p.Price, p.ImagePaths, w.UserId";
                 }
                 else
                 {
                     // If user is NOT logged in, IsWishlisted will always be false
                     query = @"
-            SELECT 
-                p.PropertyId, 
-                p.Title, 
-                p.Address AS Location, 
-                p.Bedrooms AS Beds, 
-                p.Bathrooms AS Baths, 
-p.PropertyType ,
-                CAST(p.SquareFootage AS NVARCHAR) + ' sqft' AS Size, 
-                N'₹' + CAST(p.Price AS NVARCHAR) + '/month' AS Price, 
-                p.ImagePaths AS ImagePath, 
-                CAST(ROUND(ISNULL(AVG(r.Rating), 0), 1) AS DECIMAL(2,1)) AS Rating, 
-                COUNT(r.ReviewID) AS Reviews,
-                0 AS IsWishlisted
-            FROM Properties p
-            LEFT JOIN Reviews r ON p.PropertyId = r.PropertyID
-            GROUP BY 
-                p.PropertyId, p.Title, p.Address, p.Bedrooms, p.Bathrooms, 
-                p.SquareFootage, p.Price, p.ImagePaths, p.PropertyType";
+                SELECT 
+                    p.PropertyId, 
+                    p.Title, 
+                    p.Address AS Location, 
+                    p.Bedrooms AS Beds, 
+                    p.Bathrooms AS Baths, 
+                    p.PropertyType,  -- Added PropertyType here as well
+                    CAST(p.SquareFootage AS NVARCHAR) + ' sqft' AS Size, 
+                    N'₹' + CAST(p.Price AS NVARCHAR) + '/month' AS Price, 
+                    p.ImagePaths AS ImagePath, 
+                    CAST(ROUND(ISNULL(AVG(r.Rating), 0), 1) AS DECIMAL(2,1)) AS Rating, 
+                    COUNT(r.ReviewID) AS Reviews,
+                    0 AS IsWishlisted
+                FROM Properties p
+                LEFT JOIN Reviews r ON p.PropertyId = r.PropertyID
+                GROUP BY 
+                    p.PropertyId, p.Title, p.Address, p.Bedrooms, p.Bathrooms, 
+                    p.PropertyType, p.SquareFootage, p.Price, p.ImagePaths";
                 }
 
                 SqlCommand cmd = new SqlCommand(query, conn);
@@ -214,15 +310,15 @@ p.PropertyType ,
                 {
                     properties.Add(new UserProperty
                     {
-                        PropertyID = Convert.ToInt32(reader["PropertyID"]),
+                        PropertyID = Convert.ToInt32(reader["PropertyId"]),  // Corrected to PropertyId instead of PropertyID
                         Title = reader["Title"].ToString(),
                         Location = reader["Location"].ToString(),
                         Beds = Convert.ToInt32(reader["Beds"]),
                         Baths = Convert.ToInt32(reader["Baths"]),
+                        PropertyType = reader["PropertyType"].ToString(),  // Added PropertyType
                         Size = reader["Size"].ToString(),
                         Price = reader["Price"].ToString(),
                         ImagePath = reader["ImagePath"].ToString(),
-                        PropertyType = reader["PropertyType"].ToString(),
                         Rating = Convert.ToDecimal(reader["Rating"]),
                         Reviews = Convert.ToInt32(reader["Reviews"]),
                         IsWishlisted = Convert.ToInt32(reader["IsWishlisted"]) == 1
@@ -233,6 +329,7 @@ p.PropertyType ,
             ViewData["ActivePage"] = "Privacy";
             return View(properties);
         }
+
 
         public IActionResult WishList()
         {
@@ -312,32 +409,34 @@ GROUP BY
         public IActionResult Property_details(int id)
         {
             UserProperty property = null;
-
             string connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+            int? userId = HttpContext.Session.GetInt32("UserId");
 
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
+                // Fetch property details with average rating and review count
                 string query = @"
-        SELECT 
-            p.PropertyId, 
-            p.Title, 
-            p.Address AS Location, 
-            p.Bedrooms AS Beds, 
-            p.Bathrooms AS Baths, 
-            CAST(p.SquareFootage AS NVARCHAR) + ' sqft' AS Size, 
-            N'₹' + CAST(p.Price AS NVARCHAR) + '/month' AS Price, 
-            p.ImagePaths AS ImagePath, 
-            CAST(ROUND(ISNULL(AVG(r.Rating), 0), 1) AS DECIMAL(2,1)) AS Rating, 
-            COUNT(r.ReviewID) AS Reviews
-        FROM Properties p
-        LEFT JOIN Reviews r ON p.PropertyId = r.PropertyID
-        WHERE p.PropertyId = @PropertyId
-        GROUP BY 
-            p.PropertyId, p.Title, p.Address, p.Bedrooms, p.Bathrooms, 
-            p.SquareFootage, p.Price, p.ImagePaths";
+SELECT 
+    p.PropertyId, 
+    p.Title, 
+    p.Address AS Location, 
+    p.Bedrooms AS Beds, 
+    p.Bathrooms AS Baths, 
+    CAST(p.SquareFootage AS NVARCHAR) + ' sqft' AS Size, 
+    N'₹' + CAST(p.Price AS NVARCHAR) + '/month' AS Price, 
+    p.ImagePaths AS ImagePath, 
+    CAST(ROUND(ISNULL(AVG(r.Rating), 0), 1) AS DECIMAL(2,1)) AS Rating, 
+    COUNT(r.ReviewID) AS Reviews
+FROM Properties p
+LEFT JOIN Reviews r ON p.PropertyId = r.PropertyID
+WHERE p.PropertyId = @PropertyId
+GROUP BY 
+    p.PropertyId, p.Title, p.Address, p.Bedrooms, p.Bathrooms, 
+    p.SquareFootage, p.Price, p.ImagePaths";
 
                 SqlCommand cmd = new SqlCommand(query, conn);
-                cmd.Parameters.AddWithValue("@PropertyId", id);  // Passing the PropertyId to the query
+                cmd.Parameters.AddWithValue("@PropertyId", id);
 
                 conn.Open();
                 SqlDataReader reader = cmd.ExecuteReader();
@@ -355,18 +454,129 @@ GROUP BY
                         Price = reader["Price"].ToString(),
                         ImagePath = reader["ImagePath"].ToString(),
                         Rating = Convert.ToDecimal(reader["Rating"]),
-                        Reviews = Convert.ToInt32(reader["Reviews"])
+                        Reviews = Convert.ToInt32(reader["Reviews"]),
+                        UserReview = null // will be set below if logged in
                     };
+                }
+
+                reader.Close();
+
+                // If user is logged in, get their review for this property
+                if (property != null && userId.HasValue)
+                {
+                    string reviewQuery = "SELECT TOP 1 * FROM Reviews WHERE PropertyID = @PropertyId AND UserID = @UserId";
+
+                    SqlCommand reviewCmd = new SqlCommand(reviewQuery, conn);
+                    reviewCmd.Parameters.AddWithValue("@PropertyId", id);
+                    reviewCmd.Parameters.AddWithValue("@UserId", userId.Value);
+
+                    SqlDataReader reviewReader = reviewCmd.ExecuteReader();
+                    if (reviewReader.Read())
+                    {
+                        property.UserReview = new Review
+                        {
+                            ReviewID = Convert.ToInt32(reviewReader["ReviewID"]),
+                            Rating = Convert.ToInt32(reviewReader["Rating"]),
+                            Comment = reviewReader["Comment"].ToString()
+                        };
+                    }
+                    reviewReader.Close();
                 }
             }
 
             if (property == null)
             {
-                return NotFound();  // If the property was not found, return a 404 error.
+                return NotFound();
             }
 
-            return View(property);  // Passing the property details to the view.
+            return View(property);
         }
+
+
+        //       public IActionResult Property_details(int id)
+        //       {
+        //           UserProperty property = null;
+        //           bool isPaymentDone = false;  // Add this to track payment status
+
+        //           string connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+        //           using (SqlConnection conn = new SqlConnection(connectionString))
+        //           {
+        //               string query = @"
+        //SELECT 
+        //    p.PropertyId, 
+        //    p.Title, 
+        //    p.Address AS Location, 
+        //    p.Bedrooms AS Beds, 
+        //    p.Bathrooms AS Baths, 
+        //    CAST(p.SquareFootage AS NVARCHAR) + ' sqft' AS Size, 
+        //    N'₹' + CAST(p.Price AS NVARCHAR) + '/month' AS Price, 
+        //    p.ImagePaths AS ImagePath, 
+        //    CAST(ROUND(ISNULL(AVG(r.Rating), 0), 1) AS DECIMAL(2,1)) AS Rating, 
+        //    COUNT(r.ReviewID) AS Reviews
+        //FROM Properties p
+        //LEFT JOIN Reviews r ON p.PropertyId = r.PropertyID
+        //WHERE p.PropertyId = @PropertyId
+        //GROUP BY 
+        //    p.PropertyId, p.Title, p.Address, p.Bedrooms, p.Bathrooms, 
+        //    p.SquareFootage, p.Price, p.ImagePaths";
+
+        //               SqlCommand cmd = new SqlCommand(query, conn);
+        //               cmd.Parameters.AddWithValue("@PropertyId", id);  // Passing the PropertyId to the query
+
+        //               conn.Open();
+        //               SqlDataReader reader = cmd.ExecuteReader();
+
+        //               if (reader.Read())
+        //               {
+        //                   property = new UserProperty
+        //                   {
+        //                       PropertyID = Convert.ToInt32(reader["PropertyID"]),
+        //                       Title = reader["Title"].ToString(),
+        //                       Location = reader["Location"].ToString(),
+        //                       Beds = Convert.ToInt32(reader["Beds"]),
+        //                       Baths = Convert.ToInt32(reader["Baths"]),
+        //                       Size = reader["Size"].ToString(),
+        //                       Price = reader["Price"].ToString(),
+        //                       ImagePath = reader["ImagePath"].ToString(),
+        //                       Rating = Convert.ToDecimal(reader["Rating"]),
+        //                       Reviews = Convert.ToInt32(reader["Reviews"])
+        //                   };
+        //               }
+        //           }
+
+        //           // Add a second query to check if the payment is done
+        //           if (property != null)
+        //           {
+        //               var userId = HttpContext.Session.GetInt32("UserId");
+
+        //               if (userId.HasValue)
+        //               {
+        //                   string paymentQuery = @"
+        //                   SELECT COUNT(*) 
+        //                   FROM Payments 
+        //                   WHERE UserId = @UserId AND PropertyId = @PropertyId AND PaymentStatus = 'Success'";
+
+        //                   SqlCommand paymentCmd = new SqlCommand(paymentQuery, conn);
+        //                   paymentCmd.Parameters.AddWithValue("@UserId", userId.Value);
+        //                   paymentCmd.Parameters.AddWithValue("@PropertyId", id);
+
+        //                   int paymentCount = (int)paymentCmd.ExecuteScalar();
+        //                   isPaymentDone = paymentCount > 0;
+        //               }
+        //           }
+        //       }
+
+        //           if (property == null)
+        //           {
+        //               return NotFound();  // If the property was not found, return a 404 error.
+        //           }
+        //   // Set the payment status in ViewBag to check on the front end
+        //   ViewBag.PaymentDone = isPaymentDone;
+
+        //           return View(property);  // Passing the property details to the view.
+        //       }
+
 
 
         [HttpPost]
@@ -404,6 +614,44 @@ GROUP BY
             {
                 Console.WriteLine(ex.Message);
                 TempData["ErrorMessage"] = "Error submitting review: " + ex.Message;
+            }
+
+            return RedirectToAction("Property_details", new { id = propertyId });
+        }
+        [HttpPost]
+        public IActionResult UpdateReview(int reviewId, int propertyId, int rating, string comment)
+        {
+            if (rating == 0 || string.IsNullOrWhiteSpace(comment))
+            {
+                TempData["ErrorMessage"] = "Rating and comment are required.";
+                return RedirectToAction("Property_details", new { id = propertyId });
+            }
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+                {
+                    string query = @"UPDATE Reviews 
+                             SET Rating = @Rating, Comment = @Comment, ReviewDate = @UpdatedAt 
+                             WHERE ReviewID = @ReviewID";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@Rating", rating);
+                        cmd.Parameters.AddWithValue("@Comment", comment);
+                        cmd.Parameters.AddWithValue("@UpdatedAt", DateTime.Now);
+                        cmd.Parameters.AddWithValue("@ReviewID", reviewId);
+
+                        conn.Open();
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+
+                TempData["SuccessMessage"] = "Review updated successfully.";
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "Error updating review: " + ex.Message;
             }
 
             return RedirectToAction("Property_details", new { id = propertyId });
@@ -605,7 +853,7 @@ GROUP BY
             }
         }
 
-
+        
 
 
         //public IActionResult Dashboard() { 

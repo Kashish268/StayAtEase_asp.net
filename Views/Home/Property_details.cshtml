@@ -1,7 +1,7 @@
 ﻿@{
     ViewData["Title"] = "Property_details";
     var isLoggedIn = Context.Session.GetString("UserId") != null;
-
+    // var paymentDone = ViewBag.PaymentDone as bool? ?? false;
 }
 <style>
     .star {
@@ -14,6 +14,7 @@
             color: #ffcc00;
         }
 </style>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 @model WebApplication1.Models.UserProperty
 
 <div class="property-info custom-property">
@@ -94,7 +95,22 @@
                         <small style="color:#4B5563;">Senior Property Consultant</small>
                     </div>
                 </div>
-                <button class="btn btn-primary w-100 mb-2">Payment</button>
+                 <form method="post" asp-controller="Payment" asp-action="Payment"> 
+                     <input type="hidden" name="propertyId" value=" @Model.PropertyID" /> 
+                     <button type="submit" class="btn btn-primary w-100 mb-2">Proceed to Payment</button> 
+                 </form> 
+                @* @if (paymentDone) *@
+                @* { *@
+                @*     <button class="btn btn-success w-100 mb-2" disabled>Payment Done</button> *@
+                @* } *@
+                @* else *@
+                @* { *@
+                @*     <form method="post" asp-controller="Payment" asp-action="Payment"> *@
+                @*         <input type="hidden" name="propertyId" value="@Model.PropertyID" /> *@
+                @*         <button type="submit" class="btn btn-primary w-100 mb-2">Proceed to Payment</button> *@
+                @*     </form> *@
+                @* } *@
+
                 <button class="btn btn-outline-primary w-100 mb-2" data-bs-toggle="modal" data-bs-target="#inquiryModal">
                     ✉️ Send Inquiry
                 </button>
@@ -297,59 +313,59 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content p-2" style="border-radius: 12px; max-width: 500px; margin: auto;">
             <div class="modal-header border-0">
-                <h4 class="modal-title fw-bold" id="reviewModalLabel">Write Your Review</h4>
+                <h4 class="modal-title fw-bold" id="reviewModalLabel">@(Model.UserReview != null ? "Edit Your Review" : "Write Your Review")</h4>
                 <button type="button" class="btn-close position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-           <div class="modal-body">
-    @if (isLoggedIn)
+            <div class="modal-body">
+                @if (isLoggedIn)
                 {
-                    <form method="POST" action="@Url.Action("SubmitReview", "Home")">
+                    <form method="POST" action="@Url.Action(Model.UserReview != null ? "UpdateReview" : "SubmitReview", "Home")">
                         <label class="fw-semibold">Rating</label>
                         <div class="mb-3">
-                            <span class="star" data-value="1">★</span>
-                            <span class="star" data-value="2">★</span>
-                            <span class="star" data-value="3">★</span>
-                            <span class="star" data-value="4">★</span>
-                            <span class="star" data-value="5">★</span>
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                <span class="star @(Model.UserReview != null && i <= Model.UserReview.Rating ? "text-warning" : "")" data-value="@i">★</span>
+                            }
                         </div>
 
-                        <input type="hidden" name="rating" id="ratingInput" />
+                        <input type="hidden" name="rating" id="ratingInput" value="@(Model.UserReview?.Rating ?? 0)" />
 
                         <div class="mb-3">
                             <label for="reviewText" class="form-label fw-semibold">Your Review</label>
-                            <textarea class="form-control" id="reviewText" name="comment" rows="4" placeholder="Share your experience..."></textarea>
+                            <textarea class="form-control" id="reviewText" name="comment" rows="4" placeholder="Share your experience...">@Model.UserReview?.Comment</textarea>
                         </div>
 
                         <input type="hidden" name="propertyId" value="@Model.PropertyID" />
                         <input type="hidden" name="userId" value="@Context.Session.GetInt32("UserId")" />
+                        @if (Model.UserReview != null)
+                        {
+                            <input type="hidden" name="reviewId" value="@Model.UserReview.ReviewID" />
+                        }
 
-                        <button type="submit" class="btn btn-primary w-100">Submit Review</button>
+                        <button type="submit" class="btn btn-@(Model.UserReview != null ? "success" : "primary") w-100">
+                            @(Model.UserReview != null ? "Update Review" : "Submit Review")
+                        </button>
                     </form>
-
 
                     @if (TempData["InquirySuccess"] != null)
                     {
-                        <div class="alert alert-success">@TempData["InquirySuccess"]</div>
+                        <div class="alert alert-success mt-3">@TempData["InquirySuccess"]</div>
                     }
                     @if (TempData["InquiryError"] != null)
                     {
-                        <div class="alert alert-danger">@TempData["InquiryError"]</div>
+                        <div class="alert alert-danger mt-3">@TempData["InquiryError"]</div>
                     }
-
-                   
-
                 }
                 else
-    {
-        <!-- ❌ Not logged in – show message -->
-        <div class="alert alert-warning text-center mb-0" role="alert" style="border-radius: 8px;">
-            Please log in to write a review.
+                {
+                    <div class="alert alert-warning text-center mb-0" role="alert" style="border-radius: 8px;">
+                        Please log in to write a review.
+                    </div>
+                }
+            </div>
         </div>
-    }
-
     </div>
 </div>
-
 
 
     <!-- Bootstrap Modal -->
@@ -404,6 +420,22 @@
     @*         star.style.color = index < rating ? '#ffcc00' : ''; *@
     @*     }); *@
     @* } *@
+            <script>
+            document.querySelectorAll('.star').forEach(star => {
+                star.addEventListener('click', function () {
+                    const rating = this.dataset.value;
+                    document.getElementById('ratingInput').value = rating;
+
+                    document.querySelectorAll('.star').forEach(s => {
+                        s.classList.remove('text-warning');
+                        if (s.dataset.value <= rating) {
+                            s.classList.add('text-warning');
+                        }
+                    });
+                });
+            });
+        </script>
+
 </script>
         <script>
             const stars = document.querySelectorAll('.star');

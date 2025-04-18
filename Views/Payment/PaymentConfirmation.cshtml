@@ -1,0 +1,44 @@
+﻿
+@{
+    ViewData["Title"] = "PaymentConformation";
+}
+
+<h2>Pay Now</h2>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    var options = {
+        "key": "@ViewBag.Key",
+        "amount": "@((decimal)ViewBag.Amount * 100)",
+        "currency": "INR",
+        "name": "StayAtEase",
+        "description": "Property Rent Payment",
+        "order_id": "@ViewBag.orderId",
+        "handler": function (response) {
+
+            // POST to server to verify payment
+            fetch('/Payment/VerifyPayment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: `razorpayPaymentId=${response.razorpay_payment_id}&orderId=${response.razorpay_order_id}&razorpaySignature=${response.razorpay_signature}`
+        }).then(response => window.location.href = response.url);},
+        "prefill": {
+            "name": "Test User",
+            "email": "test@example.com"
+        },
+        "theme": { "color": "#F37254" }
+    };
+    var rzp1 = new Razorpay(options);
+    rzp1.open();
+</script>
+
+
+<h2>Confirm Payment</h2>
+<p>Your Order ID is: @ViewBag.orderId</p>
+
+<form method="post" action="/Payment/VerifyPayment">
+    <input type="hidden" name="orderId" value="@ViewBag.OrderId" />
+    <input type="hidden" name="razorpayPaymentId" value="your_payment_id_here" /> <!-- You will get this after Razorpay handles the payment -->
+    <input type="hidden" name="razorpaySignature" value="your_signature_here" /> <!-- You will get this after Razorpay handles the payment -->
+    <button type="submit">Verify Payment</button>
+</form>
+

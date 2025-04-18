@@ -1,0 +1,37 @@
+﻿@model WebApplication1.Models.PaymentViewModel
+
+
+@{
+    ViewBag.Title = "Payment";
+    var isLoggedIn = ViewBag.IsLoggedIn as bool?;
+}
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<h2>Payment Page</h2>
+
+@if (isLoggedIn == false)
+{
+    <div class="alert alert-warning">Please login for payment.</div>
+}
+else
+{
+    var details = ViewBag.PaymentDetails as PaymentViewModel;
+    @if (details != null)
+    {
+        <p><strong>User ID:</strong> @details.UserId</p>
+        <p><strong>Property ID:</strong> @details.PropertyId</p>
+        <p><strong>Title:</strong> @details.PropertyTitle</p>
+        <p><strong>Location:</strong> @details.PropertyLocation</p>
+        <p><strong>Rent Amount:</strong> ₹@details.RentAmount</p>
+        <form method="post" action="/Payment/ProceedPayment">
+            <input type="hidden" name="userId" value="@details.UserId" />
+            <input type="hidden" name="propertyId" value="@details.PropertyId" />
+            <input type="hidden" name="amount" value="@details.RentAmount" />
+            <button type="submit" class="btn btn-primary">Proceed to Pay</button>
+        </form>
+    }
+    else
+    {
+        <div class="alert alert-danger">Error: Payment details are missing.</div>
+    }
+}

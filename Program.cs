@@ -4,6 +4,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddDistributedMemoryCache(); // Required for session
 builder.Services.AddSession();                // Enables session
+builder.Services.AddScoped<PaymentService>();
 
 var app = builder.Build();
 
