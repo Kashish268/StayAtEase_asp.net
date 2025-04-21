@@ -14,7 +14,12 @@
     <div class="mb-3">
 
         <label for="password" class="form-label">Password</label>
+            <div class="input-group">
         <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password"  minlength="6">
+            <span class="input-group-text" onclick="togglePassword()" style="cursor: pointer;">
+                <i class="fa fa-eye" id="toggleIcon"></i>
+            </span>
+            </div>
         <span id="passwordError" class="text-danger"></span>
     </div>
 
@@ -96,6 +101,18 @@
     });
 });
 
+    function togglePassword() {
+        const passwordInput = document.getElementById("passwordInput");
+        const toggleIcon = document.getElementById("toggleIcon");
+
+        const isPassword = passwordInput.type === "password";
+        passwordInput.type = isPassword ? "text" : "password";
+        toggleIcon.classList = isPassword ? "fa fa-eye-slash" : "fa fa-eye";
+    }
+
 </script>
+
+
+
 
 

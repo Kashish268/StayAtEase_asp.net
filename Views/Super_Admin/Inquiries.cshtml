@@ -43,7 +43,7 @@
                             <td>@message.Message</td>
                             <td>
                                 <!-- Inquiry Deletion Form -->
-                                <form asp-action="DeleteInquiry" asp-controller="Super_Admin" method="post"
+                                <form asp-action="inquiries" asp-controller="Super_Admin" method="post"
                                       onsubmit="return confirm('Are you sure you want to delete this inquiry?');">
                                     <input type="hidden" name="inquiryId" value="@message.Id" />
                                     <input type="hidden" name="propertyId" value="@message.PropertyId" />

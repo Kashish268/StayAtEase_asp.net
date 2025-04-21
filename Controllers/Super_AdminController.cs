@@ -628,11 +628,11 @@ public IActionResult Total_Properties(int id)
 
             return View("Particular_property", propertyDetails); ;
         }
-        [HttpDelete]
-        public IActionResult DeleteInquiry(int inquiryId, int propertyId)
+        [HttpPost]
+        public IActionResult inquiries(int inquiryId, int propertyId)
         {
             // Define the connection string (ensure to replace with your actual connection string)
-            string connectionString = "YourConnectionStringHere";
+            string connectionString = _configuration.GetConnectionString("DefaultConnection");
 
             // Define the query to delete the inquiry
             string query = "DELETE FROM Inquiries WHERE InquiryId = @InquiryId";
@@ -656,13 +656,13 @@ public IActionResult Total_Properties(int id)
             }
 
             // Redirect to the property details page after deletion
-            return RedirectToAction("Particular_property", new { id = propertyId });
+            return RedirectToAction("inquiries", new { id = propertyId });
         }
         [HttpDelete]
         public IActionResult DeleteReview(int reviewId, int propertyId)
         {
             // Define the connection string (ensure to replace with your actual connection string)
-            string connectionString = "YourConnectionStringHere";
+            string connectionString = _configuration.GetConnectionString("DefaultConnection");
 
             // Define the query to delete the review
             string query = "DELETE FROM Reviews WHERE ReviewId = @ReviewId";
