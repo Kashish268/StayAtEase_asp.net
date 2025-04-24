@@ -7,6 +7,7 @@ namespace WebApplication1.Models
     {
         // Unique ID for each message (from DB)
         public int Id { get; set; }
+        public int InquiryId { get; set; }
 
         // Guest name (user's name who sent the message)
         public string Name { get; set; }

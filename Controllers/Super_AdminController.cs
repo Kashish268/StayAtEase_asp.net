@@ -112,33 +112,40 @@ namespace WebApplication1.Controllers
 
             return View(tenants);
         }
+
         [HttpPost]
         public IActionResult Total_User(int id)
         {
+            var redirect = RedirectToLoginIfNotLoggedIn();
+            if (redirect != null) return redirect;
+
             string connectionString = _configuration.GetConnectionString("DefaultConnection");
 
-            try
+            using (SqlConnection conn = new SqlConnection(connectionString))
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
-                {
-                    string query = "DELETE FROM users WHERE user_id = @UserId AND role = 'Tenant'";
-                    SqlCommand cmd = new SqlCommand(query, conn);
-                    cmd.Parameters.AddWithValue("@UserId", id);
+                conn.Open();
 
-                    conn.Open();
-                    cmd.ExecuteNonQuery();
+                // Step 1: Delete from Payments
+                string deletePayments = "DELETE FROM Payments WHERE UserId = @id";
+                using (SqlCommand cmdPayments = new SqlCommand(deletePayments, conn))
+                {
+                    cmdPayments.Parameters.AddWithValue("@id", id);
+                    cmdPayments.ExecuteNonQuery();
                 }
 
-                TempData["Success"] = "User deleted successfully.";
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error deleting user with ID: " + id);
-                TempData["Error"] = "Error deleting user.";
+                // Step 2: Delete from Users
+                string deleteUser = "DELETE FROM Users WHERE user_id = @id AND role = 'Tenant'";
+                using (SqlCommand cmdUser = new SqlCommand(deleteUser, conn))
+                {
+                    cmdUser.Parameters.AddWithValue("@id", id);
+                    cmdUser.ExecuteNonQuery();
+                }
             }
 
             return RedirectToAction("Total_User");
         }
+
+
         [HttpGet]
         public IActionResult Total_Admin()
         {
@@ -178,30 +185,38 @@ namespace WebApplication1.Controllers
         [HttpPost]
         public IActionResult Total_Admin(int id)
         {
+            ViewData["ActivePage"] = "Total_Admin";
+
+            var redirect = RedirectToLoginIfNotLoggedIn();
+            if (redirect != null) return redirect;
+
             string connectionString = _configuration.GetConnectionString("DefaultConnection");
 
-            try
+            using (SqlConnection conn = new SqlConnection(connectionString))
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
-                {
-                    string query = "DELETE FROM users WHERE user_id = @UserId AND role = 'RoomOwner'";
-                    SqlCommand cmd = new SqlCommand(query, conn);
-                    cmd.Parameters.AddWithValue("@UserId", id);
+                conn.Open();
 
-                    conn.Open();
-                    cmd.ExecuteNonQuery();
+                // Step 1: Delete related properties
+                string deleteProperties = "DELETE FROM Properties WHERE UserId = @UserId";
+                using (SqlCommand cmdProps = new SqlCommand(deleteProperties, conn))
+                {
+                    cmdProps.Parameters.AddWithValue("@UserId", id);
+                    cmdProps.ExecuteNonQuery();
                 }
 
-                TempData["Success"] = "Room owner deleted successfully.";
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error deleting room owner with ID: {id}");
-                TempData["Error"] = "Error deleting room owner.";
+                // Step 2: Delete the RoomOwner from users table
+                string deleteUser = "DELETE FROM users WHERE user_id = @UserId AND role = 'RoomOwner'";
+                using (SqlCommand cmdUser = new SqlCommand(deleteUser, conn))
+                {
+                    cmdUser.Parameters.AddWithValue("@UserId", id);
+                    cmdUser.ExecuteNonQuery();
+                }
             }
 
+            TempData["SuccessMessage"] = "Room Owner deleted successfully.";
             return RedirectToAction("Total_Admin");
         }
+
         [HttpGet]
         public async Task<IActionResult> Property_Reviews(string? searchTerm, int page = 1)
         {
@@ -409,6 +424,29 @@ namespace WebApplication1.Controllers
                 return View(messageListViewModel);
             }
         }
+    
+
+        [HttpPost]
+        public IActionResult Inquiries(int id)
+        {
+            string connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+            using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                string query = "DELETE FROM Inquiries WHERE InquiryID = @InquiryID";
+                SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Parameters.AddWithValue("@InquiryID", id);
+
+                con.Open();
+                cmd.ExecuteNonQuery();
+            }
+
+            TempData["SuccessMessage"] = "Inquiry deleted successfully.";
+            return RedirectToAction("Inquiries");
+        }
+
+
+
 
         [HttpGet]
      public IActionResult Total_Properties()
@@ -482,31 +520,38 @@ public IActionResult Total_Properties(int id)
 {
     string connectionString = _configuration.GetConnectionString("DefaultConnection");
 
-    using (SqlConnection conn = new SqlConnection(connectionString))
-    {
-        string query = "DELETE FROM Properties WHERE PropertyId = @Id";
-
-        using (SqlCommand cmd = new SqlCommand(query, conn))
-        {
-            cmd.Parameters.AddWithValue("@Id", id);
-
-            conn.Open();
-            int rowsAffected = cmd.ExecuteNonQuery();
-            conn.Close();
-
-            if (rowsAffected > 0)
+            using (SqlConnection conn = new SqlConnection(connectionString))
             {
-                TempData["Success"] = "Property deleted successfully.";
-            }
-            else
-            {
-                TempData["Error"] = "Failed to delete property.";
-            }
-        }
-    }
+                conn.Open();
 
-    return RedirectToAction("Total_Properties"); // Redirect back to property list view
+                // Step 1: Delete from Payments
+                string deletePayments = "DELETE FROM Payments WHERE PropertyId = @Id";
+                using (SqlCommand cmdPayments = new SqlCommand(deletePayments, conn))
+                {
+                    cmdPayments.Parameters.AddWithValue("@Id", id);
+                    cmdPayments.ExecuteNonQuery();
+                }
+
+                // Step 2: Delete from Properties
+                string deleteProperty = "DELETE FROM Properties WHERE PropertyId = @Id";
+                using (SqlCommand cmdProperty = new SqlCommand(deleteProperty, conn))
+                {
+                    cmdProperty.Parameters.AddWithValue("@Id", id);
+                    int rowsAffected = cmdProperty.ExecuteNonQuery();
+
+                    if (rowsAffected > 0)
+                        TempData["Success"] = "Property deleted successfully.";
+                    else
+                        TempData["Error"] = "Failed to delete property.";
+                }
+
+                conn.Close();
+            }
+
+
+            return RedirectToAction("Total_Properties"); // Redirect back to property list view
 }
+
         public async Task<IActionResult> Particular_property(int id)
         {
             ViewData["ActivePage"] = "Particular_property";
@@ -628,37 +673,9 @@ public IActionResult Total_Properties(int id)
 
             return View("Particular_property", propertyDetails); ;
         }
+        
+
         [HttpPost]
-        public IActionResult inquiries(int inquiryId, int propertyId)
-        {
-            // Define the connection string (ensure to replace with your actual connection string)
-            string connectionString = _configuration.GetConnectionString("DefaultConnection");
-
-            // Define the query to delete the inquiry
-            string query = "DELETE FROM Inquiries WHERE InquiryId = @InquiryId";
-
-            // Use ADO.NET to execute the query
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                SqlCommand command = new SqlCommand(query, connection);
-                command.Parameters.AddWithValue("@InquiryId", inquiryId);
-
-                try
-                {
-                    connection.Open();
-                    command.ExecuteNonQuery();
-                }
-                catch (Exception ex)
-                {
-                    // Handle exceptions (logging, etc.)
-                    ViewBag.ErrorMessage = "Error deleting inquiry: " + ex.Message;
-                }
-            }
-
-            // Redirect to the property details page after deletion
-            return RedirectToAction("inquiries", new { id = propertyId });
-        }
-        [HttpDelete]
         public IActionResult DeleteReview(int reviewId, int propertyId)
         {
             // Define the connection string (ensure to replace with your actual connection string)

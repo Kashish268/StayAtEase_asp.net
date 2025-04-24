@@ -803,7 +803,7 @@ namespace WebApplication1.Controllers
         public IActionResult DeleteInquiry(int inquiryId, int propertyId)
         {
             // Define the connection string (ensure to replace with your actual connection string)
-            string connectionString = "YourConnectionStringHere";
+            string connectionString = _configuration.GetConnectionString("DefaultConnection");
 
             // Define the query to delete the inquiry
             string query = "DELETE FROM Inquiries WHERE InquiryId = @InquiryId";
@@ -829,11 +829,11 @@ namespace WebApplication1.Controllers
             // Redirect to the property details page after deletion
             return RedirectToAction("Property_Details", new { id = propertyId });
         }
-        [HttpDelete]
+        [HttpPost]
         public IActionResult DeleteReview(int reviewId, int propertyId)
         {
             // Define the connection string (ensure to replace with your actual connection string)
-            string connectionString = "YourConnectionStringHere";
+            string connectionString = _configuration.GetConnectionString("DefaultConnection");
 
             // Define the query to delete the review
             string query = "DELETE FROM Reviews WHERE ReviewId = @ReviewId";

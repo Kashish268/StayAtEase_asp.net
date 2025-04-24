@@ -1113,7 +1113,7 @@ GROUP BY
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                TempData["ErrorMessage"] = "Error submitting review: " + ex.Message;
+               
             }
 
             return RedirectToAction("Property_details", new { id = propertyId });
